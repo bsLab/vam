@@ -1,0 +1,16 @@
+2004.1.23:
+    added get_env_caps
+
+2004.2.22:
+    Added cap environment name prefix 'CAP' handling
+
+2005.1.1:
+    changed path_resolve -> handles now empty "" paths as Unix_path
+
+2005.5.2:
+    fixed path_resolve bug with "" and "/" paths
+
+2005.5.9:
+    renamed module to Myenv
+    added string environment
+    strongly enhanced version of path_resolve introduced
