@@ -1,0 +1,35 @@
+#!/bin/bash
+
+#
+# Generate interface file from source file
+#
+
+if [ "X$VAMDIR" = "X" ] 
+then
+	VAMDIR=/amoeba/Vam-1.5
+fi
+while [ "X$1" != "X" ]
+do
+        case $1 in
+                *.ml)   IN=$1;
+                        OUT=${IN/.ml/.mli}; 
+                        OBJ=${IN/.ml/.cmo};
+                        ;;
+                *)      ARGS="$ARGS $1";;
+        esac
+        shift
+done
+
+
+$VAMDIR/bin/vamrun -b $VAMDIR/ocamlsys/bin/ocamlc 	\
+	-pp 'cpp -traditional'			\
+	-I $VAMDIR/interface			\
+	-I $VAMDIR/lib				\
+	-I $VAMDIR/ocamlsys/lib/ocaml		\
+	-I $VAMDIR/ocamlsys/lib/ocaml/threads	\
+	-c -i					\
+	$ARGS $IN > $OUT
+
+rm $OBJ
+
+
