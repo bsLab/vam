@@ -1,0 +1,34 @@
+include ../../config/Makefile.config
+
+CROSS_INC_PACKAGES=-thread
+LIBINSTALL_SUBDIR=xlib
+RESULT=X11
+SOURCES=xdebug.ml xA.ml xfifo.ml xequeue.ml jeton.ml xtypes.ml wintbl.ml xbuffer.ml xauth.ml ll_trans.ml conv_event.ml shbuf.ml display.ml xproto.ml x.ml xsync.ml xasync.ml xC.ml xK.ml keyBind.ml xlib.ml xtext.ml icccm.ml zpixmap.ml  shape.ml xmu.ml eloop.ml selection.ml xterm.ml xpm.mll xGraphics.ml xrm.mll
+DEPCROSS=-subdir .th
+INC_PACKAGES=xlib
+HTML= libX11.html
+TITLE="The <TT> X11 </TT> Library"
+
+byte:: byte-code-library cross-byte-library
+opt:: native-code-library cross-native-library
+install:: install-library
+
+xK.ml: xK.ml.cpp Makefile
+	cp xK.ml.cpp xK.ml
+	echo >> xK.ml
+	echo "let name_to_keysym = [" >> xK.ml
+	cat xK.ml.cpp | sed -n -e 's/let.*xk_\([a-zA-Z_0-9]*\).*=.*0x\([0-9A-Fa-f]*\).*$$/"\1",0x\2;/p' >> xK.ml
+	echo "]" >> xK.ml
+	echo "let keysym_to_name = [" >> xK.ml
+	cat xK.ml.cpp | sed -n -e 's/let.*xk_\([a-zA-Z_0-9]*\).*=.*0x\([0-9A-Fa-f]*\).*$$/0x\2,"\1";/p' >> xK.ml
+	echo "]" >> xK.ml
+
+shbuf.th.cmo: shbuf.th_ml
+shbuf.th.cmx: shbuf.th_ml
+
+DEMOS=demos-subdir
+
+clean:: demos-clean
+
+include ../../Makefile.generic
+-include .depend
