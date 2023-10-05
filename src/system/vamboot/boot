@@ -1,0 +1,97 @@
+(*
+**      ==================================
+**      OOOO   OOOO OOOO  O      O   OOOO
+**      O   O  O    O     O     O O  O   O
+**      O   O  O    O     O     O O  O   O
+**      OOOO   OOOO OOOO  O     OOO  OOOO
+**      O   O     O    O  O    O   O O   O
+**      O   O     O    O  O    O   O O   O
+**      OOOO   OOOO OOOO  OOOO O   O OOOO
+**      ================================== 
+**      BSSLAB, Dr. Stefan Bosse sci@bsslab.de
+**
+**    PROTECTED BY AND DISTRIBUTED UNDER THE TERMS OF: 
+**    Free Software Foundation-Europe, GNU GPL License, Version 2
+**
+**    $MODIFIEDBY:  BSSLAB
+**    $AUTHORS:     Stefan Bosse
+**    $INITIAL:     (C) 2003 BSSLAB
+**    $CREATED:     
+**    $MODIFIED:    
+**    $VERSION:     1.05
+**
+**    $INFO:
+**
+**  Default VAM boot script.
+**
+**    $ENDOFINFO
+**
+*)
+
+
+
+open Amoeba ;;
+open Vamboot ;;
+open Unix ;;
+open Cap_env ;;
+open Sema ;;
+open Stderr ;;
+open Stdcom ;;
+
+let supercap = ref nilcap ;;
+
+let defs = [|
+    { boot_name = "flipd";
+      boot_src = Unix_src (Boot_path "/unix/amoeba/Amunix/bin/flipd");
+      boot_dst = Unix_dst;
+      boot_args = [];
+      boot_env = [];
+      boot_ops = [Boot_coldstart;Boot_stop];
+      boot_deps = [];
+    };
+    { boot_name = "afs_unix";
+      boot_src = Unix_src (Boot_path "/unix/amoeba/Vam-2.0/bin/afs_unix");
+      boot_dst = Unix_dst;
+      boot_args = ["-s";"-d"];
+      boot_env = [Env_str ("VAMRUN","/unix/amoeba/Vam-2.0/bin/vamrun")];
+      boot_ops = [Boot_coldstart;
+                  Boot_stop;
+                  Boot_poll ((Boot_path "/unix/amoeba/afs/.servercap"),5);
+                  Boot_restart;
+                 ];
+      boot_deps = ["flipd"];
+    };
+    { boot_name = "dns_unix";
+      boot_src = Unix_src (Boot_path "/unix//amoeba/Vam-2.0/bin/dns_unix");
+      boot_dst = Unix_dst;
+      boot_args = ["-s";"-d"];
+      boot_env = [Env_str ("VAMRUN","/unix/amoeba/Vam-2.0/bin/vamrun")];
+      boot_ops = [Boot_coldstart;
+                  Boot_stop;
+                  Boot_poll (Boot_path ("/unix/amoeba/dns/.servercap"),5);
+                  Boot_restart;
+                 ];
+      boot_deps = ["flipd";"afs_unix"];
+    };
+    { boot_name = "boot_pub";
+      boot_src = Fun_src (fun () ->
+                        ignore (Name.name_delete "/server/boot");
+                        ignore (Name.name_append "/server/boot" 
+                                                 !supercap);
+                        boot_info ("supercap= "^(Ar.ar_cap !supercap));
+                        std_OK
+                    );
+      boot_dst = Nil_dst;
+      boot_args = [];
+      boot_env = [];
+      boot_ops = [Boot_coldstart];
+      boot_deps = ["flipd";"afs_unix";"dns_unix"];
+    };
+|];;
+
+let bs,stat = boot_init defs ;;
+supercap := bs.boot_supercap ;;
+
+boot_start_all bs ;;
+boot_loop bs ;;
+boot_wait bs ;;
