@@ -1,0 +1,46 @@
+  .S2
+    .NA Section headers .AN
+    Sections together with subsections are used to structure the
+    complete manual document.
+     
+    .TB
+      .TH Available sections .HT
+      .TR
+        .TC .B Name .R .CT
+        .TC .B begin .R .CT
+        .TC .B end .R .CT 
+        .TC .B Comment .R .CT
+      .RT
+      .TR
+        .TC Package .CT
+        .TC .[ .PK .] .CT 
+        .TC .[ .KP .] .CT
+        .TC Name argument required .CT
+      .RT
+      .TR
+        .TC Program .CT
+        .TC .[ .PR .] .CT 
+        .TC .[ .RP .] .CT
+        .TC Name argument required .CT
+      .RT
+      .TR
+        .TC Generic Section S1 .CT
+        .TC .[ .S1 .] .CT 
+        .TC .[ .1S .] .CT 
+        .TC Name argument required .CT
+      .RT
+    .BT
+    The .NA Name .AN command must follow the .NA section .AN command 
+    immediately. Here is a short example for a new .NA Package .AN 
+    section in the document:
+
+    .EX
+        .[ .PK .]
+        .# .[ .NA Standard Library .AN .]
+        .# ... 
+        .[ .KP .] 
+    .XE
+    Packages can be ML-Libraries or other kinds of programming
+    environments.
+    
+  .2S
