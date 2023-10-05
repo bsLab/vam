@@ -1,0 +1,214 @@
+  .S2
+    .NA Paragraph elements .AN
+    In this section, all generic paragraph elements like lists are 
+    described. .NL
+    There are three different kinds of list you can use:
+
+    .UL
+      .LI Numbered lists (aka ordered lists) .IL
+      .LI Unnumbered lists (aka unordered lists) .IL
+      .LI Option lists (aka definition lists) .IL
+    .LU     
+    
+    .PA .NA Lists .AN
+    Lists of different kind can be mixed and stacked to an
+    arbitrary depth.
+
+    .TB
+      .TH Lists .HT
+      .TR
+        .TC .B Name .R .CT
+        .TC .B begin .R .CT
+        .TC .B end .R .CT
+        .TC .B Comment .R .CT
+      .RT
+      .TR
+        .TC Ordered (numbered) List .CT
+        .TC .[ .OL .] .CT
+        .TC .[ .LO .] .CT
+        .TC  .CT
+      .RT
+      .TR
+        .TC Unordered List .CT
+        .TC .[ .UL .] .CT
+        .TC .[ .LU .] .CT
+        .TC .CT
+      .RT
+      .TR
+        .TC Option List .CT
+        .TC .[ .PL .] .CT
+        .TC .[ .LP .] .CT
+        .TC First command in List item must be a Name. .CT
+      .RT
+      .TR
+        .TC List item .CT
+        .TC .[ .LI .] .CT
+        .TC .[ .IL .] .CT
+        .TC Used inside lists only. .CT
+      .RT
+    .BT
+
+    .OL
+      .LI 1 .IL
+      .LI 2 .IL
+    .LO
+
+    Here is an example for an option list:
+    .PL
+      .LI
+        .NA  -a  .AN
+        This program option is used to show all available options. It's
+        not needed in the server mode, but it's possible use this option
+        in client mode.
+      .IL
+      .LI
+        .NA -b .AN
+        This program option is used to build all available options.
+      .IL
+      .LI
+        .NA -c .AN
+        This program option is used to convert all available options.
+      .IL
+    .LP
+
+    The required source code for this option list is shown below:
+
+    .{
+    .[ .PL .]
+    .#  .[ .LI .]
+    .# .#    .[ .NA -a .AN .]
+    .# .#    This program option is used to show all available options.
+    .#  .[ .IL .]
+    .#  .[ .LI .]
+    .# .#    .[ .NA -b .AN .]
+    .# .#    This program option is used to build all available options.
+    .#   .[ .IL .]
+    .[ .LP .]
+    .}
+    
+    The .NA Option List .AN header can be changed with the .NA Name .AN
+    argument, too.
+    
+    .AP
+
+
+    .PA .NA Tables .AN
+    There is support for simple tables, too. A .NA MlDoC .AN table is
+    comparable with HTML tables. You need to specifiy the table
+    body, an optional table head, table rows and in each table row
+    the table column data. 
+
+    .TB
+      .TH Tables .HT
+      .TR
+        .TC .B Name .R .CT
+        .TC .B begin .R .CT
+        .TC .B end .R .CT
+        .TC .B Comment .R .CT
+      .RT
+      .TR
+        .TC Table body .CT
+        .TC .[ .TB .] .CT
+        .TC .[ .BT .] .CT
+        .TC  .CT
+      .RT
+      .TR
+        .TC NoRulers .CT
+        .TC .[ .NR .] .CT
+        .TC .CT
+        .TC Don't put boxes around the table cells. .CT
+      .RT
+      .TR
+        .TC Table head .CT
+        .TC .[ .TH .] .CT
+        .TC .[ .HT .] .CT
+        .TC Optional table head row. .CT
+      .RT
+      .TR
+        .TC Table row .CT
+        .TC .[ .TR .] .CT
+        .TC .[ .RT .] .CT
+        .TC .CT
+      .RT
+      .TR
+        .TC Table columns .CT
+        .TC .[ .TC .] .CT
+        .TC .[ .CT .] .CT
+        .TC Must be included between the row command. .CT
+      .RT
+    .BT
+
+    Here is a small example for a generic table:
+
+    .TB
+      .TR
+        .TC 1 .CT
+        .TC 2 .CT
+      .RT
+      .TR
+        .TC 3 .CT
+        .TC 4 .CT
+      .RT
+    .BT
+  
+    and the required source code:
+
+    .{
+    .[ .TB .]
+      .# .[ .TR .]
+        .# .# .[ .TC 1 .CT .]
+        .# .# .[ .TC 2 .CT .]
+      .# .[ .RT .]
+      .# .[ .TR .]
+        .# .# .[ .TC 3 .CT .]
+        .# .# .[ .TC 4 .CT .]
+      .# .[ .RT .]
+    .[ .BT .]
+    .}
+
+    The horizontal and vertical rulers are always present and can be
+    removed with the .NA NoRulers .AN command. The .[ .NR .] command
+    must follow the .NA TableBody .AN command immediately. 
+    The above table looks
+    then like:
+
+    .TB
+      .NR
+      .TR
+        .TC 1 .CT
+        .TC 2 .CT
+      .RT
+      .TR
+        .TC 3 .CT
+        .TC 4 .CT
+      .RT
+    .BT
+    
+    .AP
+
+    
+    Misc. elements:
+
+    .TB
+      .TR
+        .TC .B Name .R .CT
+        .TC .B begin .R .CT
+        .TC .B end .R .CT
+        .TC .B Description .R .CT
+      .RT
+      .TR
+        .TC Name .CT
+        .TC .[ .NA .] .CT
+        .TC .[ .AN .] .CT
+        .TC Outside from special interfaces, this command emphasize 
+            names of functions, types or other important names.
+        .CT
+      .RT
+      .TR
+        .TC Link .CT
+        .TC .[ .LK .] .CT
+        .TC .[ .KL .] .CT
+        .TC A link to another section or document .CT
+      .RT
+    .BT
+  .2S
