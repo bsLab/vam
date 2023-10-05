@@ -1,0 +1,434 @@
+##
+##      ==================================
+##      OOOO   OOOO OOOO  O      O   OOOO
+##      O   O  O    O     O     O O  O   O
+##      O   O  O    O     O     O O  O   O
+##      OOOO   OOOO OOOO  O     OOO  OOOO
+##      O   O     O    O  O    O   O O   O
+##      O   O     O    O  O    O   O O   O
+##      OOOO   OOOO OOOO  OOOO O   O OOOO
+##      ================================== 
+##      BSSLAB, Dr. Stefan Bosse sci@bsslab.de
+##
+##    PROTECTED BY AND DISTRIBUTED UNDER THE TERMS OF: 
+##    Free Software Foundation-Europe, GNU GPL License, Version 2
+##
+##    $MODIFIEDBY:  BSSLAB
+##    $AUTHORS:     Stefan Bosse
+##    $INITIAL:     (C) 2003 BSSLAB
+##    $CREATED:     
+##    $MODIFIED:    
+##    $VERSION:     1.01
+##
+##    $INFO:
+##
+##
+##    $ENDOFINFO
+##
+
+
+#
+# Common OCaML compiler and archiver definitions 
+#
+
+#
+# User defined ocaml compiler flags
+#
+
+%if (%not defined(CFLAGS), {
+    CFLAGS = {};
+});
+
+
+#
+# User defined ocaml include paths
+#
+
+%if (%not defined(INCLUDES), {
+    INCLUDES = {};
+});
+
+
+#
+# User defined C compiler flags
+#
+
+%if (%not defined(CCFLAGS), {
+    CCFLAGS = {};
+});
+
+#
+# User defined C include paths
+#
+
+%if (%not defined(CINCLUDES), {
+    CINCLUDES = {};
+});
+
+#
+# for generic programs - user defined
+#
+%if (%not defined(CLIBS), {
+    CLIBS = {};
+});
+
+
+
+#
+# OCaML yacc
+#
+
+
+%tool ocaml-yacc (
+    src:        %in             [ type = ML-src-yacc ];
+    dest:       %out            [ type = ML-src-impl ]   
+                                                     => match($src);
+
+
+    flags:      %string %list                        => $OCAML_YACC_FLAGS;
+
+
+    program:    %in             [ type = command ]   => $BOOT_OCAMLYACC;
+
+)
+{
+    exec($program, args => 
+            $flags + '-b' + basename($dest,'%.ml') + $src);
+    
+};
+
+#
+# OCaML lex
+#
+
+
+%tool ocaml-lex (
+    src:        %in             [ type = ML-src-lex ];
+    dest:       %out            [ type = ML-src-impl ]   
+                                                     => match($src);
+
+    program:    %in             [ type = command ]   => $BOOT_OCAMLRUN;
+
+)
+{
+    exec($program, args => 
+            $BOOT_OCAMLLEX + $src + basename($dest,'%.ml')'.ml');
+    
+};
+
+
+
+#
+# OCaML Implementation compiler tool [without external interface]
+#
+
+%tool ocaml-c-impl-int (
+    src:        %in             [ type = ML-src-impl-int ];
+    object:     %out            [ type = ML-obj-impl ]   
+                                                     => match($src);
+    flags:      %string %list                        => $OCAML_STD_FLAGS;
+
+    objflags:   %string %list                        =>
+                if (get($src, flags) <> %unknown, {get($src, flags)}, {});
+
+    includes:   %string %list                        => $OCAML_STD_INC;
+
+    program:    %in             [ type = command ]   => $BOOT_OCAMLRUN;
+    move_cmi:   %in             [ type = command ]   => $BOOT_OCAMLMVCMI;
+
+    deps:       %out            [ type = ML-src-impl-dep ] 
+                                                     => match($src);
+    incl:       %in %list       [ ML-src-impl-int,implicit ]
+                                                     => %computed $deps;
+    
+)
+{
+    exec($program, args => 
+            $BOOT_OCAMLCOMPILE + '-c' + $flags +
+            '-o' + basename($src,'%.ml') + 
+            $includes + $INCLUDES + 
+            $objflags + $CFLAGS + $src);
+
+    exec($move_cmi, args => 
+            basename($src,'%.ml')'.cmi' + 
+            './interface/'basename($src,'%.ml')'.cmi');
+
+    exec($program, args =>
+            $BOOT_OCAMLDEP + '-amake' + 
+            $includes + $INCLUDES +  
+            $src,
+            stdout => $deps);
+
+};
+
+
+
+#
+# OCaML Interface compiler tool
+#
+
+%tool ocaml-c-intf (
+    src:        %in             [ type = ML-src-intf ];
+    object:     %out            [ type = ML-obj-intf ]   
+                                                     => match($src);
+    flags:      %string %list                        => $OCAML_STD_FLAGS;
+
+    objflags:   %string %list                        =>
+                if (get($src, flags) <> %unknown, {get($src, flags)}, {});
+
+
+    includes:   %string %list                        => $OCAML_STD_INC;
+    program:    %in             [ type = command ]   => $BOOT_OCAMLRUN;
+
+    deps:       %out            [ type = ML-src-intf-dep ] 
+                                                     => match($src);
+    incl:       %in %list       [ML-src-intf,implicit ]
+                                                     => %computed $deps;
+    
+)
+{
+    exec($program, args => 
+            $BOOT_OCAMLCOMPILE + '-c' + $flags +
+            '-o' + basename($src,'%.mli') + 
+            $includes + $INCLUDES + 
+            $objflags + $CFLAGS + $src);
+
+    exec(cp, args =>
+            basename($src,'%.mli')'.cmi' + './interface/');     
+
+    exec($program, args =>
+            $BOOT_OCAMLDEP + '-amake' + 
+            $includes + $INCLUDES +  
+            $src,
+            stdout => $deps);
+};
+
+#
+# OCaML Implementation compiler tool
+#
+
+%tool ocaml-c-impl (
+    src:        %in             [ type = ML-src-impl ];
+    object:     %out            [ type = ML-obj-impl ]   
+                                                     => match($src);
+    flags:      %string %list                        => $OCAML_STD_FLAGS;
+
+    objflags:   %string %list                        =>
+                if (get($src, flags) <> %unknown, {get($src, flags)}, {});
+
+    includes:   %string %list                        => $OCAML_STD_INC;
+
+    program:    %in             [ type = command ]   => $BOOT_OCAMLRUN;
+    move_cmi:   %in             [ type = command ]   => $BOOT_OCAMLMVCMI;
+
+    deps:       %out            [ type = ML-src-impl-dep ] 
+                                                     => match($src);
+    incl:       %in %list       [ ML-src-impl,implicit ]
+                                                     => %computed $deps;
+    
+)
+{
+    exec($program, args => 
+            $BOOT_OCAMLCOMPILE + '-c' + $flags +
+            '-o' + basename($src,'%.ml') + 
+            $includes + $INCLUDES + 
+            $objflags + $CFLAGS + $src);
+
+    exec($move_cmi, args => 
+            basename($src,'%.ml')'.cmi' + 
+            './interface/'basename($src,'%.ml')'.cmi');
+
+    exec($program, args =>
+            $BOOT_OCAMLDEP + '-amake' + 
+            $includes + $INCLUDES +  
+            $src,
+            stdout => $deps);
+
+};
+
+
+
+
+#
+# OCaML archiver tool
+#
+
+%tool ocaml-ar (
+    src:        %in %list       [ type = ML-obj-impl ];
+    srci:       %in %list       [ type = ML-obj-intf ];       
+    library:    %out            [ type = ML-lib ];
+
+    custom:     %string %list                        => {};
+    flags:      %string %list                        => $OCAML_AR_FLAGS;
+
+    program:    %in             [ type = command ]   => $BOOT_OCAMLRUN;
+)
+{
+    exec($program, args => 
+            $BOOT_OCAMLCOMPILE + '-a' + $custom + $flags + 
+            '-o' + $library + $src);
+    
+};
+
+
+
+#
+# C compiler tool
+#
+
+%tool comp-cc (
+    src:        %in             [ is-source, type = CC-src ];
+    object:     %out            [ type = CC-obj ]   
+                                                     => match($src);
+    flags:      %string %list                        => $OCAML_CC_STDFLAGS;
+
+    objflags:   %string %list                        =>
+                if (get($src, flags) <> %unknown, {get($src, flags)}, {});
+
+
+    includes:   %string %list                        => $OCAML_CC_STDINC;
+
+    program:    %in             [ type = command ]   => $OCAML_CC;
+
+
+    # dependency generation support:
+    mkdep:      %in             [ type = command ]   => $MKDEP;
+    deps:       %out            [ type = CC-src-dep ] 
+                                                     => match($src);
+    incl:       %in %list       [CC-src,implicit ]
+                                                     => %computed $deps;
+    
+)
+{
+    exec($program, args => 
+            $CCFLAGS + '-c' + 
+            '-o' + basename($src,'%.c')'.o' + 
+            $includes + $flags + $objflags + $CINCLUDES + $src);
+
+    exec($mkdep, args =>  
+          basename($src,'%.c')'.d' +
+          basename($src,'%.c')'.c.d');
+};
+
+
+#
+# C archiver tool 
+#
+
+%tool ar-cc (
+    src:        %in %list       [ type = CC-obj ];
+    library:    %out            [ type = CC-lib ];
+
+    flags:      %string %list                        => $OCAML_CC_AR_FLAGS;
+
+    program:    %in             [ type = command ]   => $OCAML_CC_AR;
+    ranlib:     %in             [ type = command ]   => $OCAML_CC_RANLIB;
+)
+{
+    exec($program, args => 
+            $flags + $library + $src);
+    exec($ranlib, args =>
+            $library);    
+};
+
+#
+# C linker tool 
+#
+
+%tool ld-cc (
+    src:        %in %list       [ type = CC-obj ];
+    dest:       %out            [ type =  generic-program ];
+
+    flags:      %string %list                        => $OCAML_CC_LD_FLAGS;
+
+    program:    %in             [ type = command ]   => $OCAML_CC;
+    libs:       %string %list                        => $CLIBS;
+)
+{
+    exec($program, args => 
+            $flags + $OCAML_LD_START_GROUP + 
+            $src + $libs + $OCAML_LD_END_GROUP +
+            '-o' + $dest);
+};
+
+
+
+#
+# Build a new runtime virtual machine
+#
+
+%tool vm-build (
+    src:     %in %list           [ type = CC-lib ];
+    vmobj:   %out                [ type = program ];
+
+    flags:      %string %list                        => $OCAML_CC_LD_FLAGS;
+
+    syslibs:   %string %list                        => $OCAML_CC_LIBS;
+
+    program:    %in              [ type = command ]  => $OCAML_CC;
+)
+{
+    exec($program, args => 
+            $flags + 
+            '-o' + $vmobj + $OCAML_LD_START_GROUP + $src +
+            $syslibs + $OCAML_LD_END_GROUP
+            );
+    
+};
+
+
+
+
+#
+# Build a new top level system
+#
+
+%tool top-build (
+    src:     %in %list           [ type = ML-lib ];
+    src2:    %in %list           [ type = ML-obj-impl ];
+    topname:    %out             [ type = bytecode-top ];
+    vmname:     %string %list                        => {};
+    flags:      %string %list                        => $OCAML_VM_FLAGS;
+
+    includes:   %string %list                        => $OCAML_STD_INC;
+
+
+    program:    %in              [ type = command ]  => $BOOT_OCAMLRUN;
+)
+{
+    exec($program, args => 
+            $BOOT_OCAMLCOMPILE + '-linkall' + '-use-runtime' + $vmname + 
+            $flags + '-o' + $topname + $includes + $INCLUDES +
+            $src + $src2
+            );
+    
+};
+
+
+#
+# Build a bytecode executable (without explicit C references)
+#
+
+
+%tool bytecode-build (
+    src:     %in %list           [ type = ML-lib ];
+    src2:    %in %list           [ type = ML-obj-impl ];
+    progname:  %out              [ type = bytecode-exe ];
+
+    flags:      %string %list                        => {};
+
+    includes:   %string %list                        => $OCAML_STD_INC;
+
+
+    program:    %in              [ type = command ]  => $BOOT_OCAMLRUN;
+)
+{
+    exec($program, args => 
+            $BOOT_OCAMLCOMPILE +  
+            -use-runtime + $OCAML_RUNTIME +
+            $flags + '-o' + $progname + $includes + $INCLUDES +
+            $src + $src2
+            );
+    
+};
+
