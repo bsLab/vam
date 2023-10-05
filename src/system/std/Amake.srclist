@@ -1,0 +1,10 @@
+SRC_STD = {
+    $PWD/dummy.mli,
+    $PWD/io.ml,
+    $PWD/std_fun.ml,
+    $PWD/std.ml
+};
+
+SRC_STD_MAIN = {
+    $PWD/main.ml
+};
