@@ -1,0 +1,40 @@
+
+OCAML_PARSING_SRC = {
+    $PWD/linenum.mli,
+    $PWD/location.mli,
+    $PWD/longident.mli,
+    $PWD/syntaxerr.mli,
+    $PWD/asttypes.mli,
+    $PWD/parsetree.mli,
+#    $PWD/linenum.ml,
+    linenum.ml,    
+    $PWD/parser.mli,
+    $PWD/location.ml,
+    $PWD/parse.mli,
+    $PWD/lexer.mli,
+    $PWD/printast.mli,
+    $PWD/longident.ml,
+    $PWD/syntaxerr.ml,
+    parser.ml,
+#    $PWD/lexer.ml,
+    lexer.ml,   
+    $PWD/parse.ml,
+    $PWD/printast.ml,
+
+};
+
+OCAML_PARSING_MLY = 
+{
+    $PWD/parser.mly,
+};
+
+OCAML_PARSING_MLL = 
+{
+    $PWD/linenum.mll,
+};
+
+OCAML_LEXER_MLL = 
+{
+    $PWD/lexer.mll,
+};
+
