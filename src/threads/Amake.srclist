@@ -1,0 +1,19 @@
+
+MODULE_THREADS_MLI = {
+    $PWD/mutex.mli,
+    $PWD/thread.mli,
+    $PWD/sema.mli
+};
+
+MODULE_THREADS_ML = {
+    $PWD/thread.ml,
+    $PWD/mutex.ml, 
+    $PWD/sema.ml
+};
+
+
+MODULE_THREADS_C = {
+    $PWD/amoeba_thr.c,
+    $PWD/sema_ext.c,
+};
+
