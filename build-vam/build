@@ -1,0 +1,124 @@
+#!/bin/bash
+
+source ../toolset/build.env
+
+
+if [ $# = 0 ]
+then
+    echo "Usage: build <targets>"
+    echo "Targets: all clean install install-ocaml"
+    exit 1
+fi
+
+SUBTARGETS="    \
+math            \
+matrix		\
+buffer          \
+os              \
+threads         \
+debug           \
+unix            \
+mandoc          \
+amoeba          \
+ddi             \
+server          \
+shell           \
+xwin            \
+vxlib		\
+test            \
+linda           \
+top             \
+scripts         \
+"
+
+check ()
+{
+    if [ $? != 0 ]
+    then
+        echo "[Abort due to errors building target.]"
+        exit 1
+    fi
+}
+
+
+for TARGET in $@
+do
+    echo "Building target [$TARGET] ..."
+    case $TARGET in
+        all)    
+                for subtarget in $SUBTARGETS
+                do
+                    $ECHO [Entering directory $subtarget...]
+                    cd $subtarget
+
+                    build all
+                    check
+                    build install
+                    check
+        
+                    cd ..
+                done
+                ;;
+        clean)  
+                for subtarget in $SUBTARGETS
+                do
+                    $ECHO [Entering directory $subtarget...]
+                    cd $subtarget
+                    build clean
+                    if [ $? = 0 ]
+                    then
+                        cd ..
+                    else
+                        echo "Abort."
+                        exit 1
+                    fi
+                done
+                $RM ../interface/*
+                $RM /tmp/camlpp*
+                ;;
+        install)    
+                for subtarget in $SUBTARGETS
+                do
+                    $ECHO [Entering directory $subtarget...]
+                    cd $subtarget
+                    build install
+                    if [ $? = 0 ]
+                    then
+                        cd ..
+                    else
+                        echo "Abort."
+                        exit 1
+                    fi
+                done
+
+		;;
+
+#        install-ocaml)
+#
+#                $ECHO [Installing OCAML distribution...]
+#                $INSTALL -d $INSTALLDIR/ocamlsys
+#                $INSTALL -d $INSTALLDIR/ocamlsys/bin
+#                $INSTALL -d $INSTALLDIR/ocamlsys/lib
+#                $INSTALL -d $INSTALLDIR/ocamlsys/lib/ocaml
+#                $INSTALL -d $INSTALLDIR/ocamlsys/lib/ocaml/caml
+#                $INSTALL -d $INSTALLDIR/ocamlsys/lib/ocaml/sys
+#
+#                $INSTALL -C $VAMDIR/ocamlsys/bin/* $INSTALLDIR/ocamlsys/bin
+#                $INSTALL -C $VAMDIR/ocamlsys/lib/ocaml/*.cma    \
+#                            $VAMDIR/ocamlsys/lib/ocaml/*.cmi    \
+#                            $VAMDIR/ocamlsys/lib/ocaml/*.cmo    \
+#                            $VAMDIR/ocamlsys/lib/ocaml/*.mli    \
+#                            $VAMDIR/ocamlsys/lib/ocaml/camlheader    \
+#                            $VAMDIR/ocamlsys/lib/ocaml/camlheader_ur    \
+#                            $INSTALLDIR/ocamlsys/lib/ocaml
+#                $INSTALL -C $VAMDIR/ocamlsys/lib/ocaml/caml/*   \
+#                            $INSTALLDIR/ocamlsys/lib/ocaml/caml
+#                $INSTALL -C $VAMDIR/ocamlsys/lib/ocaml/sys/*    \
+#                            $INSTALLDIR/ocamlsys/lib/ocaml/sys
+#                ;;
+#                
+ 
+   esac
+done
+
+echo "Done."
