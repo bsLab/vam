@@ -1,0 +1,18 @@
+
+OCAML_UTILS_SRC = {
+    $PWD/config.mlp[type = caml-config-templ,flags={$PWD/config.mli}], 
+    $PWD/misc.mli,
+    $PWD/tbl.mli,
+    $PWD/config.mli,
+    $PWD/terminfo.mli,
+    $PWD/clflags.ml,
+    $PWD/ccomp.mli,
+    $PWD/warnings.mli,
+    $PWD/misc.ml,
+    $PWD/tbl.ml,
+#   config.ml ->
+    $PWD/terminfo.ml,
+    $PWD/ccomp.ml,
+    $PWD/warnings.ml,
+};
+
