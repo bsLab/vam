@@ -1,0 +1,50 @@
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include $VAMDIR/src/system/xafs/Amake.srclist;
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/system/xafs,
+    -I,
+    $INSTALLDIR/interface,
+    -I,
+    $INSTALLDIR/lib,
+};
+
+
+DEFINES = {
+    -g,
+};
+
+SRC = {
+    $XAFS_SRC
+};
+
+LIB = xafs.cma;
+
+%include $VAMDIR/toolset/ocaml.lib;
+%include $VAMDIR/toolset/ocaml.sys;
+
+%instance libcluster($LIB,$SRC);
+
+
+PNAME = xafs;
+PLIBS = {
+    debug.cma,
+    buffer.cma,
+    unix.cma,
+    str.cma,
+    threads.cma,
+    os.cma,
+    amoeba.cma,
+    xlib.cma,
+    xcom.cma,
+    wxlib.cma,
+    xafs.cma,
+};
+PSRC = $XAFS_MAIN_SRC;
+VM = $INSTALLDIR/bin/vamrun;
+%instance bytecode-exe($PNAME,$PLIBS,$VM,$PSRC);
+
