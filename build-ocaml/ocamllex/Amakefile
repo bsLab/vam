@@ -1,0 +1,56 @@
+
+# version 1.01
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include common.amk;
+%include $VAMDIR/toolset/ocaml.types;
+%include $VAMDIR/src/ocaml/toolset/ocaml-tools.common;
+%include $VAMDIR/src/ocaml/toolset/ocaml.sys;
+
+%include $VAMDIR/src/ocaml/tools/Amake.srclist;
+
+%include $VAMDIR/src/ocaml/lex/Amake.srclist;
+
+INCLUDES = {
+    -I, ./,
+    -I, $VAMDIR/build-ocaml/stdlib,
+    -I, $VAMDIR/build-ocaml/utils/interface,
+    -I, $VAMDIR/build-ocaml/parsing/interface,
+    -I, $VAMDIR/build-ocaml/typing/interface,
+    -I, $VAMDIR/build-ocaml/bytecomp/interface,
+    -I, $VAMDIR/build-ocaml/driver/interface,
+    -I, $VAMDIR/src/ocaml/lex
+};
+
+CAMLSRC = {
+    $OCAML_LEX_SRC,
+};
+
+CAMLLIB = lex.cma;
+
+CAMLMAIN = {
+    $VAMDIR/build-ocaml/ocamllex/main.cmo
+};
+
+CAMLLIBS = {
+    $VAMDIR/build-ocaml/ocamllex/lex.cma
+};
+
+%cluster main.cmo
+{
+    %targets    main.cmo;
+    %sources    $OCAML_LEX_MAIN;
+};
+
+#
+# Create the bytecode program
+#
+
+PROGNAME = ocamllex;
+
+%include $VAMDIR/src/ocaml/toolset/ocaml.lib;
+%instance libcluster ($CAMLLIB,$CAMLSRC);
+
+%instance bytecode-exe($PROGNAME,$CAMLLIBS,$CAMLMAIN);
