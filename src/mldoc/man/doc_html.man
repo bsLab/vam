@@ -1,0 +1,56 @@
+  .MD
+    .NA doc_html .AN
+    .S4 .NA Description .AN
+    This is the HTML backend module used to convert .NA MlDoC .AN documents in
+    HTML-4 (transitional) format.
+    This .NA html_of_tree .AN function is used to convert the 
+    .NA structure_block .AN graph to HTML output. 
+    .4S
+    
+    .IN
+      .IF
+        .NA html_of_tree .AN
+        .RV unit .VR
+        .AR ~ds: structure_block .RA
+        .AR ~options: html_options list .RA
+        .AR ~sections: section_names list .RA
+      .FI
+    .NI
+
+    The .NA html_of_tree .AN function needs three arguments:
+    .PL
+      .NA Arguments .AN 
+      .LI 
+        .NA ds .AN
+        This is the structure block tree previously generated with
+        the .NA atoms_of_ .AN function family.
+      .IL
+      .LI
+        .NA options .AN
+        Several options can control the converting behaviour and the output.
+        Available options:
+        .TB
+          .TR
+            .TC .T HTML_single_doc of string .R .CT
+            .TC 
+              Only create a single HTML file instead of a collection
+              of files, each for one section. The string is the 
+              file name.
+            .CT
+          .RT
+        .BT
+      .IL
+      .LI
+        .NA sections .AN
+        To convert only a part of a manual, for example a module like this,
+        some informations are needed about sections above this section. 
+      .IL
+    .LP
+    
+    .S4
+      .NA Module dependencies: .AN
+      .UL
+      .LI .NA Doc_core .AN .IL
+      .LU
+    .4S
+  .DM
