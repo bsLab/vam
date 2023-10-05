@@ -1,0 +1,31 @@
+#!/bin/bash
+
+
+if [ "X$VAMDIR" = "X" ] 
+then
+	VAMDIR=@VAMDIR@
+fi
+
+EXEC=$VAMDIR/bin/xvam.byte
+
+ARGS="	-I $VAMDIR/doc				
+	-I $VAMDIR/ocamlsys/lib/ocaml		
+	-I $VAMDIR/ocamlsys/lib/ocaml/sys	
+	-I $VAMDIR/ocamlsys/lib/ocaml/threads	
+	-I $VAMDIR/interface 			
+	-I $VAMDIR/lib
+"
+
+
+if [ "X$1" = "X-gdb" ]; then
+        shift
+        tmpf=/tmp/vamtest.gdb.$$
+        echo set args "$EXEC $ARGS $@" > $tmpf
+        echo "set env ROOTCAP = $ROOTCAP" >> $tmpf
+        exec gdb -x $tmpf $VAMDIR/bin/vamrun
+        rm -f $tmpf
+else
+        exec $VAMDIR/bin/vamrun $EXEC $ARGS $@
+fi
+
+
