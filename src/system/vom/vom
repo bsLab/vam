@@ -1,0 +1,14 @@
+
+open Name ;;
+open Om ;;
+
+
+let conf = [
+    Om_root "/";
+    Om_ignore "/hosts";
+    Om_passnum 10;
+    Om_age "/server/afs";
+    Om_mintouch 10;
+]
+let om = Om.om_init conf ;;
+Om.om_loop om ;;
