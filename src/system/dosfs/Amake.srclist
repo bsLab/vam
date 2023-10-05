@@ -1,0 +1,10 @@
+
+MOD_DOSFS_SRC = {
+    $PWD/fat.mli,
+    $PWD/fat.ml,
+    $PWD/dosfs.ml,
+};
+
+MAIN_XDFS_SRC = {
+    $PWD/xdfs.ml
+};
