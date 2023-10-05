@@ -1,0 +1,11 @@
+
+
+MODULE_DEBUG_MLI = {
+    $PWD/db.mli
+};
+
+MODULE_DEBUG_ML = {
+    $PWD/db.ml,
+    $PWD/debug.ml,
+};
+
