@@ -1,0 +1,196 @@
+\documentclass{report}
+ \usepackage{newcent}
+ \usepackage{pifont}
+ \usepackage[dvips]{color}
+
+ \usepackage{graphics}
+
+ \parindent 0pt
+ \pagestyle{plain}
+ \topmargin0cm
+ \headheight0pt
+ \headsep0pt
+ \textwidth16.5cm
+ \textheight23cm
+ \footskip1cm
+ \oddsidemargin0cm
+ \evensidemargin0cm
+
+ \renewcommand{\labelitemi}{\ding{228}}
+ \renewcommand{\labelitemii}{\ding{169}}
+ \renewcommand{\labelitemiii}{\ding{72}}
+ \renewcommand{\arraystretch}{1.1}
+ \begin{document}
+ \vskip \baselineskip
+ \vbox{\hsize \textwidth
+   \hrule
+   \vbox{\rule[-.55em]{0pt}{1.7em}\strut \vrule \quad \hfill
+     \label{S1Section}{\bf S1 Section } \hfill
+     \quad \vrule}\hrule}
+   
+ \vskip \baselineskip
+ {The first Section in the document. \\
+ Some more paragraphs... }
+ \vskip \baselineskip
+ \vbox{\hsize \textwidth
+   \hrule
+   \vbox{\rule[-.55em]{0pt}{1.7em}\strut \vrule \quad 
+     \label{S2Subsection}{\bf S2 Subsection } \hfill 
+     {\it  S1 Section}\quad \vrule}\hrule}
+   
+ \vskip \baselineskip
+ {The first subsection inside the section. }
+ \vskip \baselineskip
+ \vbox{\hsize \textwidth
+   \hrule
+   \vbox{\rule[-.55em]{0pt}{1.7em}\strut \vrule \quad 
+     \label{S2Subsection2}{\bf S2 Subsection 2 } \hfill 
+     {\it  S1 Section}\quad \vrule}\hrule}
+   
+ \vskip \baselineskip
+ {The next subsection. }
+ \vskip \baselineskip
+ \vbox{\hsize \textwidth
+   \hrule
+   \vbox{\rule[-.55em]{0pt}{1.7em}\strut \vrule \quad 
+     \label{S3Unit}{\bf S3 Unit } \hfill
+     {\it  S2 Subsection 2}\quad \vrule}\hrule}
+   
+ \vskip \baselineskip
+ {This kind of unit is often used. }\vskip .5\baselineskip 
+ {\parindent 0pt \vbox{\bf \label{S4NamedParagraph}S4 Named Paragraph }
+ \leftskip 20pt \rightskip 20pt \vskip .5\baselineskip\begin{list}{}{}\item{
+ \parindent 0pt 
+   {More words... }}\end{list}}
+ \vskip .5\baselineskip
+ A data format table: 
+ \vskip 2\baselineskip
+ \begin{center}
+   \begin{tabular}{|p{10em}|p{10em}|p{10em}|p{10em}|}\hline
+     Byte 1 &\\\hline
+     Byte 2 &\\\hline
+     Byte 3 &\\\hline
+     Byte 4 \\\hline
+     \end{tabular}
+   \end{center}
+ \vskip 2\baselineskip
+ {The following programming interface gives an impression of the MANDoc system. 
+ }
+ \vskip 2\baselineskip
+ \vbox{\hfil
+   \vbox{\hrule
+     \hbox{\vrule\qquad
+       {\rule[-.55em]{0pt}{1.7em}\sc Programming Interface: {\sl ML }}
+       \quad\vrule}
+     \hrule}
+   }
+ \nobreak\vskip \baselineskip\nobreak
+ {
+   \nobreak\vskip .5\baselineskip 
+   \halign{
+     
+     \textcolor{black}{\strut\vrule width 5pt\hskip 20pt \hfill #} & # \hfil & # & #\hfill & # \hfil & \qquad # \hfill \cr
+     &&&&& \cr
+     $[$ & {\it ret1 }: int $*$ & & & & \cr
+     & {\it ret2 }: bool  & $]=$ & {\bf ml$\_$fun } & 
+      $^\sim$arg : float $\rightarrow$ & \cr
+     & & & &  $^\sim$kind : bool  & \cr
+     }
+   \halign{
+     
+     \textcolor{black}{\strut\vrule width 5pt\hskip 20pt \hfill } # & # \hfil  & \qquad # \cr
+     &&\cr
+     \textcolor{black}{external} {\bf buf$\_$physical }: 
+     & size :  int  $\rightarrow$  &  \cr
+     &  buffer  &  \cr
+      & 
+     {\bf $=$ "ext$\_$buf$\_$physical" } & \cr
+     }
+   \halign{\textcolor{black}{\strut\vrule width 5pt#}&#\cr&\cr}
+   }
+ \vskip 2\baselineskip
+ {Not only ML, C interfaces are supported, too. }
+ \vskip 2\baselineskip
+ \vbox{\hfil
+   \vbox{\hrule
+     \hbox{\vrule\qquad
+       {\rule[-.55em]{0pt}{1.7em}\sc Programming Interface: {\sl ML }}
+       \quad\vrule}
+     \hrule}
+   }
+ \nobreak\vskip \baselineskip\nobreak
+ {
+   \nobreak\vskip .5\baselineskip 
+   \halign{
+     
+     \textcolor{black}{\strut\vrule width 5pt\hskip 20pt \hfill #} & # \hfil & # & #\hfill & \qquad # \hfill \cr
+     &&&&\cr
+     &struct module$\_$s  & {\bf mycfun }$($&int a ,  & \cr
+     & & &float b ,  & \cr
+     & & &struct module$\_$s $*$p $);$ & \cr
+     }
+   \halign{
+     \textcolor{black}{\strut\vrule width 5pt\hskip 20pt \hfill #} & # & #\cr
+     &&\cr
+     &struct model  & {\bf myvar };\cr
+     }
+   \halign{
+     
+     \textcolor{black}{\strut\vrule width 5pt\hskip 20pt \hfill #} & # \hfil & # \hfil & #\hfill & \qquad # \hfill \cr
+     &&&&\cr
+     \textcolor{black}{struct} & {\bf c$\_$struc } $\{$ & &char name[20] $;$ & 
+     \cr
+     && &int len $;$ & \cr
+     && &float zahl  $\}$  & \cr
+     }
+   \halign{\textcolor{black}{\strut\vrule width 5pt#}&#\cr&\cr}
+   }
+ \vskip 2\baselineskip
+ {Now we have an image: }
+ \vskip \baselineskip
+ \begin{center}\begin{minipage}{.9\textwidth}\vbox{
+   \hbox{\includegraphics{logo.eps}}
+   {(Fig. 1) All the components of the VAMNET system together in an example 
+   configuration. \\
+   }
+ }\end{minipage}\end{center}
+ \vskip \baselineskip
+ \vskip \baselineskip
+ \vbox{\hsize \textwidth
+   \hrule
+   \vbox{\rule[-.55em]{0pt}{1.7em}\strut \vrule \quad 
+     \label{S2single}{\bf S2 single } \hfill 
+     \quad \vrule}\hrule}
+   
+ \vskip \baselineskip
+ {One more isolated S2 section. A table: }
+ \vskip 2\baselineskip
+ \begin{center}
+   \begin{tabular}{|p{6.6cm}|p{1.8cm}|}\hline
+     \multicolumn{2}{|c|}{{\sc Table }}\\\hline\hline
+     The special interfaces are used to show ML or C functions, types, 
+     submodules and values. Only the content must be given by the user, not the 
+     alignment. Commonly, they are collected in an interface subunit. &1+1$=$2 
+     \\\hline
+     \end{tabular}
+   \end{center}
+ \vskip 2\baselineskip
+ \vskip 2\baselineskip
+ \begin{center}
+   \begin{tabular}{|p{3cm}|p{1.8cm}|}\hline
+     \multicolumn{2}{|c|}{{\sc Table }}\\\hline\hline
+     Operation &1+1$=$2 \\\hline
+     \end{tabular}
+   \end{center}
+ \vskip 2\baselineskip
+ \vskip \baselineskip
+ \vbox{\hsize \textwidth
+   \hrule
+   \vbox{\rule[-.55em]{0pt}{1.7em}\strut \vrule \quad \hfill
+     \label{NextSection1}{\bf Next Section 1 } \hfill
+     \quad \vrule}\hrule}
+   
+ \vskip \baselineskip
+ {Here comes another section following the above main section. }
+ \end{document}
+ 
