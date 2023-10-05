@@ -1,0 +1,1127 @@
+/*
+**      ==================================
+**      OOOO   OOOO OOOO  O      O   OOOO
+**      O   O  O    O     O     O O  O   O
+**      O   O  O    O     O     O O  O   O
+**      OOOO   OOOO OOOO  O     OOO  OOOO
+**      O   O     O    O  O    O   O O   O
+**      O   O     O    O  O    O   O O   O
+**      OOOO   OOOO OOOO  OOOO O   O OOOO
+**      ================================== 
+**      BSSLAB, Dr. Stefan Bosse sci@bsslab.de
+**
+**    PROTECTED BY AND DISTRIBUTED UNDER THE TERMS OF: 
+**    Free Software Foundation-Europe, GNU GPL License, Version 2
+**
+**    $MODIFIEDBY:  BSSLAB
+**    $AUTHORS:     Stefan Bosse
+**    $INITIAL:     (C) 2005 BSSLAB
+**    $CREATED:     4.7.2005
+**    $VERSION:     1.07
+**
+**    $INFO:
+**
+**  ML Linda uses currently already existing HP-Linda implementation.
+**  The interface to the HP-Linda functions is blurred due to the
+**  effect of varying number of function arguments. C has no 
+**  tuples!!! Slightly magic code on the cutting edge...
+**  
+**    $ENDOFINFO
+**
+*/
+
+#include <mlvalues.h>
+#include <alloc.h>
+#include <custom.h>
+#include <callback.h>
+#include <memory.h>
+#include <signals.h>
+#include <fail.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#ifdef HAS_STRING_H
+  #include <string.h>
+#endif
+
+#include <amoeba.h>
+#include <module/linda.h>
+#include <module/linda_svr.h>
+#include <module/name.h>
+
+/*
+** no multi space
+*/
+#define NOMS    (-1)
+
+static char tmp[200];
+
+/*
+** Keep consistent with linda_data_kind and linda_data_type
+** in linda_common.ml.
+*/
+enum linda_data_kind {
+    D,
+    Q
+};
+
+enum linda_data_type {
+    C,  /* char   ???????? */
+    S,  /* string   */
+    I,  /* integer  */
+    F,  /* float    */
+    IA, /* C array  */
+    FA  /* Float (double) array */  
+};
+
+/*
+** Extract type of value
+*/
+static int data_type(value v)
+{
+ 
+    if (Is_long(v))
+        return I;
+    else if (Is_block(v))
+    {
+        int tag=Tag_val(v);
+        switch (tag) {
+            case String_tag:
+                return S;
+                break;
+            case Double_tag:
+                return F;
+                break;
+            case Double_array_tag:
+                return FA;
+                break;
+            case Abstract_tag:
+            {
+                break;
+            }
+            default:
+                break;
+        };
+    };
+       
+    return (-1);    /* unknown */
+}
+
+
+#define EB   enter_blocking_section()
+#define LB   leave_blocking_section()
+
+CAMLexport value
+ext_out_t1 (value att)
+{
+    int tag;
+
+    switch (data_type(att)) {
+        case C:
+        {
+            Linda_char c;
+            c=(Linda_char)Int_val(att);
+            EB; out ("%c",c); LB;
+            break;
+        };
+        case S:
+        {
+            Linda_charp s;
+            s=(Linda_charp)String_val(att);            
+            EB; out ("%s",s); LB;
+            break;
+        };
+        case I:
+        {
+            Linda_int i;
+            i=(Linda_int)Int_val(att);
+            EB; out ("%d",i); LB;
+            break;
+        };
+        case F:
+        {
+            Linda_float f;
+            f=(Linda_float)Double_val(att);
+            EB; out("%f",f); LB;
+            break;
+        };
+        default:
+            failwith("type not supported");
+    };
+    return Val_unit;
+};
+
+CAMLexport value
+ext_out_t1_ms (value vtsid,value att)
+{
+    int tag;
+    linda_tsid ts=Int_val(vtsid);
+    switch (data_type(att)) {
+        case C:
+        {
+            Linda_char c;
+            c=(Linda_char)Int_val(att);
+            EB; out_ti (ts,"%c",c); LB;
+            break;
+        };
+        case S:
+        {
+            Linda_charp s;
+            s=(Linda_charp)String_val(att);            
+            EB; out_ti (ts,"%s",s); LB;
+            break;
+        };
+        case I:
+        {
+            Linda_int i;
+            i=(Linda_int)Int_val(att);
+            EB; out_ti (ts,"%d",i); LB;
+            break;
+        };
+        case F:
+        {
+            Linda_float f;
+            f=(Linda_float)Double_val(att);
+            EB; out_ti (ts,"%f",f); LB;
+            break;
+        };
+        default:
+            failwith("type not supported");
+    };
+    return Val_unit;
+};
+
+
+CAMLexport value
+ext_out_tn (linda_tsid ts,int n,value att)
+{
+    int lt;
+    int tag;
+    int i;
+
+    int addr;
+    char fmt[100];
+    int fmtp=0;
+    char args[100];
+    int argp=0;
+    int li;
+
+    for(i=0;i<n;i++)
+    {
+      value at=Field(att,i);
+      switch (data_type(at)) {
+        case C:
+        {
+            li=Int_val(at);            
+            memcpy(&args[argp],(char *)(&li),sizeof(Linda_int));
+            argp=argp+sizeof(Linda_int);        /* !!! */
+            sprintf(&fmt[fmtp],"%s","%c");
+            fmtp=fmtp+2;
+            break;
+        };
+        case S:
+        {
+            addr=(int)String_val(at);
+            memcpy(&args[argp],(char *)(&addr),sizeof(Linda_charp));
+            argp=argp+sizeof(Linda_charp);
+            sprintf(&fmt[fmtp],"%s","%s");
+            fmtp=fmtp+2;
+            break;
+        };
+        case I:
+        {
+            Linda_int i;
+            li=Int_val(at);
+            memcpy(&args[argp],(char *)(&li),sizeof(Linda_int));
+            argp=argp+sizeof(Linda_int);
+            sprintf(&fmt[fmtp],"%s","%d");
+            fmtp=fmtp+2;
+            break;
+        };
+
+        case F:
+        {
+            Linda_double d;
+            d=Double_val(at);
+            addr=(int)&d;
+            memcpy(&args[argp],(char *)(&d),sizeof(Linda_double));
+            argp=argp+sizeof(Linda_double);
+            sprintf(&fmt[fmtp],"%s","%F");
+            fmtp=fmtp+2;
+            break;
+        };
+        default:
+            failwith("type not supported");
+      };
+    };
+    fmt[fmtp]='\0';
+    EB; 
+    if (ts==NOMS) 
+        out_list(fmt,(va_list)args); 
+    else
+        out_ts_list(ts,fmt,(va_list)args);
+    LB;
+
+    return Val_unit;
+};
+
+CAMLexport value
+ext_out_t2 (value att)
+{
+    return ext_out_tn(NOMS,2,att);
+};
+CAMLexport value
+ext_out_t3 (value att)
+{
+    return ext_out_tn(NOMS,3,att);
+};
+
+
+CAMLexport value
+ext_out_t2_ms (value vtsid,value att)
+{
+    linda_tsid ts=Int_val(vtsid);
+    return ext_out_tn(ts,2,att);
+};
+CAMLexport value
+ext_out_t3_ms (value vtsid,value att)
+{
+    linda_tsid ts=Int_val(vtsid);
+    return ext_out_tn(ts,3,att);
+};
+
+
+CAMLexport value
+ext_in_t1 (value kt,value at)
+{
+    int tag;
+ 
+    /*
+    ** Argument must be from type Q!!!
+    */
+    if (Int_val(kt) != Q)
+        failwith("in_t1: argument must be of type Q!!!");
+
+
+    switch (data_type(at)) {
+        case C:
+        {
+            Linda_char c;
+            EB; in ("?%c",&c); LB;
+            at=Val_int((int)c);
+            break;
+        };
+        case S:
+        {
+            Linda_string s1,s2;
+            int len;
+            /*
+            ** We get an already allocated string!
+            */
+            EB; in ("?%S",&s1); LB;
+            if (s1 != NULL)
+            {
+                len=strlen(s1);                
+                at=alloc_string(len);
+                s2=(Linda_string)String_val(at);
+                strcpy(s2,s1);
+                free(s1);
+            };         
+            break;
+        };
+        case I:
+        {
+            Linda_int i;
+            EB; in ("?%d",&i); LB;
+            at=Val_int(i);
+            break;
+        };
+        case F:
+        {
+            Linda_double d;
+            EB; in ("?%F",&d); LB;
+            at=copy_double(d);
+            break;
+        };
+        default:
+            failwith("type not supported");
+    };
+    return at;
+};
+
+CAMLexport value
+ext_in_t1_ms (value vtsid,value kt,value at)
+{
+    int tag;
+    linda_tsid ts=Int_val(vtsid);
+ 
+    /*
+    ** Argument must be from type Q!!!
+    */
+    if (Int_val(kt) != Q)
+        failwith("in_t1: argument must be of type Q!!!");
+
+
+    switch (data_type(at)) {
+        case C:
+        {
+            Linda_char c;
+            EB; in_ti (ts,"?%c",&c); LB;
+            at=Val_int((int)c);
+            break;
+        };
+        case S:
+        {
+            Linda_string s1,s2;
+            int len;
+            /*
+            ** We get an already allocated string!
+            */
+            EB; in_ti (ts,"?%S",&s1); LB;
+            if (s1 != NULL)
+            {
+                len=strlen(s1);                
+                at=alloc_string(len);
+                s2=(Linda_string)String_val(at);
+                strcpy(s2,s1);
+                free(s1);
+            };         
+            break;
+        };
+        case I:
+        {
+            Linda_int i;
+            EB; in_ti (ts,"?%d",&i); LB;
+            at=Val_int(i);
+            break;
+        };
+        case F:
+        {
+            Linda_double d;
+            EB; in_ti (ts,"?%F",&d); LB;
+            at=copy_double(d);
+            break;
+        };
+        default:
+            failwith("type not supported");
+    };
+    return at;
+};
+
+ 
+CAMLexport value
+ext_inrd_tn (char type,linda_tsid ts,int n,value ktt,value att)
+{
+    CAMLparam0();
+    CAMLlocal1(ret_att);
+
+    errstat stat;
+
+    int tag;
+    int i;
+
+    int addr;
+    char fmt[100];
+    int fmtp=0;
+    char args[100];
+    int argp=0;
+    char mem[100];
+    int memp=0;
+
+    int li;
+ 
+    for(i=0;i<n;i++)
+    {
+      value at=Field(att,i);
+      value kt=Int_val(Field(ktt,i));
+
+
+      switch (data_type(at)) {
+        case C:
+        {
+            if (kt == D)
+            {
+                li=Int_val(at);            
+                memcpy(&args[argp],(char *)(&li),sizeof(Linda_int *));
+                argp=argp+sizeof(Linda_int);        /* !!! */
+                sprintf(&fmt[fmtp],"%s","%c");
+                fmtp=fmtp+2;
+            }
+            else
+            {
+                Linda_int *lp=(Linda_int *)&mem[memp];
+                memcpy(&args[argp],(char *)(&lp),sizeof(Linda_int *));
+                memp=memp+sizeof(Linda_int);
+                argp=argp+sizeof(Linda_int *);        /* !!! */
+                sprintf(&fmt[fmtp],"%s","?%c");
+                fmtp=fmtp+3;
+            };
+            break;
+        };
+        case S:
+        {
+            if (kt == D)
+            {
+                addr=(int)String_val(at);
+                memcpy(&args[argp],(char *)(&addr),sizeof(Linda_charp));
+                argp=argp+sizeof(Linda_string);
+                sprintf(&fmt[fmtp],"%s","%s");
+                fmtp=fmtp+2;
+
+            }
+            else
+            {
+                Linda_string *lp=(Linda_string *)&mem[memp];
+                memcpy(&args[argp],(char *)(&lp),sizeof(Linda_string *));
+                memp=memp+sizeof(Linda_string);
+                argp=argp+sizeof(Linda_string *);        /* !!! */
+                sprintf(&fmt[fmtp],"%s","?%S");
+                fmtp=fmtp+3;
+            };
+            break;
+        };
+        case I:
+        {
+            Linda_int i;
+            if(kt == D)
+            {
+                li=Int_val(at);
+                memcpy(&args[argp],(char *)(&li),sizeof(Linda_int));
+                argp=argp+sizeof(Linda_int);
+                sprintf(&fmt[fmtp],"%s","%d");
+                fmtp=fmtp+2;
+            }
+            else
+            {
+                Linda_int *lp=(Linda_int *)&mem[memp];
+                memcpy(&args[argp],(char *)(&lp),sizeof(Linda_int *));
+                memp=memp+sizeof(Linda_int);
+                argp=argp+sizeof(Linda_int *);        /* !!! */
+                sprintf(&fmt[fmtp],"%s","?%d");
+                fmtp=fmtp+3;
+            };
+            break;
+        };
+        case F:
+        {
+            Linda_double d;
+            if (kt == D)
+            {
+                Linda_double d=Double_val(at);
+                memcpy(&args[argp],(char *)(&d),sizeof(Linda_double));
+                argp=argp+sizeof(Linda_double);
+                sprintf(&fmt[fmtp],"%s","%F");
+                fmtp=fmtp+2;
+            }
+            else
+            {
+                Linda_double *lp=(Linda_double *)&mem[memp];
+                memcpy(&args[argp],(char *)(&lp),sizeof(Linda_double *));
+                memp=memp+sizeof(Linda_double);
+                argp=argp+sizeof(Linda_double *);        /* !!! */
+                sprintf(&fmt[fmtp],"%s","?%F");
+                fmtp=fmtp+3;
+            };
+            break; 
+        };    
+        default:
+            failwith("type not supported");
+      };
+    };
+    fmt[fmtp]='\0';
+
+    Begin_roots1(att);
+
+    EB; 
+    if (type == 'i')
+    {
+        if (ts==NOMS)
+            stat=in_list(fmt,(va_list)args); 
+        else
+            stat=in_ts_list(ts,fmt,(va_list)args);
+    }
+    else
+    {
+        if (ts==NOMS)
+            stat=rd_list(fmt,(va_list)args); 
+        else
+            stat=rd_ts_list(ts,fmt,(va_list)args);
+
+    };
+    LB;
+
+    End_roots();
+     
+    /*
+    ** Post processing ... back to ML
+    */
+
+    ret_att=alloc_tuple(n);
+
+    argp=0;
+    memp=0;
+
+    
+    if (stat == STD_OK) 
+    for(i=0;i<n;i++)
+    {
+      value at=Field(att,i);
+      value kt=Int_val(Field(ktt,i));
+
+      switch (data_type(at)) {
+        case C:
+        {
+            if (kt == D)
+            {
+                Store_field(ret_att,i,at);
+            }
+            else
+            {
+                int li=*((int *)&mem[memp]);
+                Store_field(ret_att,i,Val_int(li));
+                memp=memp+sizeof(Linda_int);
+            };
+            break;
+        };
+        case S:
+        {
+            if (kt == D)
+            {
+                Store_field(ret_att,i,at);
+
+#if 0
+                memp=memp+sizeof(char *); 
+#endif
+
+            }
+            else
+            {
+                char *s2;
+                char *s1=*((char **)&mem[memp]);
+                int len;
+                /*
+                ** We get an already allocated string!
+                */
+                if (s1 != NULL)
+                {
+                    len=strlen(s1);                
+                    at=alloc_string(len);
+                    s2=(Linda_string)String_val(at);
+                    strcpy(s2,s1);
+                    free(s1);
+                };         
+                Store_field(ret_att,i,at);
+                memp=memp+sizeof(char *);
+            };
+            break;
+        };
+        case I:
+        {
+            if(kt == D)
+            {
+                Store_field(ret_att,i,at);
+            }
+            else
+            {
+                int li=*((int *)&mem[memp]);
+                Store_field(ret_att,i,Val_int(li));
+                memp=memp+sizeof(Linda_int);
+            };
+            break;
+        };
+        case F:
+        {
+            if (kt == D) 
+            {
+                Store_field(ret_att,i,at);
+            }
+            else
+            {
+                double lf=*((double *)&mem[memp]);
+                Store_field(ret_att,i,copy_double(lf));
+                memp=memp+sizeof(Linda_double);
+            };
+            break;
+        };
+        default:
+            failwith("type not supported");
+      };
+    }
+    else for(i=0;i<2;i++) Store_field(ret_att,i,Field(att,i));
+
+    CAMLreturn(ret_att);
+};
+
+ 
+CAMLexport value
+ext_in_t2 (value ktt,value att)
+{
+    return ext_inrd_tn('i',NOMS,2,ktt,att);
+};
+CAMLexport value
+ext_in_t3 (value ktt,value att)
+{
+    return ext_inrd_tn('i',NOMS,3,ktt,att);
+};
+
+CAMLexport value
+ext_in_t2_ms (value vtsid,value ktt,value att)
+{
+    linda_tsid ts=Int_val(vtsid);
+    return ext_inrd_tn('i',ts,2,ktt,att);
+};
+CAMLexport value
+ext_in_t3_ms (value vtsid,value ktt,value att)
+{
+    linda_tsid ts=Int_val(vtsid);
+    return ext_inrd_tn('i',ts,3,ktt,att);
+};
+
+CAMLexport value
+ext_rd_t1 (value kt,value at)
+{
+    int tag;
+ 
+    /*
+    ** Argument must be from type Q!!!
+    */
+    if (Int_val(kt) != Q)
+        failwith("rd_t1: argument must be of type Q!!!");
+
+
+    switch (data_type(at)) {
+        case C:
+        {
+            Linda_char c;
+            EB; rd ("?%c",&c); LB;
+            at=Val_int((int)c);
+            break;
+        };
+        case S:
+        {
+            Linda_string s1,s2;
+            int len;
+            /*
+            ** We get an already allocated string!
+            */
+            EB; rd ("?%S",&s1); LB;
+            if (s1 != NULL)
+            {
+                len=strlen(s1);                
+                at=alloc_string(len);
+                s2=(Linda_string)String_val(at);
+                strcpy(s2,s1);
+                free(s1);
+            };         
+            break;
+        };
+        case I:
+        {
+            Linda_int i;
+            EB; rd ("?%d",&i); LB;
+            at=Val_int(i);
+            break;
+        };
+        case F:
+        {
+            Linda_double d;
+            EB; rd ("?%F",&d); LB;
+            at=copy_double(d);
+            break;
+        };
+        default:
+            failwith("type not supported");
+    };
+    return at;
+};
+
+CAMLexport value
+ext_rd_t1_ms (value vtsid,value kt,value at)
+{
+    int tag;
+    linda_tsid ts=Int_val(vtsid);
+ 
+    /*
+    ** Argument must be from type Q!!!
+    */
+    if (Int_val(kt) != Q)
+        failwith("rd_t1: argument must be of type Q!!!");
+
+
+    switch (data_type(at)) {
+        case C:
+        {
+            Linda_char c;
+            EB; rd_ti (ts,"?%c",&c); LB;
+            at=Val_int((int)c);
+            break;
+        };
+        case S:
+        {
+            Linda_string s1,s2;
+            int len;
+            /*
+            ** We get an already allocated string!
+            */
+            EB; rd_ti (ts,"?%S",&s1); LB;
+            if (s1 != NULL)
+            {
+                len=strlen(s1);                
+                at=alloc_string(len);
+                s2=(Linda_string)String_val(at);
+                strcpy(s2,s1);
+                free(s1);
+            };         
+            break;
+        };
+        case I:
+        {
+            Linda_int i;
+            EB; rd_ti (ts,"?%d",&i); LB;
+            at=Val_int(i);
+            break;
+        };
+        case F:
+        {
+            Linda_double d;
+            EB; rd_ti (ts,"?%F",&d); LB;
+            at=copy_double(d);
+            break;
+        };
+        default:
+            failwith("type not supported");
+    };
+    return at;
+};
+
+CAMLexport value
+ext_rd_t2 (value ktt,value ltt,value att)
+{
+    return ext_inrd_tn('r',NOMS,2,ktt,att);
+};
+
+CAMLexport value
+ext_rd_t3 (value ktt,value ltt,value att)
+{
+    return ext_inrd_tn('r',NOMS,3,ktt,att);
+};
+
+CAMLexport value
+ext_rd_t4 (value ktt,value ltt,value att)
+{
+    return ext_inrd_tn('r',NOMS,4,ktt,att);
+};
+
+CAMLexport value
+ext_rd_t5 (value ktt,value ltt,value att)
+{
+    return ext_inrd_tn('r',NOMS,5,ktt,att);
+};
+
+CAMLexport value
+ext_rd_t6 (value ktt,value ltt,value att)
+{
+    return ext_inrd_tn('r',NOMS,6,ktt,att);
+};
+
+CAMLexport value
+ext_rd_t7 (value ktt,value ltt,value att)
+{
+    return ext_inrd_tn('r',NOMS,7,ktt,att);
+};
+
+CAMLexport value
+ext_rd_t8 (value ktt,value ltt,value att)
+{
+    return ext_inrd_tn('r',NOMS,8,ktt,att);
+};
+
+CAMLexport value
+ext_rd_t9 (value ktt,value ltt,value att)
+{
+    return ext_inrd_tn('r',NOMS,9,ktt,att);
+};
+
+CAMLexport value
+ext_rd_t10 (value ktt,value ltt,value att)
+{
+    return ext_inrd_tn('r',NOMS,10,ktt,att);
+};
+
+
+
+CAMLexport value
+ext_rd_t2_ms (value vtsid,value ktt,value ltt,value att)
+{
+    linda_tsid ts=Int_val(vtsid);
+    return ext_inrd_tn('r',ts,2,ktt,att);
+};
+
+CAMLexport value
+ext_rd_t3_ms (value vtsid,value ktt,value ltt,value att)
+{
+    linda_tsid ts=Int_val(vtsid);
+    return ext_inrd_tn('r',ts,3,ktt,att);
+};
+
+CAMLexport value
+ext_rd_t4_ms (value vtsid,value ktt,value ltt,value att)
+{
+    linda_tsid ts=Int_val(vtsid);
+    return ext_inrd_tn('r',ts,4,ktt,att);
+};
+
+CAMLexport value
+ext_rd_t5_ms (value vtsid,value ktt,value ltt,value att)
+{
+    linda_tsid ts=Int_val(vtsid);
+    return ext_inrd_tn('r',ts,5,ktt,att);
+};
+
+CAMLexport value
+ext_rd_t6_ms (value vtsid,value ktt,value ltt,value att)
+{
+    linda_tsid ts=Int_val(vtsid);
+    return ext_inrd_tn('r',ts,6,ktt,att);
+};
+
+CAMLexport value
+ext_rd_t7_ms (value vtsid,value ktt,value ltt,value att)
+{
+    linda_tsid ts=Int_val(vtsid);
+    return ext_inrd_tn('r',ts,7,ktt,att);
+};
+
+CAMLexport value
+ext_rd_t8_ms (value vtsid,value ktt,value ltt,value att)
+{
+    linda_tsid ts=Int_val(vtsid);
+    return ext_inrd_tn('r',ts,8,ktt,att);
+};
+
+CAMLexport value
+ext_rd_t9_ms (value vtsid,value ktt,value ltt,value att)
+{
+    linda_tsid ts=Int_val(vtsid);
+    return ext_inrd_tn('r',ts,9,ktt,att);
+};
+
+CAMLexport value
+ext_rd_t10_ms (value vtsid,value ktt,value ltt,value att)
+{
+    linda_tsid ts=Int_val(vtsid);
+    return ext_inrd_tn('r',ts,10,ktt,att);
+};
+
+
+
+/*
+** Initialize client interface. 
+*/
+
+CAMLexport value
+ext_linda_client_init(value pname)
+{
+    CAMLparam0();
+    CAMLlocal1(stat_val);
+
+    errstat err=STD_OK;
+
+    char *name=String_val(pname);
+    int len = strlen(name);
+    char *linda_name=(char*)malloc(len+1);
+
+    if (linda_name==NULL)
+        failwith("linda_client_init: can't allocate name string");
+    strcpy(linda_name,name);
+    err=linda_init(linda_name);
+
+    stat_val = alloc_tuple(1);
+    Store_field(stat_val,0,Val_int(err));
+
+    CAMLreturn(stat_val);    
+};
+
+
+/*
+** Multispace version
+*/
+ 
+CAMLexport value
+ext_linda_init_ms(value pname)
+{
+    CAMLparam0();
+    CAMLlocal1(stat_val);
+
+    errstat err=STD_OK;
+
+    char *name=String_val(pname);
+    int len = strlen(name);
+    char *linda_name=(char*)malloc(len+1);
+
+    if (linda_name==NULL)
+        failwith("linda_init_ms: can't allocate name string");
+    strcpy(linda_name,name);
+    err=linda_init_ms(linda_name);
+    
+
+    stat_val = alloc_tuple(1);
+    Store_field(stat_val,0,Val_int(err));
+
+    CAMLreturn(stat_val);    
+};
+
+
+/*
+** Initialize server specific stuff. No server threads are started here!
+*/
+CAMLexport value
+ext_linda_server_init(value pname)
+{
+    CAMLparam0();
+    CAMLlocal1(stat_val);
+
+    int i;
+    errstat err=STD_OK;
+    char *name=String_val(pname);
+    int len = strlen(name);
+    capability cap;
+
+    /* init global tuple dim table lock */
+    mu_init(&Tuple_dim_tbl_lock_out);
+    mu_init(&Tuple_dim_tbl_lock_in);
+        
+    /* the global inode slot table lock */
+    mu_init(&linda_inode_tbl_lock); 
+
+    /* init the tuple space */
+    for(i=1;i<MAX_TS_DIM;i++)
+    {
+        Tuple_dim_tbl_out[i].dim=i;
+        Tuple_dim_tbl_out[i].num=0;
+        Tuple_dim_tbl_out[i].sig_first=(struct Tuple_signature*)NULL;
+    };
+    for(i=1;i<MAX_TS_DIM;i++)
+    {
+        Tuple_dim_tbl_in[i].dim=i;
+        Tuple_dim_tbl_in[i].num=0;
+        Tuple_dim_tbl_in[i].sig_first=(struct Tuple_signature*)NULL;
+    };
+
+    linda_svr_busy=0;
+ 
+    Linda_ts_name=(char*)malloc(len+1);
+    if (Linda_ts_name==NULL)
+        failwith("linda_portinit: can't allocate name string");
+    strcpy(Linda_ts_name,name);
+
+    /*
+    ** Create private version
+    */
+    err=linda_port(Linda_ts_name,&linda_svr_getcap.cap_port);
+    if (err != STD_OK) 
+        return Val_int((int)err);
+
+    /*
+    ** Make public version
+    */
+    priv2pub(&linda_svr_getcap.cap_port,
+             &linda_svr_putcap.cap_port);
+
+    /*
+    ** extract the private part from the user root dir 
+    */
+    err=name_lookup("/",&cap);
+    if(err!=STD_OK)
+    {
+        sprintf(tmp,"linda_portinit: can't lookup user root cap: %s\n",err_why(err));
+        failwith(tmp);
+    }
+    else
+    {
+        Linda_priv=cap.cap_priv;
+        linda_svr_putcap.cap_priv=Linda_priv;
+        linda_svr_getcap.cap_priv=Linda_priv;
+    };
+
+    /*
+    ** Don't allow dynamic thread pool epxansion
+    */
+    linda_dynamic=0;
+
+    stat_val = alloc_tuple(1);
+    Store_field(stat_val,0,Val_int(err));
+
+    CAMLreturn(stat_val);    
+};
+
+/*
+** One LINDA server loop. Must be started from ML with thread_create.
+*/
+CAMLexport value
+ext_linda_server(value unit)
+{
+
+    enter_blocking_section();
+    
+    linda_svr(0); 
+
+    leave_blocking_section();
+
+    return Val_unit;
+};
+
+/*
+** get status informations from server
+*/
+CAMLexport value 
+ext_linda_stat(value unit)
+{
+
+    char *p;
+    enter_blocking_section();
+
+    p=linda_stat();
+
+    leave_blocking_section();
+
+    if (p==NULL)
+        failwith("lind_stat failed");
+
+    return (copy_string(p));
+};
+
+/*
+** get status informations from server
+*/
+CAMLexport value 
+ext_linda_getid (value vname)
+{
+    char *tsname=String_val(vname);
+    linda_tsid tsnum=NOMS;
+
+    tsnum=linda_getid(tsname);
+
+    return (Val_int(tsnum));
+};
+
+/*
+** get status informations from server
+*/
+CAMLexport value 
+ext_linda_stat_ms(value vname)
+{
+    char *ts=String_val(vname);
+    char *p;
+    enter_blocking_section();
+
+    p=linda_stat_ts(ts);
+
+    leave_blocking_section();
+
+    if (p==NULL)
+        failwith("lind_stat_ms failed");
+
+    return (copy_string(p));
+};
+
