@@ -1,0 +1,19 @@
+(*
+** Top directory and project name:
+*)
+
+let topdir = ref ("/amoeba/Vam-1.6");;
+let project = ref ("Vam-1.6-freebsd");;
+        
+(*
+** The revision dir (without leading slah relative to home path)
+*)
+  
+let revisiondir = ref ("amoeba/revision");;
+
+(*
+** Exclude the following components from the state list:
+*)
+
+let path_exclude = [
+];;
