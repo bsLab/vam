@@ -1,0 +1,58 @@
+#
+# Amoeba Module Amakefile
+#
+
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include $VAMDIR/src/server/Amake.srclist;
+
+
+#
+# Special include paths
+#
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/server,
+    -I,
+    $VAMDIR/src/amoeba,
+    -I,
+    $VAMDIR/build-vam/amoeba/interface,
+    -I,
+    $VAMDIR/build-vam/threads/interface,
+    -I,
+    $VAMDIR/build-vam/mldoc/interface,
+    -I,
+    $VAMDIR/build-vam/buffer/interface,
+    -I,
+    $VAMDIR/build-vam/debug/interface,
+
+};
+
+#
+# All the sources together
+#
+
+CAMLSRC = {
+    $MODULE_SERVER_MLI,
+    $MODULE_SERVER_ML, 
+};
+
+#
+# Target libraries
+#
+
+#
+# CaML library
+#
+
+CAMLLIB     = server.cma;
+
+
+%include $VAMDIR/toolset/ocaml.lib;
+
+%instance libcluster($CAMLLIB,$CAMLSRC);
+
+ 
