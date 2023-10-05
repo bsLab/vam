@@ -1,0 +1,19 @@
+
+
+MODULE_MANDOC_MLI = {
+    $PWD/doc_core.mli,
+    $PWD/doc_latex.mli,
+    $PWD/doc_html.mli,
+};
+
+MODULE_MANDOC_ML = {
+    $PWD/doc_core.ml,
+    $PWD/doc_toc.ml,
+    $PWD/doc_html.ml,
+    $PWD/doc_latex.ml,
+    $PWD/doc_text.ml,
+};
+
+MLD_ML = {
+    $PWD/mld.ml,
+};
