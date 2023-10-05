@@ -1,0 +1,6 @@
+
+/home/vam/vam-1.0_make/ocamlsys/bin/ocamlc -thread -g -make-runtime -o
+vamrun  -I ../interface -I ../pthreads -I ../amoeba -I ./ unix.cma str.cma
+threads.cma toplevellib.cma ../help/help.cma ../pthreads/pthreads.cma
+./vamtoploop.cma ../amoeba/amoeba.cma
+
