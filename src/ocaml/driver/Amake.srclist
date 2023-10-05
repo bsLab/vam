@@ -1,0 +1,27 @@
+
+
+OCAML_DRIVER_SRC = {
+    $PWD/errors.mli,
+    $PWD/compile.mli,
+    $PWD/main_args.mli,
+    $PWD/optmain.mli,
+    $PWD/main.mli,
+    $PWD/errors.ml,
+    $PWD/compile.ml,
+    $PWD/main_args.ml,
+};
+
+OCAML_DRIVER_OPT_SRC = {
+    $PWD/optcompile.mli,    # only for asmcomp
+    $PWD/opterrors.mli,     # only for asmcomp
+    $PWD/optcompile.ml,     # only for asmcomp
+    $PWD/opterrors.ml,      # only for asmcomp
+};
+
+OCAML_DRIVER_MAIN = {
+    $PWD/main.ml,
+};
+
+OCAML_DRIVER_OPTMAIN = {
+    $PWD/optmain.ml,
+};
