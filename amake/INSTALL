@@ -1,0 +1,11 @@
+
+0. You need the bash shell:
+
+   /bin/bash
+
+1. Edit the Makefile and check the settings for your operating system.
+   Normally, no changes are necessary.
+
+2. start the build script from this directory:
+
+   ./build
