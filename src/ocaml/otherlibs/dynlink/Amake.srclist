@@ -1,0 +1,9 @@
+
+OCAML_DYNLINK_SRC = {
+    $PWD/dynlink.mli,
+    $PWD/dynlink.ml
+};
+
+OCAML_DYNLINK_MAIN = {
+    $PWD/extract_crc.ml
+};
