@@ -1,0 +1,6 @@
+2006.1.5:
+	added several new methods for text_lines handling
+	added new class edit
+
+2006.1.15:
+    fixed cursor bug (with add_lines method)
