@@ -1,0 +1,16 @@
+
+OCAML_TOPLEVEL_SRC = {
+    $PWD/script_debug.mli,
+    $PWD/genprintval.mli,
+    $PWD/toploop.mli,
+    $PWD/trace.mli,
+    $PWD/topdirs.mli,
+    $PWD/genprintval.ml,
+    $PWD/toploop.ml,
+    $PWD/trace.ml,
+    $PWD/topdirs.ml,
+};
+
+OCAML_TOP_MAIN = {
+    $PWD/topmain.ml
+};
