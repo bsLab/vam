@@ -1,0 +1,6 @@
+2003.0.0:
+    some minor changes
+    Backtrace improvements by
+
+2005.1.5:
+    made extern_pc global for debugging purposes (previously static)
