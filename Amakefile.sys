@@ -17,11 +17,11 @@
 ##    $AUTHORS:     Stefan Bosse
 ##    $INITIAL:     (C) BSSLAB 2003
 ##    $CREATED:     
-##    $VERSION:     1.54
+##    $VERSION:     1.59
 ##
 ##    $INFO:
 ##
-## Path and system independent settings to build the OCaML and the VAM
+## Path and system dependent settings to build the OCaML and the VAM
 ## system
 ##
 ##
@@ -29,215 +29,24 @@
 ##
 
 
-
-
-
-###########################################################################
-#      OCaML compiler system definitions to build the OCaML               #
-#      Most variables prefixed with BOOT.                                 #
-###########################################################################
-
 #
-# Paths and programs
-#
-
-BOOT_OCAMLRUN      = $VAMDIR/build-ocaml/byterun/ocamlrun; 
-BOOT_OCAMLCOMPILE  = $VAMDIR/src/ocaml/boot/ocamlc;
-BOOT_OCAMLDEP      = $VAMDIR/src/ocaml/boot/ocamldep;
-BOOT_OCAMLMVCMI    = $VAMDIR/toolset/ocamlmvcmi.sh;
-BOOT_OCAMLYACC     = $VAMDIR/build-ocaml/ocamlyacc/ocamlyacc;
-BOOT_OCAMLLEX      = $VAMDIR/src/ocaml/boot/ocamllex;
-
-
-OCAML_BINDIR     = $INSTALLDIR/ocamlsys/bin;
-OCAML_LIBDIR     = $INSTALLDIR/ocamlsys/lib/ocaml;
-OCAML_RUNTIME    = $OCAML_BINDIR/ocamlrun;
-
-#
-# OCAML standard include paths
-#
-
-OCAML_STD_INC   = {
-    -I, ./interface,
-    -I, $INSTALLDIR/ocamlsys/lib/ocaml
-};
-
-#
-# OCAML compiler standard options
-#
-
-%if ($OCAML_DEBUG == yes,{
-    OCAML_DEBUG_FLAG = {-g};
-},{
-    OCAML_DEBUG_FLAG = {};
-}
-);
-%if ($OCAML_CC_DEBUG == yes,{
-    OCAML_CC_DEBUG_FLAG = {-g};
-},{
-    OCAML_CC_DEBUG_FLAG = {};
-}
-);
-
-
-OCAML_STD_FLAGS   = {
-    $OCAML_DEBUG_FLAG
-}; 
-
-#
-# And archiver flags
-#
-
-OCAML_AR_FLAGS  = {}; 
-
-#
-# OCaML yacc
-#
-
-OCAML_YACC_FLAGS = {};
-
-
-#
-# VM building flags
-#
-
-OCAML_VM_FLAGS = {
-    $OCAML_DEBUG_FLAG
-};
-
-OCAML_CC_STDFLAGS = {
-    $OCAML_CC_STDFLAGS,
-    $OCAML_CC_DEBUG_FLAG
-};
-
-#
-# Dependency filters
-#
-
-MKDEP = $VAMDIR/toolset/mkdep.sh;
-
-
-#
-# OCaML Preprocessor
-#
-
-VAM_PP = $VAMDIR/toolset/cpp.sh;
-VAM_OPT = '-pp';
-
-#
-# Some more utils
-#
-
-OCAML_BUILD_CONFIG_H = $VAMDIR/src/ocaml/toolset/config-h.sh;
-OCAML_BUILD_PRIMS    = $VAMDIR/src/ocaml/toolset/prims.sh;
-OCAML_BUILD_PRIMSC   = $VAMDIR/src/ocaml/toolset/primsc.sh;
-
-
-##########################################################################
-#               Build the VAM                                            #
-#               With some different defintions.                          #
-##########################################################################  
-
-%if ($VAM_DEBUG == yes,{
-    VAM_DEBUG_FLAG = {-g};
-},{
-    VAM_DEBUG_FLAG = {};
-}
-);
-%if ($VAM_CC_DEBUG == yes,{
-    VAM_CC_DEBUG_FLAG = {-g};
-},{
-    VAM_CC_DEBUG_FLAG = {}
-}
-);
-
-#
-# OCAML compiler flags for VAM
-#
-VAM_STD_FLAGS   = { 
-    $VAM_DEBUG_FLAG, 
-    -thread
-};
-
-#
-# and archiver options
-#
-VAM_AR_FLAGS  = {$VAM_DEBUG_FLAG};
-
-
-#
-# OCaML compiler system definitions to build the VAM
 #
 
 
-OCAMLRUN      = $INSTALLDIR/ocamlsys/bin/ocamlrun; 
-OCAMLCOMPILE  = $INSTALLDIR/ocamlsys/bin/ocamlc;
-OCAMLDEP      = $INSTALLDIR/ocamlsys/bin/ocamldep;
-OCAMLMVCMI    = $VAMDIR/toolset/ocamlmvcmi.sh;
-OCAMLYACC     = $INSTALLDIR/ocamlsys/bin/ocamlyacc;
-OCAMLLEX      = $INSTALLDIR/ocamlsys/bin/ocamllex;
+VAMDIR = /amoeba/vam-2.0;
+INSTALLDIR = /amoeba/Vam-2.0;
 
 #
-# OCaML standard include paths for VAM
-#  
-
-VAM_STD_INC   = {
-    -I, ./interface,
-    -I, ./../../interface
-};
-
-
-#
-# C compiler and archiver for VAM; same as in OCAML
+# Amoeba sources and the AMUNIX environment (must be already build).
 #
 
-VAM_CC_AR = $OCAML_CC_AR;
-VAM_CC_AR_FLAGS = $OCAML_CC_AR_FLAGS;
-
-VAM_CC_RANLIB = $OCAML_CC_RANLIB;
-
-VAM_CC = $OCAML_CC;
-
-VAM_CC_STDFLAGS = {
-    $VAM_CC_STDFLAGS,
-    $VAM_CC_DEBUG_FLAG
-};
+AMUNIX_LIB_DIR = /amoeba/Amunix/lib;
+AMOEBA_SRC_DIR = /amoeba/src;
+AMUNIX_INC_DIR = /amoeba/Amunix/include;
+AMUNIX_BIN_DIR = /amoeba/Amunix/bin;
 
 #
-# OCaML yacc
+# Your OS specific settings...
 #
 
-VAM_YACC_FLAGS = {};
-
-
-#
-# VM building flags
-#
-
-VAM_VM_FLAGS = {
-    $VAM_DEBUG_FLAG,
-    -thread
-};
-
-
-#
-# Create a config.h file from defintions in Amakefile.XX
-#
-
-VAM_BUILD_CONFIG_H = $VAMDIR/toolset/config-h.sh;
-VAM_CONFIG_H_TEMPL = $VAMDIR/Amakefile.sys;
-
-#
-# Export some environment variables
-#
-
-TOOLSET=$VAMDIR/toolset;
-%export TOOLSET;
-
-PP=$VAM_CPP;
-PP_FLAGS=$VAM_CPP_FLAGS;
-
-%export PP;
-%export PP_FLAGS;
-
-
+%include $VAMDIR/Amakefile.sys.freebsd;
