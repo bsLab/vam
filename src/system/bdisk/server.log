@@ -1,0 +1,5 @@
+2004.11.14:
+    vread/vwrite: new more efficient block management
+
+2004.12.27:
+    vread changed (reads now last block only if cursize > 0)
