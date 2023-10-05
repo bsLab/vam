@@ -1,0 +1,44 @@
+#!/bin/bash
+
+source ../../toolset/build.env
+
+if [ $# = 0 ]
+then
+    echo "Usage: build <targets>"
+    echo "Targets: all clean install"
+    exit 1
+fi
+
+check ()
+{
+    if [ $? != 0 ]
+    then
+        echo "Abort due to errors building target."
+        exit 1
+    fi
+}
+
+
+for TARGET in $@
+do
+    echo "Building target [$TARGET] ..."
+    case $TARGET in
+        all)    $AMAKE vrpc_test.cma
+                check
+                $AMAKE vrpc_client
+                check
+                $AMAKE vrpc_server
+                check
+                $AMAKE vrpc_self
+                check
+                ;;
+        clean)  $AMAKE -C
+                $RM interface/*
+                ;;
+        install)    
+                $INSTALL -d $INSTALLDIR/bin
+                $INSTALL -C vrpc_client $INSTALLDIR/bin
+                $INSTALL -C vrpc_server $INSTALLDIR/bin
+                $INSTALL -C vrpc_self $INSTALLDIR/bin
+    esac
+done
