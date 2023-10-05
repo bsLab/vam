@@ -1,0 +1,87 @@
+  .MD
+    .NA doc_latex .AN
+    .S4 .NA Description .AN
+    This is the Tex backend module used to convert .NA MlDoC .AN 
+    documents in Plain-TeX/Latex format.
+    This .NA tex_of_tree .AN function is used to convert the 
+    .NA structure_block .AN graph to TeX output. 
+    .4S
+    
+    .IN
+      .IF
+        .NA tex_of_tree .AN
+        .RV unit .VR
+        .AR ~ds: structure_block .RA
+        .AR ~options: tex_options list .RA
+        .AR ~sections: section_names list .RA
+      .FI
+    .NI
+
+    The .NA tex_of_tree .AN function needs three arguments:
+    .PL
+      .NA Arguments .AN 
+      .LI 
+        .NA ds .AN
+        This is the structure block tree previously generated with
+        the .NA atoms_of_ .AN function family.
+      .IL
+      .LI
+        .NA options .AN
+        Several options can control the converting behaviour and the output.
+        Available options:
+        .TB
+          .TR
+            .TC .T TEX_doc_name of string .R .CT
+            .TC 
+              The name of the output file. The default setting is
+              .T manual.tex .R .
+            .CT
+          .RT
+          .TR
+            .TC .T TEX_head_inline .R .CT
+            .TC Don't perform a page break on section boundaries. .CT
+          .RT
+          .TR
+            .TC .T TEX_color .R .CT 
+            .TC Ouput colored manual pages. Special color commands for 
+            .NA dvips .AN 
+            are created. Default is color off.
+            .CT
+          .RT
+          .TR
+            .TC .T TEX_no_toc .R .CT
+            .TC Don't print a table of content. Default is print a TOC. .CT 
+          .RT
+          .TR
+            .TC .T TEX_link_ref .R .CT
+            .TC Generate links in the manual (page references). Default is 
+            no links. .CT
+          .RT
+        .BT
+      .IL
+      .LI
+        .NA sections .AN
+        To convert only a part of a manual, for example a module like this,
+        some informations are needed about sections above this section. 
+      .IL
+    .LP
+
+    .S4
+      .NA LaTeX package dependencies .AN
+      The following packages are used by the .NA Doc_latex .AN module:
+      .UL
+        .LI .T newcent .R .IL
+        .LI .T pifont .R .IL
+        .LI .T color[dvips] .R .IL
+      .LU
+      Most common LaTeX/TeX distributions are shipped with these packages.
+    .4S
+    
+    .S4
+      .NA Module dependencies: .AN
+      .UL
+      .LI .NA Doc_core .AN .IL
+      .LU
+    .4S
+    
+  .DM
