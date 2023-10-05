@@ -1,0 +1,15 @@
+#
+# Enable debug support:
+# xxx.ml[flags={-po,-DDEBUG}],
+#
+
+SYS_AFS_SRC = {
+    $PWD/freelist.mli,
+    $PWD/afs_unix.mli,
+    $PWD/freelist.ml,
+    $PWD/afs_unix.ml,
+};
+
+SYS_AFS_MAIN_SRC = {
+    $PWD/main.ml
+};
