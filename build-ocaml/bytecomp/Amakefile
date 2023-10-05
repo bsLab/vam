@@ -1,0 +1,102 @@
+
+# version 1.01
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include common.amk;
+%include $VAMDIR/toolset/ocaml.types;
+
+#
+# Caml runtimedef file
+#
+
+%tool camlruntimedef-tool   
+(
+    src:        %in     [type = caml-runtimedef-templ];
+    dest:       %out    [type = ML-src-impl] => {runtimedef.ml};
+    intf:       %out    [ type = ML-src-intf ]   
+                                             => {runtimedef.mli};
+
+    prog:       %in     [type = command]    => $VAMDIR/src/ocaml/toolset/make-runtimedef.sh;
+
+    objintf:   %string %list                =>
+                if (get($src, flags) <> %unknown, {get($src, flags)}, {});
+
+)
+{
+    exec($prog,
+         args   => 
+                   vpath($SED,$BINPATHS)'/'$SED + $ECHO +
+                   $VAMDIR 
+         );
+
+    exec(cp, args =>
+            $objintf + './');        
+
+};
+
+#
+# Caml opcodes file
+#
+
+%tool camlopcodes-tool   
+(
+    src:        %in     [type = caml-opcodes-templ];
+    dest:       %out    [type = ML-src-impl] => {runtimedef.ml};
+
+    prog:       %in     [type = command]    => $VAMDIR/src/ocaml/toolset/make-opcodes.sh;
+
+)
+{
+    exec($prog,
+         args   => 
+                   vpath($SED,$BINPATHS)'/'$SED + $AWK + 
+                   $VAMDIR 
+         );
+
+};
+
+
+%include $VAMDIR/src/ocaml/toolset/ocaml-tools.common;
+%include $VAMDIR/src/ocaml/toolset/ocaml.sys;
+%include $VAMDIR/src/ocaml/bytecomp/Amake.srclist;
+
+INCLUDES = {
+    -I, ./,
+    -I, $VAMDIR/build-ocaml/utils/interface,
+    -I, $VAMDIR/build-ocaml/parsing/interface,
+    -I, $VAMDIR/build-ocaml/typing/interface,
+    -I, $VAMDIR/src/ocaml/bytecomp,
+};
+
+CAMLSRC = {
+    $OCAML_BYTECOMP_SRC,
+};
+
+
+CAMLLIB = bytecomp.cma;
+
+%cluster runtimedef.ml
+{
+    %targets    runtimedef.ml;
+    %sources    $VAMDIR/build-ocaml/ocamlrun/primitives
+                    [type = caml-runtimedef-templ,
+                     flags = {$VAMDIR/src/ocaml/bytecomp/runtimedef.mli}];
+    %use        camlruntimedef-tool();
+};
+
+%cluster opcodes.ml
+{
+    %targets    opcodes.ml;
+    %sources    $VAMDIR/src/ocaml/byterun/instruct.h
+                    [type = caml-opcodes-templ];
+    %use        camlopcodes-tool();
+};
+
+#
+# Create the library
+#
+
+%include $VAMDIR/src/ocaml/toolset/ocaml.lib;
+%instance libcluster ($CAMLLIB,$CAMLSRC);
