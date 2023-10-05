@@ -1,0 +1,69 @@
+
+# version 1.01
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include common.amk;
+%include $VAMDIR/toolset/ocaml.types;
+%include $VAMDIR/src/ocaml/toolset/ocaml-tools.common;
+%include $VAMDIR/src/ocaml/toolset/ocaml.sys;
+%include $VAMDIR/src/ocaml/stdlib/Amake.srclist;
+
+CINCLUDES = {
+    -I./,
+    -I$VAMDIR/src/ocaml/stdlib,
+};
+
+CAMLSRC = {
+    $OCAML_STDLIB_SRC,
+};
+
+
+CAMLLIB = stdlib.cma;
+
+
+
+%include $VAMDIR/src/ocaml/toolset/ocaml.lib;
+%instance libcluster ($CAMLLIB,$CAMLSRC);
+
+#
+# Caml byte code headers
+#
+
+%tool camlheader-tool   
+(
+    src:        %in     [type = caml-header-dep];
+    dest1:      %out    [type = caml-header] => camlheader;
+    dest2:      %out    [type = caml-header] => camlheader_ur;
+    prog:       %in     [type = command]    => $VAMDIR/src/ocaml/toolset/make-camlheader.sh;
+)
+{
+    exec($prog,
+         args   => $ECHO + $TR + $VAMDIR'/ocamlsys/bin/ocamlrun' + $dest1);
+    exec($prog,
+         args   => $ECHO + $TR + $VAMDIR'/ocamlsys/bin/ocamlrun' + $dest2);
+};
+
+%cluster camlheader
+{
+    %targets    camlheader[type = caml-header],
+                camlheader_ur[type = caml-header];
+    %sources    ../../../Amakefile.sys[type = caml-header-dep];
+#    %use        camlheader-tool();
+};
+
+#%cluster camlheader_ur
+#{
+#   
+#    %targets    camlheader_ur[type = caml-header];
+#    %sources    ../../../Amakefile.sys[type = caml-header-dep];
+#    %use        camlheader-tool();
+#};
+
+%cluster std_exit.cmo
+{
+    %targets    std_exit.cmo;
+    %sources    $OCAML_STDLIB_STDEXIT;
+};
+
