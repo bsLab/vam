@@ -1,0 +1,577 @@
+(*
+** A small portable version of GNU's readline with history support.
+** It doesen't need any special terminal capabilities except backspace.
+**
+**
+** Written by Stefan Bosse
+**        sbosse@physik.uni-bremen.de
+**
+** Created: Oct 2001
+**
+** Last modified:   27/04/02
+**
+** Changes:
+**
+**
+**
+** PsiLAB is free software; you can redistribute it and/or
+** modify it under the terms of the GNU General Public License as 
+** published by the Free Software Foundation; version 2.
+**
+** PsiLAB is distributed in the hope that it will be usefull,
+** but WITHOUT ANY WARRANTY; without even implied warranty of 
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** !! Strongly based on the readline.c file from gnuplot !!
+**
+** 
+*)
+
+open StdLabels
+open UnixLabels
+
+open Thread
+open Printf
+
+(*
+** Some constants, perhaps system dependent ?
+*)
+
+let space_char          = ref ' ' 
+let backspace_char      = ref '\b' 
+let newline_char        = ref '\n' 
+let cr_char             = ref '\r' 
+let escape_char         = ref '\027' 
+let del_char            = ref '\127' 
+
+(* internal coding for EOF !!! *)
+let eof_char            = ref '\000' 
+
+(*
+** Escape sequences 
+*)
+
+let escape  (code:char) =
+    match code with
+    | 'A' -> '\001';
+    | 'B' -> '\002';
+    | 'C' -> '\003';
+    | 'D' -> '\004';
+    | 'E' -> '\005';
+    | 'F' -> '\006';
+    | 'G' -> '\007';
+    | 'H' -> '\008';
+    | 'I' -> '\009';
+    | 'J' -> '\010';
+    | 'K' -> '\011';
+    | 'L' -> '\012';
+    | 'M' -> '\013';
+    | 'N' -> '\014';
+    | 'O' -> '\015';
+    | 'P' -> '\016';
+    | 'Q' -> '\017';
+    | 'R' -> '\018';
+    | 'S' -> '\019';
+    | 'T' -> '\020';
+    | 'U' -> '\021';
+    | 'V' -> '\022';
+    | 'W' -> '\023';
+    | 'X' -> '\024';
+    | 'Y' -> '\025';
+    | 'Z' -> '\026';
+    | _ -> failwith "escape: invalid escape code"
+
+
+
+let leftarrow_char  = ref (escape 'B') 
+let rightarrow_char = ref (escape 'F') 
+let uparrow_char    = ref (escape 'P') 
+let downarrow_char  = ref (escape 'N') 
+
+let max_buf   = ref 1024    
+
+(*
+** History list
+*)
+
+type history_entry = 
+{
+    line: string;
+    mutable prev: history_entry;
+    mutable next: history_entry
+}                 
+
+let rec history_null = {line="\000";prev=history_null;next=history_null}
+let history          = ref history_null
+let history_current  = ref history_null
+
+let line_len  = ref 0 
+let cur_line  = ref "" 
+let cur_pos   = ref 0 
+let max_pos   = ref 0 
+
+(*
+** I/O basics
+*)
+
+let io_putc (chr:char) =
+    let str = sprintf "%c" chr in
+    ignore(Unix.write stderr str 0 1)
+    
+
+let io_puts (str:string) =
+    let strlen = String.length str in
+    ignore(Unix.write stderr str 0 strlen)
+
+let io_getc () =
+    let str = " " in
+
+    let rn = Unix.read stdin str 0 1 
+    in
+    if (rn <= 0) then
+        '\000'
+    else        
+        (String.get str 0)
+
+let backspace () =
+    io_putc !backspace_char
+
+let extend_curline () =
+    let old_line = !cur_line in
+    cur_line :=  String.create (!max_buf + !line_len);
+    
+    for i = 0 to (!cur_pos-1)
+    do
+        let c = String.get old_line i in
+            String.set !cur_line i c;
+    done;
+    line_len := !line_len + !max_buf
+
+(*
+** Clear to end of line 
+*)
+
+let clear_eoline () =
+    for i = !cur_pos to (!max_pos-1)
+    do
+        io_putc !space_char;
+    done;
+    for i = !cur_pos to (!max_pos-1)
+    do
+        backspace ();
+    done
+
+(*
+** Redraw the entire line, putting the cursor where it belongs
+*)
+
+let redraw_line (prompt:string) =
+    io_puts prompt;
+    io_puts (String.sub !cur_line ~pos:0 ~len:(!max_pos));
+    for i = !max_pos downto (!cur_pos+1)
+    do
+        backspace ();
+    done
+
+(*
+** Fix up the line from cur_pos to max_pos
+** do not need any terminal caps execept backspace,
+** and space overwrites a char
+*)
+
+let fix_line () =
+
+    (* write tail of string *)
+    for i = !cur_pos to (!max_pos-1)
+    do
+        io_putc (String.get !cur_line i);
+    done;
+
+    (* write a space at the end of the line in case we
+    ** deleted one
+    *)
+
+    io_putc !space_char;
+
+    (* backup the original position *)
+    for i = (!max_pos + 1) downto (!cur_pos + 1)
+    do
+        backspace ();
+    done
+
+(*
+** Clear current line and the screen line
+*)
+
+let clear_line (prompt:string) =
+    for i = !cur_pos downto 1 
+    do
+        backspace ();
+    done;
+    for i = 1 to !max_pos
+    do
+        io_putc !space_char;
+    done;
+    io_putc !cr_char;
+    io_puts prompt;
+    cur_pos := 0;
+    max_pos := 0
+
+(*
+** Copy line to cur_line, draw it and set cur_pos and max_pos
+*)
+
+let copy_line (str:string) =
+    let strlen = String.length str in
+
+    while (strlen+1 > !line_len)
+    do
+        extend_curline ();
+    done;
+    
+    for i = 0 to (strlen-1) 
+    do
+        String.set !cur_line i 
+            (String.get str i);
+    done;
+    io_puts str;
+    cur_pos := strlen;
+    max_pos := strlen
+
+
+(*
+** Control terminal I/O
+*)
+
+let readline_termio = ref (tcgetattr stdin);;
+
+let set_termio () =
+    let tio = tcgetattr stdin in
+    readline_termio := (tcgetattr stdin);
+    tio.c_icanon <- false;
+    tio.c_echo   <- false;
+    tio.c_echoe  <- false;
+    tio.c_echok  <- false;
+    tio.c_echonl <- false;
+    tio.c_noflsh <- false;
+    tcsetattr stdin TCSAFLUSH tio
+        
+let reset_termio () =
+    tcsetattr stdin TCSANOW !readline_termio    
+
+(*
+** Convert ANSI arrow keys to control characters
+*)
+
+let ansi_getc () =
+    let c = ref ' ' in
+
+    c := io_getc ();
+
+    if (!c = !escape_char) then
+    begin
+        c := io_getc ();    (* Check for CSI *)
+        if (!c = '[') then
+        begin
+            c := io_getc ();    (* Get command character *)
+            c := (match !c with
+                | 'D' -> !leftarrow_char;   (* left arrow key *)
+                | 'C' -> !rightarrow_char;  (* right arrow key *)
+                | 'A' -> !uparrow_char;     (* up arrow key *)
+                | 'B' -> !downarrow_char;   (* down arrow key *)
+                | _   -> !c;);
+        end;
+    end;
+    !c
+
+let isprint (chr:char) =
+    match chr with
+    | 'a' .. 'z' -> true;
+    | 'A' .. 'Z' -> true;
+    | '0' .. '9' -> true;
+    | '!'|'"'|'$'|'%'|'&'|'/'|'('|')'|'='|'?'|'`'       -> true;
+    | '^'|'°'|'{'|'['|']'|'}'|'\\'|'\''|'*'|'+'|'~'     -> true;
+    | '#'|';'|','|':'|'.'|'-'|'_'|' '|'<'|'>'|'|'|'@'   -> true;
+    | _ -> false
+
+
+(*
+** History 
+*)
+
+(*
+** Add line to history
+*)
+
+let add_history (str:string) =
+    let rec hist_entry = {  line = str;
+                            prev = !history;
+                            next = history_null;
+                         }  
+    in
+
+    if (!history <> history_null) then
+        (!history).next <- hist_entry;
+    
+    history := hist_entry;
+    history_current := history_null
+
+(*
+** Main function:
+**
+** readline "prompt"
+**
+** Editing the line with arrow keys, backspace and the Nano Emacs
+** key bindings.
+*)
+
+
+
+let readline (prompt:string) = 
+    let eol = ref false in
+    let cur_char = ref ' ' in
+
+    if (!line_len<>0) then
+        line_len := 0;
+
+    cur_line := (String.create !max_buf);
+    line_len := !max_buf;
+
+    max_pos := 0;
+    cur_pos := 0;
+    
+
+    (*
+    ** Set termio so we can do our own input processing
+    *)
+    
+    set_termio ();
+
+    (*
+    ** Print the prompt
+    *)
+
+    ignore(io_puts prompt); 
+
+
+    while( !eol = false ) 
+    do
+        
+        cur_char := ansi_getc (); 
+
+        if (isprint !cur_char) then
+        begin
+
+            (*
+            ** Printable characters 
+            *)
+
+            if(!max_pos+1 >= !line_len) then
+                extend_curline ();
+
+            for i = !max_pos downto (!cur_pos+1)
+            do
+                let c = String.get !cur_line (i-1) in
+                    String.set !cur_line i c;  
+            done;
+
+            io_putc !cur_char;
+            String.set !cur_line !cur_pos !cur_char;
+            incr cur_pos;
+            incr max_pos;
+            
+            if (!cur_pos < !max_pos) then
+                fix_line ();
+        end
+        else
+        begin
+            (*
+            ** Normal editing commands
+            *)
+
+            if (!cur_char = !eof_char) then 
+            begin
+                (* EOF - no more data from stdin *)
+                reset_termio ();
+                cur_line := "exit 0;;";
+                max_pos  := (String.length (!cur_line)) + 1 ;
+                eol := true;
+            end 
+            else if (!cur_char = (escape 'A')) then
+            begin
+                (* Begin of line *)
+                while (!cur_pos > 0) 
+                do
+                    decr cur_pos;
+                    backspace ();
+                done
+            end 
+            else if (!cur_char = (escape 'B')) then
+            begin
+                (* One position left *)
+                if (!cur_pos > 0) then
+                begin
+                    decr cur_pos;
+                    backspace ();
+                end
+            end 
+            else if (!cur_char = (escape 'E')) then
+            begin
+                (* End of line *)
+                while (!cur_pos < !max_pos)
+                do
+                    let c = String.get !cur_line !cur_pos in 
+                    ignore(io_putc c);
+                    incr cur_pos;
+                done
+            end 
+            else if (!cur_char = (escape 'F')) then
+            begin
+                (* One position right *)
+                if (!cur_pos < !max_pos) then
+                begin
+                    let c = String.get !cur_line !cur_pos in 
+                    ignore(io_putc c);
+                    incr cur_pos;
+                end;
+            end 
+            else if (!cur_char = (escape 'K')) then
+            begin
+                (* Clear line *)
+                clear_eoline ();
+                max_pos := !cur_pos;
+            end else if (!cur_char = (escape 'P')) then
+            begin
+                (* History up *)
+                if (!history <> history_null) then
+                begin
+                    if (!history_current = history_null) then
+                    begin
+                        history_current := !history;
+                        clear_line prompt;
+                        copy_line (!history_current).line;
+                    end
+                    else if (!history_current.prev <> history_null) then                
+                    begin
+                        history_current := (!history_current).prev;
+                        clear_line prompt;
+                        copy_line (!history_current).line;
+                    end; 
+                end;
+            end 
+            else if (!cur_char = (escape 'N')) then
+            begin
+                (* History down *)
+                if (!history_current <> history_null) then
+                begin
+                        history_current := (!history_current).next;
+                        clear_line prompt;
+                        if (!history_current <> history_null) then
+                            copy_line (!history_current).line
+                        else
+                        begin
+                            cur_pos := 0;
+                            max_pos := 0;
+                        end;
+                end;
+            end 
+            else if (!cur_char = (escape 'N')) then
+            begin
+                (* History down *)
+                ();
+            end 
+            else if (!cur_char = (escape 'L') || 
+                     !cur_char = (escape 'R')) then
+            begin
+                (* refresh line *)
+                ignore(io_putc !newline_char); (* go to a fresh line *)
+                redraw_line prompt;
+            end 
+            else if (!cur_char = !del_char || 
+                     !cur_char = (escape 'H')) then
+            begin
+                (* delete a char *)
+                if (!cur_pos > 0) then
+                begin
+                    decr cur_pos;
+                    backspace ();
+                    for i = !cur_pos to (!max_pos - 1) 
+                    do
+                        let c = String.get !cur_line (i+1) in
+                            String.set !cur_line i c;
+                    done;
+                    decr max_pos;
+                    fix_line ();
+                end;
+            end 
+            else if (!cur_char = (escape 'D') ) then
+            begin
+                (* Backspace or EOF *)
+                if (!max_pos = 0) then
+                begin
+                    eol := true;
+                    reset_termio ();
+                    cur_line := "exit 0;;";
+                    max_pos  := (String.length (!cur_line));
+                    io_putc '\n';
+                end
+                else
+                begin
+                    if (!cur_pos < !max_pos) then
+                    begin
+                        for i = !cur_pos to (!max_pos-1) 
+                        do
+                            let c = String.get !cur_line (i+1) in
+                                String.set !cur_line i c;
+                        done;
+                    end;
+                end;
+            end 
+            else if (!cur_char = (escape 'U') ) then
+            begin
+                (* Clear line *)
+                clear_line prompt;
+            end 
+            else if (!cur_char = (escape 'W') ) then
+            begin
+                (* delete last word *)
+                while (!cur_pos > 0)
+                do
+                    if ( (String.get !cur_line (!cur_pos-1)) = !space_char)
+                    then
+                    begin
+                        decr cur_pos;
+                        backspace ();
+                    end;
+                done;
+                while ( !cur_pos > 0 &&
+                       (String.get !cur_line (!cur_pos-1)) = !space_char)
+                do
+                    decr cur_pos;
+                    backspace();
+                done;
+                clear_eoline ();
+                max_pos := !cur_pos;
+            end 
+            else if (!cur_char = (escape 'J') ||
+                     !cur_char = (escape 'M') ||
+                     !cur_char = !newline_char) then
+            begin
+                (* New line -> we're finished *)
+                reset_termio ();
+                eol := true;
+                io_putc !newline_char;
+            end;
+        end;
+    done;
+
+    (* return the filled area in our line buffer *)
+    if(!max_pos > 0) then
+    begin
+        let result = String.sub !cur_line ~pos:0 ~len:(!max_pos) in
+        add_history result;
+        result;
+    end
+    else
+        "\n"
