@@ -1,0 +1,8 @@
+XTAP_SRC = {
+    $PWD/xtap.mli,
+    $PWD/xtap.ml
+};
+
+XTAP_MAIN_SRC = {
+    $PWD/main.ml,
+};
