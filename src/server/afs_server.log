@@ -1,0 +1,10 @@
+2004.1.11:
+    afs_time in server struct added
+    ff_time now initialized with afs_time
+
+2004.5.9:
+    afs_req_age modified
+    afs_lock bug fixed
+
+2005.5.6:
+    changed from print to sys_log
