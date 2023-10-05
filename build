@@ -1,0 +1,96 @@
+#!/bin/bash
+
+# source ./toolset/build.env
+RM="rm -f"
+ECHO=echo
+
+if [ $# = 0 ]
+then
+    echo "Usage: build <targets>"
+    echo "Targets: all clean install install-ocaml"
+    exit 1
+fi
+
+SUBTARGETS="	\
+build-ocaml	\
+build-vam	\
+build-system	\
+"
+
+check ()
+{
+    if [ $? != 0 ]
+    then
+        echo "[Abort due to errors building target.]"
+        exit 1
+    fi
+}
+
+
+for TARGET in $@
+do
+    echo "Building target [$TARGET] ..."
+    case $TARGET in
+        all)    
+                cd toolset
+                build all
+                check
+                cd -
+
+                for subtarget in $SUBTARGETS
+                do
+                    $ECHO [Entering directory $subtarget...]
+                    cd $subtarget
+
+                    build all
+                    check
+                    build install
+                    check
+        
+                    cd -
+                done
+                ;;
+        clean)  
+                cd toolset
+                build all
+                check
+                cd -
+                for subtarget in $SUBTARGETS
+                do
+                    $ECHO [Entering directory $subtarget...]
+                    cd $subtarget
+                    build clean
+                    if [ $? = 0 ]
+                    then
+                        cd -
+                    else
+                        echo "Abort."
+                        exit 1
+                    fi
+                done
+                cd toolset
+                build clean
+                check
+                cd -
+                $RM /tmp/camlpp*
+                ;;
+
+        install)    
+                for subtarget in $SUBTARGETS
+                do
+                    $ECHO [Entering directory $subtarget...]
+                    cd $subtarget
+                    build install
+                    if [ $? = 0 ]
+                    then
+                        cd -
+                    else
+                        echo "Abort."
+                        exit 1
+                    fi
+                done
+                ;;
+    esac
+done
+
+echo "Done."
