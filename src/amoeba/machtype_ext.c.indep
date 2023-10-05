@@ -1,0 +1,2316 @@
+/*
+**      ==================================
+**      OOOO   OOOO OOOO  O      O   OOOO
+**      O   O  O    O     O     O O  O   O
+**      O   O  O    O     O     O O  O   O
+**      OOOO   OOOO OOOO  O     OOO  OOOO
+**      O   O     O    O  O    O   O O   O
+**      O   O     O    O  O    O   O O   O
+**      OOOO   OOOO OOOO  OOOO O   O OOOO
+**      ================================== 
+**      BSSLAB, Dr. Stefan Bosse sci@bsslab.de
+**
+**    PROTECTED BY AND DISTRIBUTED UNDER THE TERMS OF: 
+**    Free Software Foundation-Europe, GNU GPL License, Version 2
+**
+**    $MODIFIEDBY:  BSSLAB
+**    $AUTHORS:     Stefan Bosse
+**    $INITIAL:     (C) 2003 BSSLAB
+**    $CREATED:     
+**    $MODIFIED:    
+**    $VERSION:     0.54
+**
+**    $INFO:
+**
+** Universal machine type support. Machine independt (I hope)!
+**
+** TODO
+**  - 64 bit arithmetic, also on 32 bit machines
+**  - signed logical operators are ony correct for 32 bit values
+**  - not optimized - not fast enough as it should be.
+**  - the machine independent way of handling the types was
+**    a silly idea. Better way: compiler type castings.
+**
+**
+**    $ENDOFINFO
+**
+*/
+
+
+
+
+
+
+#define HAVE_LONGLONG
+
+
+#include <mlvalues.h>
+#include <alloc.h>
+#include <custom.h>
+#include <callback.h>
+#include <memory.h>
+#include <signals.h>
+#include <fail.h>
+#include <stdio.h>
+
+#include <string.h>
+
+#include "machtype.h"
+
+/*
+** Return machine type id
+*/
+CAMLexport value
+unimach_id(value v1)
+{
+    UCHAR *us;
+    int type;
+    UCHAR *data;
+    if(Is_block(v1) == 0)
+        failwith ("unimach_id: not a machine type");    
+    if(Tag_val(v1) != String_tag)
+        failwith ("unimach_id: not a machine type");    
+
+    us=(unsigned char*)String_val(v1);
+    type=(int)us[0];
+
+    return (Val_int(type));
+};
+
+
+CAMLexport value 
+unimach_compare (value v1,value v2,char comp)
+{
+    value res;
+    SINT i1,i2;
+    UINT u,u1,u2;
+
+#ifdef HAVE_LONGLONG
+    LLSINT il,il1,il2;
+    LLUINT ul,ul1,ul2;
+#endif
+
+    UCHAR *data;
+    
+    if (Is_long(v1)  && Is_long(v2))
+    {
+        /*
+        ** OCaML integer 
+        */
+        int i1=Int_val(v1);
+        int i2=Int_val(v2);
+        switch (comp) 
+        {
+            case 'l':
+                res=Val_int(i1<i2);
+                break;
+            case 'L':
+                res=Val_int(i1<=i2);
+                break;
+            case 'g':
+                res=Val_int(i1>i2);
+                break;
+            case 'G':
+                res=Val_int(i1>=i2);
+                break;
+            case 'E':
+                res=Val_int(i1==i2);
+                break;
+            default: 
+                failwith("prog. error");
+          };
+    } 
+    else if (Is_block(v1) && Tag_val(v1) == String_tag &&
+             Is_block(v2) && Tag_val(v2) == String_tag)
+    {
+        /*
+        ** unitype
+        */ 
+        UCHAR *us1=(unsigned char*)String_val(v1);
+        int type1=(int)us1[0];
+        UCHAR * data1=&us1[1];
+        UCHAR *us2=(unsigned char*)String_val(v2);
+        int type2=(int)us2[0];
+        UCHAR * data2=&us2[1];
+
+        if (type1 != type2)
+            failwith ("unimach_add: arguments of different types\n");
+        switch(type1) {
+            case INT8:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT b1=(UINT)(data2[0]);
+                i1=(SINT)(a1);
+                i2=(SINT)(b1);
+                switch (comp) 
+                {
+                    case 'l':
+                        res=Val_int(i1<i2);
+                        break;
+                    case 'L':
+                        res=Val_int(i1<=i2);
+                        break;
+                    case 'g':
+                        res=Val_int(i1>i2);
+                        break;
+                    case 'G':
+                        res=Val_int(i1>=i2);
+                        break;
+                    case 'E':
+                        res=Val_int(i1==i2);
+                        break;
+                    default: 
+                        failwith("prog. error");
+                };
+            }
+            case INT16:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                i1=(SINT)(a1 | (a2 << 8));
+                i2=(SINT)(b1 | (b2 << 8));
+    
+                switch (comp) 
+                {
+                    case 'l':
+                        res=Val_int(i1<i2);
+                        break;
+                    case 'L':
+                        res=Val_int(i1<=i2);
+                        break;
+                    case 'g':
+                        res=Val_int(i1>i2);
+                        break;
+                    case 'G':
+                        res=Val_int(i1>=i2);
+                        break;
+                    case 'E':
+                        res=Val_int(i1==i2);
+                        break;
+                    default: 
+                        failwith("prog. error");
+                };
+            }
+            break;
+            case INT32:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT a3=(UINT)(data1[2]);
+                UINT a4=(UINT)(data1[3]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                UINT b3=(UINT)(data2[2]);
+                UINT b4=(UINT)(data2[3]);
+                i1=(SINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24));
+                i2=(SINT)(b1 | (b2 << 8) | (b3 << 16) | (b4 << 24));
+                
+                switch (comp) 
+                {
+                    case 'l':
+                        res=Val_int(i1<i2);
+                        break;
+                    case 'L':
+                        res=Val_int(i1<=i2);
+                        break;
+                    case 'g':
+                        res=Val_int(i1>i2);
+                        break;
+                    case 'G':
+                        res=Val_int(i1>=i2);
+                        break;
+                    case 'E':
+                        res=Val_int(i1==i2);
+                        break;
+                    default: 
+                        failwith("prog. error");
+                };
+            }
+            break;
+#ifdef HAVE_LONGLONG
+            case INT64:
+            {
+                LLUINT a1=(LLUINT)(data1[0]);
+                LLUINT a2=(LLUINT)(data1[1]);
+                LLUINT a3=(LLUINT)(data1[2]);
+                LLUINT a4=(LLUINT)(data1[3]);
+                LLUINT a5=(LLUINT)(data1[4]);
+                LLUINT a6=(LLUINT)(data1[5]);
+                LLUINT a7=(LLUINT)(data1[6]);
+                LLUINT a8=(LLUINT)(data1[7]);
+                LLUINT b1=(LLUINT)(data2[0]);
+                LLUINT b2=(LLUINT)(data2[1]);
+                LLUINT b3=(LLUINT)(data2[2]);
+                LLUINT b4=(LLUINT)(data2[3]);
+                LLUINT b5=(LLUINT)(data2[4]);
+                LLUINT b6=(LLUINT)(data2[5]);
+                LLUINT b7=(LLUINT)(data2[6]);
+                LLUINT b8=(LLUINT)(data2[7]);
+                il1=(LLSINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24) |
+                             (a2 << 32) | (a3 << 40) | (a4 << 48) | 
+                             (a2 << 56));
+                il2=(LLSINT)(b1 | (b2 << 8) | (b3 << 16) | (b4 << 24) |
+                             (b2 << 32) | (b3 << 40) | (b4 << 48) | 
+                             (b2 << 56));
+                
+                switch (comp) 
+                {
+                    case 'l':
+                        res=Val_int(il1<il2);
+                        break;
+                    case 'L':
+                        res=Val_int(il1<=il2);
+                        break;
+                    case 'g':
+                        res=Val_int(il1>il2);
+                        break;
+                    case 'G':
+                        res=Val_int(il1>=il2);
+                        break;
+                    case 'E':
+                        res=Val_int(il1==il2);
+                        break;
+                    default: 
+                        failwith("prog. error");
+                };
+            }
+            break;
+#endif
+
+            case WORD8:
+            case UINT8:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT b1=(UINT)(data2[0]);
+                u1=(UINT)(a1);
+                u2=(UINT)(b1);
+                
+                switch (comp) 
+                {
+                    case 'l':
+                        res=Val_int(u1<u2);
+                        break;
+                    case 'L':
+                        res=Val_int(u1<=u2);
+                        break;
+                    case 'g':
+                        res=Val_int(u1>u2);
+                        break;
+                    case 'G':
+                        res=Val_int(u1>=u2);
+                        break;
+                    case 'E':
+                        res=Val_int(u1==u2);
+                        break;
+                    default: 
+                        failwith("prog. error");
+                };
+            }
+            break;
+            case WORD16:
+            case UINT16:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                u1=(UINT)(a1 | (a2 << 8));
+                u2=(UINT)(b1 | (b2 << 8));
+
+                
+                switch (comp) 
+                {
+                    case 'l':
+                        res=Val_int(u1<u2);
+                        break;
+                    case 'L':
+                        res=Val_int(u1<=u2);
+                        break;
+                    case 'g':
+                        res=Val_int(u1>u2);
+                        break;
+                    case 'G':
+                        res=Val_int(u1>=u2);
+                        break;
+                    case 'E':
+                        res=Val_int(u1==u2);
+                        break;
+                    default: 
+                        failwith("prog. error");
+                };
+            }
+            break;
+            case WORD32:
+            case UINT32:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT a3=(UINT)(data1[2]);
+                UINT a4=(UINT)(data1[3]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                UINT b3=(UINT)(data2[2]);
+                UINT b4=(UINT)(data2[3]);
+                u1=(UINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24));
+                u2=(UINT)(b1 | (b2 << 8) | (b3 << 16) | (b4 << 24));
+
+                
+                switch (comp) 
+                {
+                    case 'l':
+                        res=Val_int(u1<u2);
+                        break;
+                    case 'L':
+                        res=Val_int(u1<=u2);
+                        break;
+                    case 'g':
+                        res=Val_int(u1>u2);
+                        break;
+                    case 'G':
+                        res=Val_int(u1>=u2);
+                        break;
+                    case 'E':
+                        res=Val_int(u1==u2);
+                        break;
+                    default: 
+                        failwith("prog. error");
+                };
+            }
+            break;
+#ifdef HAVE_LONGLONG
+            case UINT64:
+            case WORD64:
+            {
+                LLUINT a1=(LLUINT)(data1[0]);
+                LLUINT a2=(LLUINT)(data1[1]);
+                LLUINT a3=(LLUINT)(data1[2]);
+                LLUINT a4=(LLUINT)(data1[3]);
+                LLUINT a5=(LLUINT)(data1[4]);
+                LLUINT a6=(LLUINT)(data1[5]);
+                LLUINT a7=(LLUINT)(data1[6]);
+                LLUINT a8=(LLUINT)(data1[7]);
+                LLUINT b1=(LLUINT)(data2[0]);
+                LLUINT b2=(LLUINT)(data2[1]);
+                LLUINT b3=(LLUINT)(data2[2]);
+                LLUINT b4=(LLUINT)(data2[3]);
+                LLUINT b5=(LLUINT)(data2[4]);
+                LLUINT b6=(LLUINT)(data2[5]);
+                LLUINT b7=(LLUINT)(data2[6]);
+                LLUINT b8=(LLUINT)(data2[7]);
+                ul1=(LLUINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24) |
+                             (a2 << 32) | (a3 << 40) | (a4 << 48) | 
+                             (a2 << 56));
+                ul2=(LLUINT)(b1 | (b2 << 8) | (b3 << 16) | (b4 << 24) |
+                             (b2 << 32) | (b3 << 40) | (b4 << 48) | 
+                             (b2 << 56));
+                
+                switch (comp) 
+                {
+                    case 'l':
+                        res=Val_int(ul1<ul2);
+                        break;
+                    case 'L':
+                        res=Val_int(ul1<=ul2);
+                        break;
+                    case 'g':
+                        res=Val_int(ul1>ul2);
+                        break;
+                    case 'G':
+                        res=Val_int(ul1>=ul2);
+                        break;
+                    case 'E':
+                        res=Val_int(ul1==ul2);
+                        break;
+                    default: 
+                        failwith("prog. error");
+                };
+            }
+            break;
+#endif
+            default: failwith ("unimach_add: unsupported type\n");
+        };
+    }
+    else if (Is_block(v1) && Tag_val(v1) == Double_tag &&
+             Is_block(v2) && Tag_val(v2) == Double_tag)
+    {
+        /*
+        ** float
+        */
+        double d1=Double_val(v1);
+        double d2=Double_val(v2);
+        switch (comp) 
+        {
+            case 'l':
+                res=Val_int(d1<d2);
+                break;
+            case 'L':
+                res=Val_int(d1<=d2);
+                break;
+            case 'g':
+                res=Val_int(d1>d2);
+                break;
+            case 'G':
+                res=Val_int(d1>=d2);
+                break;
+            case 'E':
+                res=Val_int(d1==d2);
+                break;
+            default: 
+                failwith("prog. error");
+          };
+    
+    }
+    else failwith ("unimach_lt: unsupported or different argument types\n");
+ 
+    return res;
+}
+
+
+
+CAMLexport value 
+unimach_lt (value v1,value v2)
+{
+    return unimach_compare(v1,v2,'l');
+};
+CAMLexport value 
+unimach_le (value v1,value v2)
+{
+    return unimach_compare(v1,v2,'L');
+};
+
+
+
+
+CAMLexport value 
+unimach_gt (value v1,value v2)
+{
+    return unimach_compare(v1,v2,'g');
+};
+CAMLexport value 
+unimach_ge (value v1,value v2)
+{
+    return unimach_compare(v1,v2,'G');
+};
+
+CAMLexport value 
+unimach_eq (value v1,value v2)
+{
+    return unimach_compare(v1,v2,'E');
+};
+
+
+
+
+/*
+** Conversion and creation of unidata values.
+*/
+
+CAMLexport value 
+unimach_to_int(value v1)
+{
+    UCHAR *us;
+    int type;
+    UCHAR *data;
+    int i=0;
+
+    if(Is_block(v1) == 0)
+        failwith ("unimach_to_int: not a machine type");    
+    if(Tag_val(v1) != String_tag)
+        failwith ("unimach_to_int: not a machine type");    
+
+    us=(unsigned char*)String_val(v1);
+    type=(int)us[0];
+    data=&us[1];
+
+    switch (type) {
+        case UINT8:
+        case WORD8:
+        {
+            UINT d1=(UINT)(data[0]);
+            i=(int)d1;
+        }
+        break;
+        case UINT16:
+        case WORD16:
+        {
+            UINT d1=(UINT)(data[0]);
+            UINT d2=(UINT)(data[1]);
+            i=(int)(d1 | (d2 << 8));
+        }
+        break;
+        case UINT32:
+        case WORD32:
+        {
+            UINT d1=(UINT)(data[0]);
+            UINT d2=(UINT)(data[1]);
+            UINT d3=(UINT)(data[2]);
+            UINT d4=(UINT)(data[3]);
+            i=(int)(d1 | (d2 << 8) | (d3 << 16) | (d4 << 24));
+        }
+        break;
+
+        case INT8:
+        {
+            UCHAR c1=data[0];
+            i=(SINT)((SCHAR)c1);
+        }
+        break;
+        case INT16:
+        {
+            UINT d1=(UINT)(data[0]);
+            UINT d2=(UINT)(data[1]);
+            i=(SINT)(d1 | (d2 << 8));
+            if ((i & 0x8000) == 0x8000)
+                i = i | 0xffff0000;
+        }
+        break;
+        case INT32:
+        {
+            UINT d1=(UINT)(data[0]);
+            UINT d2=(UINT)(data[1]);
+            UINT d3=(UINT)(data[2]);
+            UINT d4=(UINT)(data[3]);
+            i=(SINT)(d1 | (d2 << 8) | (d3 << 16) | (d4 << 24));
+        }
+        break;
+         
+        default: failwith ("to_int: unknown or unsupported type\n");
+    };    
+    return Val_int(i);
+}
+
+CAMLexport value 
+unimach_of_int(value vi, value vt)
+{
+    CAMLparam0();
+    CAMLlocal1(res);
+
+    UCHAR *data=(UCHAR)NULL;
+    int i = Int_val(vi);
+    int type = Int_val(vt);
+        
+
+    switch (type) {
+        case UINT8:
+        case WORD8:
+        {
+            UINT u=(UINT)i;
+            res=alloc_string(2);
+            data=(UCHAR*)String_val(res);
+            data[1] = (UCHAR)(u & 0xff);
+        }
+        break;
+        case UINT16:
+        case WORD16:
+        {
+            UINT u=(UINT)i;
+            res=alloc_string(3);
+            data=(UCHAR*)String_val(res);
+            data[1] = (UCHAR)(u & 0xff);
+            data[2] = (UCHAR)((u >> 8) & 0xff);
+        }
+        break;
+        case UINT32:
+        case WORD32:
+        {
+            UINT u=(UINT)i;
+            res=alloc_string(5);
+            data=(UCHAR*)String_val(res);
+            data[1] = (UCHAR)(u & 0xff);
+            data[2] = (UCHAR)((u >> 8) & 0xff);
+            data[3] = (UCHAR)((u >> 16) & 0xff);
+            data[4] = (UCHAR)((u >> 24) & 0xff);
+        }
+        break;
+        case INT8:
+        {
+            SINT s=(SINT)i;
+            res=alloc_string(2);
+            data=(UCHAR*)String_val(res);
+            data[1] = (UCHAR)((SCHAR)(s));
+        }
+        break;
+        case INT16:
+        {
+            UINT u=(UINT)i;
+            res=alloc_string(3);
+            data=(UCHAR*)String_val(res);
+            data[1] = (UCHAR)(u & 0xff);
+            data[2] = (UCHAR)((u >> 8) & 0xff);
+        }
+        break;
+        case INT32:
+        {
+            UINT u=(UINT)i;
+            res=alloc_string(5);
+            data=(UCHAR*)String_val(res);
+            data[1] = (UCHAR)(u & 0xff);
+            data[2] = (UCHAR)((u >> 8) & 0xff);
+            data[3] = (UCHAR)((u >> 16) & 0xff);
+            data[4] = (UCHAR)((u >> 24) & 0xff);
+        }
+        break;
+        default: failwith ("of_int: unknown or unsupported type\n");
+    };    
+    if (data == NULL)
+        failwith("of_int: data error\n");
+
+    data[0]=(UCHAR)type;
+
+    CAMLreturn(res);
+};
+
+
+static char * parse_sign_and_base(char * p,
+                                  /*out*/ int * base,
+                                  /*out*/ int * sign)
+{
+  *sign = 1;
+  if (*p == '-') {
+    *sign = -1;
+    p++;
+  }
+  *base = 10;
+  if (*p == '0') {
+    switch (p[1]) {
+    case 'x': case 'X':
+      *base = 16; p += 2; break;
+    case 'o': case 'O':
+      *base = 8; p += 2; break;
+    case 'b': case 'B':
+      *base = 2; p += 2; break;
+    }
+  }
+  return p;
+};
+
+static int parse_digit(char * p)
+{
+  int c = *p;
+  if (c >= '0' && c <= '9')
+    return c - '0';
+  else if (c >= 'A' && c <= 'F')
+    return c - 'A' + 10;
+  else if (c >= 'a' && c <= 'f')
+    return c - 'a' + 10;
+  else
+    return -1;
+};
+
+static long parse_long(char * p)
+{
+  unsigned long res;
+  int sign, base, d;
+
+  p = parse_sign_and_base(p, &base, &sign);
+  d = parse_digit(p);
+  if (d < 0 || d >= base) failwith("int_of_string");
+  for (p++, res = d; /*nothing*/; p++) {
+    d = parse_digit(p);
+    if (d < 0 || d >= base) break;
+    res = base * res + d;
+  }
+  if (*p != 0) failwith("of_string\n");
+  return sign < 0 ? -((long) res) : (long) res;
+};
+
+CAMLexport value 
+unimach_of_str(value vs, value vt)
+{
+    CAMLparam0();
+    CAMLlocal1(res);
+
+    UCHAR *data=(UCHAR)NULL;
+    char *str = String_val(vs);
+    int i=parse_long(str);
+    int type = Int_val(vt);
+        
+
+    switch (type) {
+        case UINT8:
+        case WORD8:
+        {
+            UINT u=(UINT)i;
+            res=alloc_string(2);
+            data=(UCHAR*)String_val(res);
+            data[1] = (UCHAR)(u & 0xff);
+        }
+        break;
+        case UINT16:
+        case WORD16:
+        {
+            UINT u=(UINT)i;
+            res=alloc_string(3);
+            data=(UCHAR*)String_val(res);
+            data[1] = (UCHAR)(u & 0xff);
+            data[2] = (UCHAR)((u >> 8) & 0xff);
+        }
+        break;
+        case UINT32:
+        case WORD32:
+        {
+            UINT u=(UINT)i;
+            res=alloc_string(5);
+            data=(UCHAR*)String_val(res);
+            data[1] = (UCHAR)(u & 0xff);
+            data[2] = (UCHAR)((u >> 8) & 0xff);
+            data[3] = (UCHAR)((u >> 16) & 0xff);
+            data[4] = (UCHAR)((u >> 24) & 0xff);
+        }
+        break;
+        case INT8:
+        {
+            SINT s=(SINT)i;
+            res=alloc_string(2);
+            data=(UCHAR*)String_val(res);
+            data[1] = (UCHAR)((SCHAR)(s));
+        }
+        break;
+        case INT16:
+        {
+            UINT u=(UINT)i;
+            res=alloc_string(3);
+            data=(UCHAR*)String_val(res);
+            data[1] = (UCHAR)(u & 0xff);
+            data[2] = (UCHAR)((u >> 8) & 0xff);
+        }
+        break;
+        case INT32:
+        {
+            UINT u=(UINT)i;
+            res=alloc_string(5);
+            data=(UCHAR*)String_val(res);
+            data[1] = (UCHAR)(u & 0xff);
+            data[2] = (UCHAR)((u >> 8) & 0xff);
+            data[3] = (UCHAR)((u >> 16) & 0xff);
+            data[4] = (UCHAR)((u >> 24) & 0xff);
+        }
+        break;
+        default: failwith ("of_str: unknown or unsupported type\n");
+    };    
+    if (data == NULL)
+        failwith("of_str: data error\n");
+
+    data[0]=(UCHAR)type;
+
+    CAMLreturn(res);
+}
+                                                                                                                        
+
+/*
+** Arithmetic operations. Possible argument types:
+**
+** 1. int
+** 2. float
+** 3. unidata (of course!)
+**
+*/
+
+CAMLexport value 
+unimach_add (value v1,value v2)
+{
+    CAMLparam0();
+    CAMLlocal1(res);
+    SINT i1,i2;
+    UINT u,u1,u2;
+
+#ifdef HAVE_LONGLONG
+    LLSINT il,il1,il2;
+    LLUINT ul,ul1,ul2;
+#endif
+
+    UCHAR *data;
+    
+    if (Is_long(v1)  && Is_long(v2))
+    {
+        /*
+        ** OCaML integer 
+        */
+        res=Val_int(Int_val(v1) + Int_val(v2));
+    } 
+    else if (Is_block(v1) && Tag_val(v1) == String_tag &&
+             Is_block(v2) && Tag_val(v2) == String_tag)
+    {
+        /*
+        ** unitype
+        */ 
+        UCHAR *us1=(unsigned char*)String_val(v1);
+        int type1=(int)us1[0];
+        UCHAR * data1=&us1[1];
+        UCHAR *us2=(unsigned char*)String_val(v2);
+        int type2=(int)us2[0];
+        UCHAR * data2=&us2[1];
+
+        if (type1 != type2)
+            failwith ("unimach_add: arguments of different types\n");
+        switch(type1) {
+            case INT8:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT b1=(UINT)(data2[0]);
+                i1=(SINT)(a1);
+                i2=(SINT)(b1);
+                u=(UINT)(i1+i2);
+                res=alloc_string(2);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+            }
+            case INT16:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                i1=(SINT)(a1 | (a2 << 8));
+                i2=(SINT)(b1 | (b2 << 8));
+                u=(UINT)(i1+i2);
+                res=alloc_string(3);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+            }
+            break;
+            case INT32:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT a3=(UINT)(data1[2]);
+                UINT a4=(UINT)(data1[3]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                UINT b3=(UINT)(data2[2]);
+                UINT b4=(UINT)(data2[3]);
+                i1=(SINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24));
+                i2=(SINT)(b1 | (b2 << 8) | (b3 << 16) | (b4 << 24));
+                u=(UINT)(i1+i2);
+                res=alloc_string(5);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+                data[3] = (UCHAR)((u >> 16) & 0xff);
+                data[4] = (UCHAR)((u >> 24) & 0xff);
+            }
+            break;
+#ifdef HAVE_LONGLONG
+            case INT64:
+            {
+                LLUINT a1=(LLUINT)(data1[0]);
+                LLUINT a2=(LLUINT)(data1[1]);
+                LLUINT a3=(LLUINT)(data1[2]);
+                LLUINT a4=(LLUINT)(data1[3]);
+                LLUINT a5=(LLUINT)(data1[4]);
+                LLUINT a6=(LLUINT)(data1[5]);
+                LLUINT a7=(LLUINT)(data1[6]);
+                LLUINT a8=(LLUINT)(data1[7]);
+                LLUINT b1=(LLUINT)(data2[0]);
+                LLUINT b2=(LLUINT)(data2[1]);
+                LLUINT b3=(LLUINT)(data2[2]);
+                LLUINT b4=(LLUINT)(data2[3]);
+                LLUINT b5=(LLUINT)(data2[4]);
+                LLUINT b6=(LLUINT)(data2[5]);
+                LLUINT b7=(LLUINT)(data2[6]);
+                LLUINT b8=(LLUINT)(data2[7]);
+                il1=(LLSINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24) |
+                             (a2 << 32) | (a3 << 40) | (a4 << 48) | 
+                             (a2 << 56));
+                il2=(LLSINT)(b1 | (b2 << 8) | (b3 << 16) | (b4 << 24) |
+                             (b2 << 32) | (b3 << 40) | (b4 << 48) | 
+                             (b2 << 56));
+                ul=(LLUINT)(il1+il2);
+                res=alloc_string(9);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(ul & 0xff);
+                data[2] = (UCHAR)((ul >> 8) & 0xff);
+                data[3] = (UCHAR)((ul >> 16) & 0xff);
+                data[4] = (UCHAR)((ul >> 24) & 0xff);
+                data[5] = (UCHAR)((ul >> 32) & 0xff);
+                data[6] = (UCHAR)((ul >> 40) & 0xff);
+                data[7] = (UCHAR)((ul >> 48) & 0xff);
+                data[8] = (UCHAR)((ul >> 56) & 0xff);
+            }
+            break;
+#endif
+
+            case WORD8:
+            case UINT8:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT b1=(UINT)(data2[0]);
+                u1=(UINT)(a1);
+                u2=(UINT)(b1);
+                u=(UINT)(u1+u2);
+                res=alloc_string(2);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+            }
+            break;
+            case WORD16:
+            case UINT16:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                u1=(UINT)(a1 | (a2 << 8));
+                u2=(UINT)(b1 | (b2 << 8));
+                u=(UINT)(u1+u2);
+                res=alloc_string(3);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+            }
+            break;
+            case WORD32:
+            case UINT32:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT a3=(UINT)(data1[2]);
+                UINT a4=(UINT)(data1[3]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                UINT b3=(UINT)(data2[2]);
+                UINT b4=(UINT)(data2[3]);
+                u1=(UINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24));
+                u2=(UINT)(b1 | (b2 << 8) | (b3 << 16) | (b4 << 24));
+                u=(UINT)(u1+u2);
+                res=alloc_string(5);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+                data[3] = (UCHAR)((u >> 16) & 0xff);
+                data[4] = (UCHAR)((u >> 24) & 0xff);
+            }
+            break;
+#ifdef HAVE_LONGLONG
+            case UINT64:
+            case WORD64:
+            {
+                LLUINT a1=(LLUINT)(data1[0]);
+                LLUINT a2=(LLUINT)(data1[1]);
+                LLUINT a3=(LLUINT)(data1[2]);
+                LLUINT a4=(LLUINT)(data1[3]);
+                LLUINT a5=(LLUINT)(data1[4]);
+                LLUINT a6=(LLUINT)(data1[5]);
+                LLUINT a7=(LLUINT)(data1[6]);
+                LLUINT a8=(LLUINT)(data1[7]);
+                LLUINT b1=(LLUINT)(data2[0]);
+                LLUINT b2=(LLUINT)(data2[1]);
+                LLUINT b3=(LLUINT)(data2[2]);
+                LLUINT b4=(LLUINT)(data2[3]);
+                LLUINT b5=(LLUINT)(data2[4]);
+                LLUINT b6=(LLUINT)(data2[5]);
+                LLUINT b7=(LLUINT)(data2[6]);
+                LLUINT b8=(LLUINT)(data2[7]);
+                ul1=(LLUINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24) |
+                             (a2 << 32) | (a3 << 40) | (a4 << 48) | 
+                             (a2 << 56));
+                ul2=(LLUINT)(b1 | (b2 << 8) | (b3 << 16) | (b4 << 24) |
+                             (b2 << 32) | (b3 << 40) | (b4 << 48) | 
+                             (b2 << 56));
+                ul=(LLUINT)(ul1+ul2);
+                res=alloc_string(9);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(ul & 0xff);
+                data[2] = (UCHAR)((ul >> 8) & 0xff);
+                data[3] = (UCHAR)((ul >> 16) & 0xff);
+                data[4] = (UCHAR)((ul >> 24) & 0xff);
+                data[5] = (UCHAR)((ul >> 32) & 0xff);
+                data[6] = (UCHAR)((ul >> 40) & 0xff);
+                data[7] = (UCHAR)((ul >> 48) & 0xff);
+                data[8] = (UCHAR)((ul >> 56) & 0xff);
+            }
+            break;
+#endif
+            default: failwith ("unimach_add: unsupported type\n");
+        };
+    }
+    else if (Is_block(v1) && Tag_val(v1) == Double_tag &&
+             Is_block(v2) && Tag_val(v2) == Double_tag)
+    {
+        /*
+        ** float
+        */
+        float d=(Double_val(v1)+Double_val(v2));
+        res=copy_double(d);
+    }
+    else failwith ("unimach_add: unsupported or different argument types\n");
+ 
+    CAMLreturn(res);    
+}
+
+
+CAMLexport value 
+unimach_sub (value v1,value v2)
+{
+    CAMLparam0();
+    CAMLlocal1(res);
+    SINT i1,i2;
+    UINT u,u1,u2;
+    UCHAR *data;
+    
+    if (Is_long(v1)  && Is_long(v2))
+    {
+        /*
+        ** OCaML integer 
+        */
+        res=Val_int(Int_val(v1) - Int_val(v2));
+    } 
+    else if (Is_block(v1) && Tag_val(v1) == String_tag &&
+             Is_block(v2) && Tag_val(v2) == String_tag)
+    {
+        /*
+        ** unitype
+        */ 
+        UCHAR *us1=(unsigned char*)String_val(v1);
+        int type1=(int)us1[0];
+        UCHAR * data1=&us1[1];
+        UCHAR *us2=(unsigned char*)String_val(v2);
+        int type2=(int)us2[0];
+        UCHAR * data2=&us2[1];
+
+        if (type1 != type2)
+            failwith ("unimach_sub: arguments of different types\n");
+        switch(type1) {
+            case INT8:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT b1=(UINT)(data2[0]);
+                i1=(SINT)(a1);
+                i2=(SINT)(b1);
+                u=(UINT)(i1-i2);
+                res=alloc_string(2);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+            }
+            case INT16:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                i1=(SINT)(a1 | (a2 << 8));
+                i2=(SINT)(b1 | (b2 << 8));
+                u=(UINT)(i1-i2);
+                res=alloc_string(3);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+            }
+            break;
+            case INT32:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT a3=(UINT)(data1[2]);
+                UINT a4=(UINT)(data1[3]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                UINT b3=(UINT)(data2[2]);
+                UINT b4=(UINT)(data2[3]);
+                i1=(SINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24));
+                i2=(SINT)(b1 | (b2 << 8) | (b3 << 16) | (b4 << 24));
+                u=(UINT)(i1-i2);
+                res=alloc_string(5);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+                data[3] = (UCHAR)((u >> 16) & 0xff);
+                data[4] = (UCHAR)((u >> 24) & 0xff);
+            }
+            break;
+            case WORD8:
+            case UINT8:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT b1=(UINT)(data2[0]);
+                u1=(UINT)(a1);
+                u2=(UINT)(b1);
+                u=(UINT)(u1-u2);
+                res=alloc_string(2);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+            }
+            break;
+            case WORD16:
+            case UINT16:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                u1=(UINT)(a1 | (a2 << 8));
+                u2=(UINT)(b1 | (b2 << 8));
+                u=(UINT)(u1-u2);
+                res=alloc_string(3);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+            }
+            break;
+            case WORD32:
+            case UINT32:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT a3=(UINT)(data1[2]);
+                UINT a4=(UINT)(data1[3]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                UINT b3=(UINT)(data2[2]);
+                UINT b4=(UINT)(data2[3]);
+                u1=(UINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24));
+                u2=(UINT)(b1 | (b2 << 8) | (b3 << 16) | (b4 << 24));
+                u=(UINT)(u1-u2);
+                res=alloc_string(5);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+                data[3] = (UCHAR)((u >> 16) & 0xff);
+                data[4] = (UCHAR)((u >> 24) & 0xff);
+            }
+            break;
+            default: failwith ("unimach_sub: unsupported type\n");
+        };
+    }
+    else if (Is_block(v1) && Tag_val(v1) == Double_tag &&
+             Is_block(v2) && Tag_val(v2) == Double_tag)
+    {
+        /*
+        ** float
+        */
+        float d=(Double_val(v1)-Double_val(v2));
+        res=copy_double(d);
+    }
+    else failwith ("unimach_sub: unsupported or different argument types\n");
+ 
+    CAMLreturn(res);    
+}
+CAMLexport value 
+unimach_mul (value v1,value v2)
+{
+    CAMLparam0();
+    CAMLlocal1(res);
+    SINT i1,i2;
+    UINT u,u1,u2;
+    UCHAR *data;
+    
+    if (Is_long(v1)  && Is_long(v2))
+    {
+        /*
+        ** OCaML integer 
+        */
+        res=Val_int(Int_val(v1) * Int_val(v2));
+    } 
+    else if (Is_block(v1) && Tag_val(v1) == String_tag &&
+             Is_block(v2) && Tag_val(v2) == String_tag)
+    {
+        /*
+        ** unitype
+        */ 
+        UCHAR *us1=(unsigned char*)String_val(v1);
+        int type1=(int)us1[0];
+        UCHAR * data1=&us1[1];
+        UCHAR *us2=(unsigned char*)String_val(v2);
+        int type2=(int)us2[0];
+        UCHAR * data2=&us2[1];
+
+        if (type1 != type2)
+            failwith ("unimach_mul: arguments of different types\n");
+        switch(type1) {
+            case INT8:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT b1=(UINT)(data2[0]);
+                i1=(SINT)(a1);
+                i2=(SINT)(b1);
+                u=(UINT)(i1*i2);
+                res=alloc_string(2);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+            }
+            case INT16:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                i1=(SINT)(a1 | (a2 << 8));
+                i2=(SINT)(b1 | (b2 << 8));
+                u=(UINT)(i1*i2);
+                res=alloc_string(3);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+            }
+            break;
+            case INT32:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT a3=(UINT)(data1[2]);
+                UINT a4=(UINT)(data1[3]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                UINT b3=(UINT)(data2[2]);
+                UINT b4=(UINT)(data2[3]);
+                i1=(SINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24));
+                i2=(SINT)(b1 | (b2 << 8) | (b3 << 16) | (b4 << 24));
+                u=(UINT)(i1*i2);
+                res=alloc_string(5);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+                data[3] = (UCHAR)((u >> 16) & 0xff);
+                data[4] = (UCHAR)((u >> 24) & 0xff);
+            }
+            break;
+            case WORD8:
+            case UINT8:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT b1=(UINT)(data2[0]);
+                u1=(UINT)(a1);
+                u2=(UINT)(b1);
+                u=(UINT)(u1*u2);
+                res=alloc_string(2);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+            }
+            break;
+            case WORD16:
+            case UINT16:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                u1=(UINT)(a1 | (a2 << 8));
+                u2=(UINT)(b1 | (b2 << 8));
+                u=(UINT)(u1*u2);
+                res=alloc_string(3);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+            }
+            break;
+            case WORD32:
+            case UINT32:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT a3=(UINT)(data1[2]);
+                UINT a4=(UINT)(data1[3]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                UINT b3=(UINT)(data2[2]);
+                UINT b4=(UINT)(data2[3]);
+                u1=(UINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24));
+                u2=(UINT)(b1 | (b2 << 8) | (b3 << 16) | (b4 << 24));
+                u=(UINT)(u1*u2);
+                res=alloc_string(5);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+                data[3] = (UCHAR)((u >> 16) & 0xff);
+                data[4] = (UCHAR)((u >> 24) & 0xff);
+            }
+            break;
+            default: failwith ("unimach_sub: unsupported type\n");
+        };
+    }
+    else if (Is_block(v1) && Tag_val(v1) == Double_tag &&
+             Is_block(v2) && Tag_val(v2) == Double_tag)
+    {
+        /*
+        ** float
+        */
+        float d=(Double_val(v1)*Double_val(v2));
+        res=copy_double(d);
+    }
+    else failwith ("unimach_mul: unsupported or different argument types\n");
+ 
+    CAMLreturn(res);    
+}
+
+CAMLexport value 
+unimach_div (value v1,value v2)
+{
+    CAMLparam0();
+    CAMLlocal1(res);
+    SINT i1,i2;
+    UINT u,u1,u2;
+    UCHAR *data;
+    
+    if (Is_long(v1)  && Is_long(v2))
+    {
+        /*
+        ** OCaML integer 
+        */
+        res=Val_int(Int_val(v1) / Int_val(v2));
+    } 
+    else if (Is_block(v1) && Tag_val(v1) == String_tag &&
+             Is_block(v2) && Tag_val(v2) == String_tag)
+    {
+        /*
+        ** unitype
+        */ 
+        UCHAR *us1=(unsigned char*)String_val(v1);
+        int type1=(int)us1[0];
+        UCHAR * data1=&us1[1];
+        UCHAR *us2=(unsigned char*)String_val(v2);
+        int type2=(int)us2[0];
+        UCHAR * data2=&us2[1];
+
+        if (type1 != type2)
+            failwith ("unimach_div: arguments of different types\n");
+        switch(type1) {
+            case INT8:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT b1=(UINT)(data2[0]);
+                i1=(SINT)(a1);
+                i2=(SINT)(b1);
+                u=(UINT)(i1/i2);
+                res=alloc_string(2);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+            }
+            case INT16:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                i1=(SINT)(a1 | (a2 << 8));
+                i2=(SINT)(b1 | (b2 << 8));
+                u=(UINT)(i1/i2);
+                res=alloc_string(3);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+            }
+            break;
+            case INT32:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT a3=(UINT)(data1[2]);
+                UINT a4=(UINT)(data1[3]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                UINT b3=(UINT)(data2[2]);
+                UINT b4=(UINT)(data2[3]);
+                i1=(SINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24));
+                i2=(SINT)(b1 | (b2 << 8) | (b3 << 16) | (b4 << 24));
+                u=(UINT)(i1/i2);
+                res=alloc_string(5);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+                data[3] = (UCHAR)((u >> 16) & 0xff);
+                data[4] = (UCHAR)((u >> 24) & 0xff);
+            }
+            break;
+            case WORD8:
+            case UINT8:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT b1=(UINT)(data2[0]);
+                u1=(UINT)(a1);
+                u2=(UINT)(b1);
+                u=(UINT)(u1/u2);
+                res=alloc_string(2);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+            }
+            break;
+            case WORD16:
+            case UINT16:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                u1=(UINT)(a1 | (a2 << 8));
+                u2=(UINT)(b1 | (b2 << 8));
+                u=(UINT)(u1/u2);
+                res=alloc_string(3);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+            }
+            break;
+            case WORD32:
+            case UINT32:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT a3=(UINT)(data1[2]);
+                UINT a4=(UINT)(data1[3]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                UINT b3=(UINT)(data2[2]);
+                UINT b4=(UINT)(data2[3]);
+                u1=(UINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24));
+                u2=(UINT)(b1 | (b2 << 8) | (b3 << 16) | (b4 << 24));
+                u=(UINT)(u1/u2);
+                res=alloc_string(5);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+                data[3] = (UCHAR)((u >> 16) & 0xff);
+                data[4] = (UCHAR)((u >> 24) & 0xff);
+            }
+            break;
+            default: failwith ("unimach_div: unsupported type\n");
+        };
+    }
+    else if (Is_block(v1) && Tag_val(v1) == Double_tag &&
+             Is_block(v2) && Tag_val(v2) == Double_tag)
+    {
+        /*
+        ** float
+        */
+        float d=(Double_val(v1)/Double_val(v2));
+        res=copy_double(d);
+    }
+    else failwith ("unimach_div: unsupported or different argument types\n");
+ 
+    CAMLreturn(res);    
+}
+
+/*
+** Logical operations. Possible argument types:
+**
+** 1. int
+** 2. unidata (of course!)
+**
+*/
+
+CAMLexport value 
+unimach_land (value v1,value v2)
+{
+    CAMLparam0();
+    CAMLlocal1(res);
+    SINT i1,i2;
+    UINT u,u1,u2;
+    UCHAR *data;
+    
+    if (Is_long(v1)  && Is_long(v2))
+    {
+        /*
+        ** OCaML integer 
+        */
+        res=Val_int(Int_val(v1) & Int_val(v2));
+    } 
+    else if (Is_block(v1) && Tag_val(v1) == String_tag &&
+             Is_block(v2) && Tag_val(v2) == String_tag)
+    {
+        /*
+        ** unitype
+        */ 
+        UCHAR *us1=(unsigned char*)String_val(v1);
+        int type1=(int)us1[0];
+        UCHAR * data1=&us1[1];
+        UCHAR *us2=(unsigned char*)String_val(v2);
+        int type2=(int)us2[0];
+        UCHAR * data2=&us2[1];
+
+        if (type1 != type2)
+            failwith ("unimach_land: arguments of different types\n");
+        switch(type1) {
+            case INT8:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT b1=(UINT)(data2[0]);
+                i1=(SINT)(a1);
+                i2=(SINT)(b1);
+                u=(UINT)(i1&i2);
+                res=alloc_string(2);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+            }
+            case INT16:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                i1=(SINT)(a1 | (a2 << 8));
+                i2=(SINT)(b1 | (b2 << 8));
+                u=(UINT)(i1&i2);
+                res=alloc_string(3);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+            }
+            break;
+            case INT32:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT a3=(UINT)(data1[2]);
+                UINT a4=(UINT)(data1[3]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                UINT b3=(UINT)(data2[2]);
+                UINT b4=(UINT)(data2[3]);
+                i1=(SINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24));
+                i2=(SINT)(b1 | (b2 << 8) | (b3 << 16) | (b4 << 24));
+                u=(UINT)(i1 & i2);
+                res=alloc_string(5);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+                data[3] = (UCHAR)((u >> 16) & 0xff);
+                data[4] = (UCHAR)((u >> 24) & 0xff);
+            }
+            break;
+            case WORD8:
+            case UINT8:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT b1=(UINT)(data2[0]);
+                u1=(UINT)(a1);
+                u2=(UINT)(b1);
+                u=(UINT)(u1&u2);
+                res=alloc_string(2);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+            }
+            break;
+            case WORD16:
+            case UINT16:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                u1=(UINT)(a1 | (a2 << 8));
+                u2=(UINT)(b1 | (b2 << 8));
+                u=(UINT)(u1&u2);
+                res=alloc_string(3);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+            }
+            break;
+            case WORD32:
+            case UINT32:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT a3=(UINT)(data1[2]);
+                UINT a4=(UINT)(data1[3]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                UINT b3=(UINT)(data2[2]);
+                UINT b4=(UINT)(data2[3]);
+                u1=(UINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24));
+                u2=(UINT)(b1 | (b2 << 8) | (b3 << 16) | (b4 << 24));
+                u=(u1 & u2);
+                res=alloc_string(5);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+                data[3] = (UCHAR)((u >> 16) & 0xff);
+                data[4] = (UCHAR)((u >> 24) & 0xff);
+            }
+            break;
+            default: failwith ("unimach_land: unsupported type\n");
+        };
+    }
+    else
+        failwith ("unimach_land: unsupported or different types\n");
+
+    CAMLreturn(res);
+}
+
+CAMLexport value 
+unimach_lor (value v1,value v2)
+{
+    CAMLparam0();
+    CAMLlocal1(res);
+    SINT i1,i2;
+    UINT u,u1,u2;
+    UCHAR *data;
+    
+    if (Is_long(v1)  && Is_long(v2))
+    {
+        /*
+        ** OCaML integer 
+        */
+        res=Val_int(Int_val(v1) | Int_val(v2));
+    } 
+    else if (Is_block(v1) && Tag_val(v1) == String_tag &&
+             Is_block(v2) && Tag_val(v2) == String_tag)
+    {
+        /*
+        ** unitype
+        */ 
+        UCHAR *us1=(unsigned char*)String_val(v1);
+        int type1=(int)us1[0];
+        UCHAR * data1=&us1[1];
+        UCHAR *us2=(unsigned char*)String_val(v2);
+        int type2=(int)us2[0];
+        UCHAR * data2=&us2[1];
+
+        if (type1 != type2)
+            failwith ("unimach_lor: arguments of different types\n");
+        switch(type1) {
+            case INT8:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT b1=(UINT)(data2[0]);
+                i1=(SINT)(a1);
+                i2=(SINT)(b1);
+                u=(UINT)(i1|i2);
+                res=alloc_string(2);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+            }
+            case INT16:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                i1=(SINT)(a1 | (a2 << 8));
+                i2=(SINT)(b1 | (b2 << 8));
+                u=(UINT)(i1|i2);
+                res=alloc_string(3);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+            }
+            break;
+            case INT32:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT a3=(UINT)(data1[2]);
+                UINT a4=(UINT)(data1[3]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                UINT b3=(UINT)(data2[2]);
+                UINT b4=(UINT)(data2[3]);
+                i1=(SINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24));
+                i2=(SINT)(b1 | (b2 << 8) | (b3 << 16) | (b4 << 24));
+                u=(UINT)(i1 | i2);
+                res=alloc_string(5);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+                data[3] = (UCHAR)((u >> 16) & 0xff);
+                data[4] = (UCHAR)((u >> 24) & 0xff);
+            }
+            break;
+            case WORD8:
+            case UINT8:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT b1=(UINT)(data2[0]);
+                u1=(UINT)(a1);
+                u2=(UINT)(b1);
+                u=(UINT)(u1|u2);
+                res=alloc_string(2);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+            }
+            break;
+            case WORD16:
+            case UINT16:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                u1=(UINT)(a1 | (a2 << 8));
+                u2=(UINT)(b1 | (b2 << 8));
+                u=(UINT)(u1|u2);
+                res=alloc_string(3);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+            }
+            break;
+            case WORD32:
+            case UINT32:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT a3=(UINT)(data1[2]);
+                UINT a4=(UINT)(data1[3]);
+                UINT b1=(UINT)(data2[0]);
+                UINT b2=(UINT)(data2[1]);
+                UINT b3=(UINT)(data2[2]);
+                UINT b4=(UINT)(data2[3]);
+                u1=(UINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24));
+                u2=(UINT)(b1 | (b2 << 8) | (b3 << 16) | (b4 << 24));
+                u=(UINT)(u1 | u2);
+                res=alloc_string(5);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+                data[3] = (UCHAR)((u >> 16) & 0xff);
+                data[4] = (UCHAR)((u >> 24) & 0xff);
+            }
+            break;
+            default: failwith ("unimach_lor: unsupported type\n");
+        };
+    }
+    else
+        failwith ("unimach_lor: unsupported or different types\n");
+
+    CAMLreturn(res);
+}
+
+CAMLexport value 
+unimach_lnot (value v1)
+{
+    CAMLparam0();
+    CAMLlocal1(res);
+    SINT i1;
+    UINT u,u1;
+    UCHAR *data;
+    
+    if (Is_long(v1))
+    {
+        /*
+        ** OCaML integer 
+        */
+        res=Val_int(~Int_val(v1));
+    } 
+    else if (Is_block(v1) && Tag_val(v1) == String_tag)
+    {
+        /*
+        ** unitype
+        */ 
+        UCHAR *us1=(unsigned char*)String_val(v1);
+        int type1=(int)us1[0];
+        UCHAR * data1=&us1[1];
+
+        switch(type1) {
+            case INT8:
+            {
+                UINT a1=(UINT)(data1[0]);
+                i1=(SINT)(a1);
+                u=(UINT)(~i1);
+                res=alloc_string(2);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+            }
+            case INT16:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                i1=(SINT)(a1 | (a2 << 8));
+                u=(UINT)(~i1);
+                res=alloc_string(3);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+            }
+            break;
+            case INT32:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT a3=(UINT)(data1[2]);
+                UINT a4=(UINT)(data1[3]);
+                i1=(SINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24));
+                u=(UINT)(~i1);
+                res=alloc_string(5);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+                data[3] = (UCHAR)((u >> 16) & 0xff);
+                data[4] = (UCHAR)((u >> 24) & 0xff);
+            }
+            break;
+            case WORD8:
+            case UINT8:
+            {
+                UINT a1=(UINT)(data1[0]);
+                u1=(UINT)(a1);
+                u=(UINT)(~u1);
+                res=alloc_string(2);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+            }
+            break;
+            case WORD16:
+            case UINT16:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                u1=(UINT)(a1 | (a2 << 8));
+                u=(UINT)(~u1);
+                res=alloc_string(3);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+            }
+            break;
+            case WORD32:
+            case UINT32:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT a3=(UINT)(data1[2]);
+                UINT a4=(UINT)(data1[3]);
+                u1=(UINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24));
+                u=(UINT)(~u1);
+                res=alloc_string(5);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+                data[3] = (UCHAR)((u >> 16) & 0xff);
+                data[4] = (UCHAR)((u >> 24) & 0xff);
+            }
+            break;
+            default: failwith ("unimach_lnot: unsupported type\n");
+        };
+    }
+    else
+        failwith ("unimach_lnot: unsupported or different types\n");
+
+    CAMLreturn(res);
+}
+
+CAMLexport value 
+unimach_lsl (value v1,value v2)
+{
+    CAMLparam0();
+    CAMLlocal1(res);
+    SINT i1=0;
+    int shift=Int_val(v2);
+    UINT u,u1;
+    UCHAR *data;
+    
+    if (Is_long(v1))
+    {
+        /*
+        ** OCaML integer 
+        */
+        res=Val_int(Int_val(v1) << shift);
+    } 
+    else if (Is_block(v1) && Tag_val(v1) == String_tag)
+    {
+        /*
+        ** unitype
+        */ 
+        UCHAR *us1=(unsigned char*)String_val(v1);
+        int type1=(int)us1[0];
+        UCHAR * data1=&us1[1];
+
+        switch(type1) {
+            case INT8:
+            {
+                UINT a1=(UINT)(data1[0]);
+                i1=(SINT)(a1);
+                u=(UINT)(i1<<shift);
+                res=alloc_string(2);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+            }
+            case INT16:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                i1=(SINT)(a1 | (a2 << 8));
+                u=(UINT)(i1<<shift);
+                res=alloc_string(3);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+            }
+            break;
+            case INT32:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT a3=(UINT)(data1[2]);
+                UINT a4=(UINT)(data1[3]);
+                i1=(SINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24));
+                u=(UINT)(i1 << shift);
+                res=alloc_string(5);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+                data[3] = (UCHAR)((u >> 16) & 0xff);
+                data[4] = (UCHAR)((u >> 24) & 0xff);
+            }
+            break;
+            case WORD8:
+            case UINT8:
+            {
+                UINT a1=(UINT)(data1[0]);
+                u1=(UINT)(a1);
+                u=(UINT)(u1<<shift);
+                res=alloc_string(2);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+            }
+            break;
+            case WORD16:
+            case UINT16:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                u1=(UINT)(a1 | (a2 << 8));
+                u=(UINT)(u1<<shift);
+                res=alloc_string(3);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+            }
+            break;
+            case WORD32:
+            case UINT32:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT a3=(UINT)(data1[2]);
+                UINT a4=(UINT)(data1[3]);
+                u1=(UINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24));
+                u=(UINT)(u1 << shift);
+                res=alloc_string(5);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+                data[3] = (UCHAR)((u >> 16) & 0xff);
+                data[4] = (UCHAR)((u >> 24) & 0xff);
+            }
+            break;
+            default: failwith ("unimach_lsl: unsupported type\n");
+        };
+    }
+    else
+        failwith ("unimach_lsl: unsupported type\n");
+
+    CAMLreturn(res);
+}
+
+CAMLexport value 
+unimach_lsr (value v1,value v2)
+{
+    CAMLparam0();
+    CAMLlocal1(res);
+    SINT i1=0;
+    int shift=Int_val(v2);
+    UINT u,u1;
+    UCHAR *data;
+    
+    if (Is_long(v1))
+    {
+        /*
+        ** OCaML integer 
+        */
+        res=Val_int(Int_val(v1) >> shift);
+    } 
+    else if (Is_block(v1) && Tag_val(v1) == String_tag)
+    {
+        /*
+        ** unitype
+        */ 
+        UCHAR *us1=(unsigned char*)String_val(v1);
+        int type1=(int)us1[0];
+        UCHAR * data1=&us1[1];
+
+        switch(type1) {
+            case INT8:
+            {
+                UINT a1=(UINT)(data1[0]);
+                i1=(SINT)(a1);
+                u=(UINT)(i1>>shift);
+                res=alloc_string(2);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+            }
+            case INT16:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                i1=(SINT)(a1 | (a2 << 8));
+                u=(UINT)(i1>>shift);
+                res=alloc_string(3);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+            }
+            break;
+            case INT32:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT a3=(UINT)(data1[2]);
+                UINT a4=(UINT)(data1[3]);
+                i1=(SINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24));
+                u=(UINT)(i1 >> shift);
+                res=alloc_string(5);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+                data[3] = (UCHAR)((u >> 16) & 0xff);
+                data[4] = (UCHAR)((u >> 24) & 0xff);
+            }
+            break;
+            case WORD8:
+            case UINT8:
+            {
+                UINT a1=(UINT)(data1[0]);
+                u1=(UINT)(a1);
+                u=(UINT)(u1>>shift);
+                res=alloc_string(2);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+            }
+            break;
+            case WORD16:
+            case UINT16:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                u1=(UINT)(a1 | (a2 << 8));
+                u=(UINT)(u1>>shift);
+                res=alloc_string(3);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+            }
+            break;
+            case WORD32:
+            case UINT32:
+            {
+                UINT a1=(UINT)(data1[0]);
+                UINT a2=(UINT)(data1[1]);
+                UINT a3=(UINT)(data1[2]);
+                UINT a4=(UINT)(data1[3]);
+                u1=(UINT)(a1 | (a2 << 8) | (a3 << 16) | (a4 << 24));
+                u=(UINT)(u1 >> shift);
+                res=alloc_string(5);
+                data=(UCHAR*)String_val(res);
+                data[0] = (UCHAR)(type1);
+                data[1] = (UCHAR)(u & 0xff);
+                data[2] = (UCHAR)((u >> 8) & 0xff);
+                data[3] = (UCHAR)((u >> 16) & 0xff);
+                data[4] = (UCHAR)((u >> 24) & 0xff);
+            }
+            break;
+            default: failwith ("unimach_lsl: unsupported type\n");
+        };
+    }
+    else
+        failwith ("unimach_lsl: unsupported type\n");
+
+    CAMLreturn(res);
+}
+
+
+
+
+#define FORMAT_BUFFER_SIZE 32
+
+static char * parse_format(value fmt,
+                           char * suffix,
+                           char format_string[],
+                           char default_format_buffer[])
+{
+  int prec, lastletter;
+  char * p;
+  mlsize_t len, len_suffix;
+
+  /*
+  ** Copy Caml format fmt to format_string,
+  ** adding the suffix before the last letter of the format 
+  */
+  len = string_length(fmt);
+  len_suffix = strlen(suffix);
+  if (len + len_suffix + 1 >= FORMAT_BUFFER_SIZE)
+    invalid_argument("format_int: format too long");
+  memmove(format_string, String_val(fmt), len);
+  p = format_string + len - 1;
+  lastletter = *p;
+  /* Compress two-letter formats, ignoring the [lnL] annotation */
+  if (p[-1] == 'l' || p[-1] == 'n' || p[-1] == 'L') p--;
+  memmove(p, suffix, len_suffix);  p += len_suffix;
+  *p++ = lastletter;
+  *p = 0;
+  /*
+  ** Determine space needed for result and allocate it dynamically if needed 
+  */
+  prec = 22 + 5; /* 22 digits for 64-bit number in octal + 5 extra */
+  for (p = String_val(fmt); *p != 0; p++) {
+    if (*p >= '0' && *p <= '9') {
+      prec = atoi(p) + 5;
+      break;
+    }
+  }
+  if (prec < FORMAT_BUFFER_SIZE)
+    return default_format_buffer;
+  else
+    return stat_alloc(prec + 1);
+}
+
+CAMLprim value unimach_format(value fmt, value arg)
+{
+  UCHAR *us=(unsigned char*)String_val(arg);
+  UCHAR *data=&us[1];
+  int type=(int)us[0];
+  int i;
+
+                 
+  char format_string[FORMAT_BUFFER_SIZE];
+  char default_format_buffer[FORMAT_BUFFER_SIZE];
+  char * buffer;
+  value res;
+
+  if(Tag_val(arg) != String_tag)
+        failwith ("unimach_format: not a machine type");    
+
+  buffer = parse_format(fmt, "", format_string, default_format_buffer);
+    
+  switch(type) {
+        case UINT8:
+        case WORD8:
+        {
+            UINT d1=(UINT)(data[0]);
+            i=(int)d1;
+            sprintf(buffer, format_string, i);
+        }
+        break;
+        case UINT16:
+        case WORD16:
+        {
+            UINT d1=(UINT)(data[0]);
+            UINT d2=(UINT)(data[1]);
+            i=(int)(d1 | (d2 << 8));
+            sprintf(buffer, format_string, i);        
+        }
+        break;
+        case UINT32:
+        case WORD32:
+        {
+            UINT d1=(UINT)(data[0]);
+            UINT d2=(UINT)(data[1]);
+            UINT d3=(UINT)(data[2]);
+            UINT d4=(UINT)(data[3]);
+            i=(int)(d1 | (d2 << 8) | (d3 << 16) | (d4 << 24));
+            sprintf(buffer, format_string, i);        
+        }
+        break;
+
+        case INT8:
+        {
+            UCHAR c1=data[0];
+            i=(SINT)((SCHAR)c1);
+            sprintf(buffer, format_string, i);        
+        }
+        break;
+        case INT16:
+        {
+            UINT d1=(UINT)(data[0]);
+            UINT d2=(UINT)(data[1]);
+            i=(SINT)(d1 | (d2 << 8));
+            if ((i & 0x8000) == 0x8000)
+                i = i | 0xffff0000;
+            sprintf(buffer, format_string, i);        
+        }
+        break;
+        case INT32:
+        {
+            UINT d1=(UINT)(data[0]);
+            UINT d2=(UINT)(data[1]);
+            UINT d3=(UINT)(data[2]);
+            UINT d4=(UINT)(data[3]);
+            i=(SINT)(d1 | (d2 << 8) | (d3 << 16) | (d4 << 24));
+            sprintf(buffer, format_string, i);        
+        }
+        break;
+        default: failwith ("format_machtype: unsupported type");
+  };
+
+  res = copy_string(buffer);
+  if (buffer != default_format_buffer) stat_free(buffer);
+  return res;
+}
+
+CAMLexport value 
+unimach_to_data(value v1)
+{
+    if(Is_block(v1) == 0)
+        failwith ("unimach_to_data: not a machine type");    
+    if(Tag_val(v1) != String_tag)
+        failwith ("unimach_to_data: not a machine type");    
+
+    return v1;
+}
+
+CAMLexport value 
+unimach_of_data(value v1,value v2)
+{
+    UCHAR *us=(unsigned char*)String_val(v1);
+    int type=Int_val(v2);
+    us[0]=(UCHAR)(type);
+    return v1;
+}
+
