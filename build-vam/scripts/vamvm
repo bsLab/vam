@@ -1,0 +1,40 @@
+#!/bin/bash
+
+#
+# Build a new VM.
+#
+
+if [ "X$VAMDIR" = "X" ] 
+then
+	VAMDIR=/amoeba/Vam-1.5
+fi
+if [ "X$AMUNIX_LIB_DIR" = "X" ] 
+then
+	AMUNIX_LIB_DIR=/amoeba/lib
+fi
+
+
+$VAMDIR/bin/vamrun -b $VAMDIR/ocamlsys/bin/ocamlc 	\
+	-I $VAMDIR/interface			\
+	-I $VAMDIR/lib				\
+	-I $VAMDIR/ocamlsys/lib/ocaml		\
+	-I $VAMDIR/ocamlsys/lib/ocaml/threads	\
+	-I $AMUNIX_LIB_DIR			\
+	-make-runtime -thread -g 		\
+	str.cma threads.cma utils.cma 		\
+	parsing.cma typing.cma bytecomp.cma 	\
+	driver.cma toplevellib.cma		\
+	os.cma					\
+	debug.cma				\
+	mldoc.cma				\
+	unix.cma 				\
+	amoeba.cma				\
+	server.cma				\
+	xlib.cma 				\
+	wxlib.cma 				\
+	vamtoploop.cma				\
+	-cclib -lamunix				\
+	-cclib -lpth				\
+	-cclib -lpthread			\
+	$@
+
