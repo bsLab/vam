@@ -1,0 +1,58 @@
+#
+# Portable Threads Module Amakefile
+#
+
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include $VAMDIR/src/threads/Amake.srclist;
+
+
+#
+# Special include paths
+#
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/threads,
+    -I,
+    $VAMDIR/build-vam/help/interface,
+};
+
+CCFLAGS = {
+    -I$INSTALLDIR/ocamlsys/lib/ocaml
+};
+
+#
+# All the sources together
+#
+
+CAMLTHRSRC = {
+    $MODULE_THREADS_MLI,
+    $MODULE_THREADS_ML[flags = {'-g'}], 
+    $MODULE_THREADS_C
+};
+
+#
+# Target libraries
+#
+
+#
+# CaML library
+#
+
+CAMLTHRLIB     = threads.cma;
+
+#
+# C library (for Custom link mode), if any.
+#
+
+CUSTOMTHRLIB   = libthreads.a;
+
+%include $VAMDIR/toolset/ocaml.lib;
+
+%instance customlibcluster($CAMLTHRLIB,$CUSTOMTHRLIB,$CAMLTHRSRC);
+
+
+ 
