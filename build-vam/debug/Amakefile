@@ -1,0 +1,49 @@
+#
+# Help Module Amakefile
+#
+
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include $VAMDIR/src/debug/Amake.srclist;
+
+
+#
+# Special include paths
+#
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/debug,
+};
+
+#
+# All the sources together
+#
+
+CAMLSRC = {
+    $MODULE_DEBUG_MLI,
+    $MODULE_DEBUG_ML, 
+};
+
+
+#
+# Target libraries
+#
+
+#
+# CaML library
+#
+
+CAMLLIB     = debug.cma;
+
+
+
+%include $VAMDIR/toolset/ocaml.lib;
+
+
+%instance libcluster($CAMLLIB,$CAMLSRC);
+
+
+ 
