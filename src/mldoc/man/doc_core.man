@@ -1,0 +1,184 @@
+  .MD
+    .NA doc_core .AN
+    .S4 .NA Description .AN
+    The core module of .NA MlDoC .AN . This module contains all 
+    basic functions and types used by all other frontend and backend
+    modules. 
+    .4S
+    Flow of processing string text:
+    
+    .OL
+      .LI
+        Split the string text in atoms divided by blank spaces. 
+      .IL
+      .LI
+        Translate these atoms in a structure tree.
+      .IL
+      .LI
+        Convert the structure tree into the desired output format.
+      .IL
+    .LO
+    
+    First the interface of the main .NA structure_content .AN type and the 
+    the main .NA structure_block .AN :
+    .IN
+      .IT
+        .NA structure_content .AN
+        .AR S_Empty                 .(* Empty element .*) .RA
+        .AR S_Text of (string list) .(* Generic text: basic element .*) .RA
+        .AR S_Body                  .(* Document root .*) .RA
+        .AR S_Title                 .(* Document title .*) .RA 
+        .AR S_TOC                   .(* Table of contents .*) .RA
+        .AR S_Intro                 .(* An intro paragraph .*) .RA 
+        .AR S_Package               .(* Package=Library  .*) .RA   
+        .AR S_Program               .(* A program description .*) .RA
+        .AR S_S1                    .(* Generic named section .*) .RA
+        .AR S_Module                .(* A ML-module .*) .RA
+        .AR S_Clib                  .(* A C-Library .*) .RA
+        .AR S_S2                    .(* Generic subsection .*) .RA
+        .AR S_Function              .(* A function subsection .*) .RA
+        .AR S_Type                  .(* A type subsection .*) .RA
+        .AR S_Value                 .(* A value subsection .*) .RA
+        .AR S_Class                 .(* A class subsection .*) .RA
+        .AR S_C                     .(* C functions and variables .*) .RA
+        .AR S_S3                    .(* Generic unit .*) .RA
+        .AR S_Paragraph             .(* A named paragraph .*) .RA
+        .AR S_Interface             .(* Generic Interface .*) .RA
+        .AR S_Example               .(* Example preformatted paragraph .*) .RA
+        .AR S_Preform               .(* Preformatted paragraph .*) .RA
+        .AR S_S4                    .(* Generic subunit .*) .RA
+        .AR S_Fun_Interface         .(* ML-Function interface .*) .RA
+        .AR S_Val_Interface         .(* ML-Value interface .*) .RA
+        .AR S_Type_Interface        .(* A ML-type definition .*) .RA
+        .AR S_Exc_Interface         .(* Exception .*) .RA
+        .AR S_Struc_Interface       .(* A type structure .*) .RA
+        .AR S_C_Hdr_Interface       .(* C header interface .*) .RA
+        .AR S_C_Fun_Interface       .(* C function interface .*) .RA
+        .AR S_C_Var_Interface       .(* C variable interface .*) .RA
+        .AR S_Class_Interface       .(* A ML-Class .*) .RA
+        .AR S_Method_Interface      .(* A ML method of a class .*) .RA
+        .AR S_Object_Interface      .(* A ML object of a class .*) .RA
+        .AR S_Module_Interface      .(* A ML module interface .*) .RA
+        .AR S_Attribute             .(* Text or other attributes changes .*) .RA
+        .AR S_OList                 .(* Ordered List .*) .RA
+        .AR S_UList                 .(* Unordered List .*) .RA
+        .AR S_OpList                .(* Definition List .*) .RA
+        .AR S_List_Item             .(* Unordered List item .*) .RA
+        .AR S_Table                 .(* Table body .*) .RA
+        .AR S_TableHead             .(* Table header .*) .RA
+        .AR S_TableRow              .(* A new table row .*) .RA
+        .AR S_TableCol              .(* Table column data .*) .RA
+        .AR S_TableNoRulers         .(* Don't put boxes around the table cells .*) .RA
+        .AR S_Name                  .(* Function, Type,... name .*) .RA
+        .AR S_Mutable               .(* Mutable prefix .*) .RA
+        .AR S_Private               .(* Provate prefix .*) .RA
+        .AR S_Virtual               .(* Virtual prefix .*) .RA
+        .AR S_CurArg                .(* Argument of a curried list .*) .RA
+        .AR S_UnCurArg              .(* Argument of an uncurried list:tuple .*) .RA
+        .AR S_RetArg                .(* Return argument of a function .*) .RA
+        .AR S_NL                    .(* Newline .*) .RA
+        .AR S_TAB                   .(* Text tabulation .*) .RA
+        .AR S_Link                  .(* Link .*) .RA
+        .AR S_Comment               .(* A comment .*) .RA
+      .TI    
+      .IS
+        .NA structure_block .AN
+        .AR .MU s_parent: structure_block option .RA
+        .AR .MU s_childs: structure_block list .RA
+        .AR .MU s_content: structure_content .RA
+        .AR .MU s_attr: structure_attr list .RA
+        .AR .MU s_line: int             .(* For error tracking .*) .RA
+        .AR .MU s_name: string ref      .(* For error tracking .*) .RA
+      .SI  
+    .NI
+
+    A string can be converted to an atom list with the 
+    .NA atoms_of_text .AN function, and the .NA atoms_of_file .AN
+    functions reads text from a file and convert it to an atom list:
+
+    .IN
+      .IF
+        .NA atoms_of_text .AN
+        .RV atom_list: string list .VR
+        .AR ~text: string .RA
+      .FI    
+      .IF
+        .NA atoms_of_file .AN
+        .RV atom_list: string list .VR
+        .AR ~fname: string .RA
+      .FI    
+    .NI
+
+    The atom list can now be converted to a .NA struture_block .AN tree
+    with the .NA tree_of_atoms .AN function. This function uses the
+    .NA parse .AN generic text parser function. Finally, 
+    a .NA structure_block .AN
+    tree can be printed in symbolic form with the .NA print_tree .AN 
+    function.
+    
+    .IN
+      .IF
+        .NA parse .AN
+        .RV unit .VR
+        .AR atom_list: string list .RA
+        .AR cur_block: structure_block .RA
+      .FI
+      .IF
+        .NA tree_of_atoms .AN
+        .RV struc_tree: structure_block .VR
+        .AR ~atoms: string list .RA
+      .FI
+      .IF
+        .NA print_tree .AN
+        .RV unit .VR
+        .AR structure_block .RA
+      .FI
+    .NI 
+
+    Sometimes it's usefull to convert only a part of the full document.
+    For this purpose, all back end functions have the .NA section_names .AN
+    list argument to tell the backend the current section environment.
+    The .NA Doc_core .AN module defines the .NA section .AN structure and
+    the .NA section_names .AN types. The structure is only for internal
+    use in the backend.
+    
+    .IN
+      .IT
+      .NA section_names .AN
+      .AR Sec_s1 of string .RA
+      .AR Sec_s2 of string .RA
+      .AR Sec_s3 of string .RA
+      .AR Sec_s4 of string .RA
+      .AR Sec_package of string .RA
+      .AR Sec_program of string .RA
+      .AR Sec_module of string .RA
+      .AR Sec_function of string .RA
+      .AR Sec_type of string .RA
+      .AR Sec_val of string .RA
+      .AR Sec_class of string .RA
+      .AR Sec_cint of string .RA
+      .TI
+      .IS
+        .NA section .AN
+        .AR .MU sec_parent: section .RA
+        .AR .MU sec_childs: section list .RA
+        .AR .MU sec_name: string .RA
+        .AR .MU sec_type: string .RA
+      .SI
+    .NI
+
+    A short example follows to show the processing flow to translate
+    a help text file to a .NA structure_block .AN tree.
+
+    .EX
+      let al = atoms_of_file "mldoc.man" ;;
+      let st = tree_of_atoms al ;;
+      html_of_tree ds [HTML_single_doc "mldoc_man.html"] [];;
+      tex_of_tree ds [TEX_doc_name "mldoc.tex";
+      .# .#                TEX_color;
+      .# .#                TEX_link_ref;
+      .#               ] [];
+      text_of_tree ds [TEXT_doc_name "mldoc.txt"] [];
+    .XE
+
+  .DM
