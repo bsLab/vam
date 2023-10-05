@@ -1,0 +1,84 @@
+##
+##      ==================================
+##      OOOO   OOOO OOOO  O      O   OOOO
+##      O   O  O    O     O     O O  O   O
+##      O   O  O    O     O     O O  O   O
+##      OOOO   OOOO OOOO  O     OOO  OOOO
+##      O   O     O    O  O    O   O O   O
+##      O   O     O    O  O    O   O O   O
+##      OOOO   OOOO OOOO  OOOO O   O OOOO
+##      ================================== 
+##      BSSLAB, Dr. Stefan Bosse sci@bsslab.de
+##
+##    PROTECTED BY AND DISTRIBUTED UNDER THE TERMS OF: 
+##    Free Software Foundation-Europe, GNU GPL License, Version 2
+##
+##    $MODIFIEDBY:  BSSLAB
+##    $AUTHORS:     Stefan Bosse
+##    $INITIAL:     (C) BSSLAB 2003
+##    $CREATED:     
+##    $VERSION:     1.01
+##
+##    $INFO:
+##
+## Test module 
+##
+##
+##    $ENDOFINFO
+##
+
+
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include $VAMDIR/src/test/Amake.srclist;
+
+
+#
+# Special include paths
+#
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/test,
+    -I,
+    $VAMDIR/build-vam/threads/interface,
+    -I,
+    $VAMDIR/build-vam/buffer/interface,
+    -I,
+    $VAMDIR/build-vam/amoeba/interface,
+};
+
+#
+# All the sources together
+#
+
+CAMLSRC = {
+    $TEST_MLI,
+    $TEST_ML, 
+    $TEST_CC
+};
+
+#
+# Target libraries
+#
+
+#
+# CaML library
+#
+
+CAMLLIB     = test.cma;
+
+#
+# C library (for Custom link mode), if any.
+#
+
+CUSTOMLIB   = libtest_c.a;
+
+
+%include $VAMDIR/toolset/ocaml.lib;
+
+%instance customlibcluster($CAMLLIB,$CUSTOMLIB,$CAMLSRC);
+
+ 
