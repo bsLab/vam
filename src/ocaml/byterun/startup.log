@@ -1,0 +1,13 @@
+2003.11.08:
+    Removed dynlik stuff.
+    Maked primitive management more flexible.
+    Raw Amoeba split
+
+2004.5.2:
+    OCAMLRUNPARAM handler fixed (-b)
+
+2004.12.27:
+    added support for padded bytecode files (either fille dup to
+    next block boundary with value 0 or space char)
+    changed trailer search
+    
