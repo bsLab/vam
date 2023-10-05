@@ -1,0 +1,754 @@
+#!/usr/local/bin/unixcaml
+
+(*
+**
+** File Revision System
+**
+** Common usage:
+**
+** 0. Edit the topdir and project entries below.
+** 0.1 Create a unixcaml interpreter:
+**
+**      ocamlmktop -o unixcaml unxi.cma str.cma
+**
+**
+** 1. Freeze the directory tree and create an initial backup archive:
+**      
+**      revision -freeze -archive
+**
+** 2. After changes are performed in your directory tree, make
+**    an incremental diff backup and freeze the new state:
+**
+**      revision -compare -archive
+**
+**      
+**
+** *******************************************************************      
+**  revision 
+**
+**  [ -topdir <dirpath> ] : toplevel directory of file tree
+**
+**  [ -project <name> ] : project name 
+**
+**  [ -freeze ] : freeze file tree and create a statefile {.state}
+**
+**  [ -compare ] : compare current file tree with statefile and create
+**                 difference file {.diff} 
+**
+**  [ -archive ] : in conjunction with compare or
+**                           freeze; creates a difference archive, 
+**                           too 
+**
+**  [ -extract <archive> ] : extract an difference archive {.diff.tgz}
+**                          and update the statefile 
+**
+**  [ -verbose ] : switch on verbose mode
+**  
+**
+** Written by
+**
+**      Stefan Bosse
+**      sbosse@physik.uni-bremen.de
+**
+**      
+**
+*)
+
+open Unix;;
+open Format;;
+open Str;;
+
+let ppf = Format.std_formatter;;
+
+let topdir = ref ("/home/sbosse/amoeba/vam-1.2/src/mldoc");;
+let project = ref ("mldoc-1.0");;
+
+
+let statefile = ref ("revision.state");;
+let difffile = ref ("revision.diff");;
+let revisiondir = ref ("amoeba/revision");;
+
+
+(* tar archiver program name *)
+let tarprog = ref "tar" ;;
+let tarcreate = ref "-zcf" ;;
+let tarsuffix = ref ".tgz" ;;
+let tarfilelist = ref "-T" ;;
+
+
+let tar_exclude_list = ref "";;
+let tar_exclude = "--exclude ";;
+
+(*
+** Exclude the following components from the state list:
+*)
+
+let path_exclude = [
+"*.aux";
+"*.log";
+];;
+
+let path_exclude_list = ref [];;
+
+(* cd program name *)
+let cdprog  = ref "cd" ;;
+
+let verbose = ref false;;
+let freeze  = ref false;;
+let compare = ref false;;
+let archive = ref false;;
+
+
+(*
+** What should be checked ?
+*)
+
+let check_atime     = ref false;;
+let check_mtime     = ref true;;
+let check_ctime     = ref true;;
+let check_size      = ref true;;
+
+let usage () = fprintf ppf "
+revision 
+
+[ -topdir <%s> ] : toplevel directory of file tree
+
+[ -project <%s> ] : project name 
+
+[ -revisiondir <%s> ] : revision directory
+
+[ -freeze ] : freeze file tree and create a statefile {.state}
+
+[ -compare ] : compare current file tree with statefile and create
+               difference file {.diff} 
+
+[ -archive ] : in conjunction with compare or
+               freeze; creates a difference archive,too 
+
+[ -extract <archive> ] : extract an difference archive {.diff.tgz}
+                         and update the statefile 
+
+[ -verbose ] : switch on verbose mode
+
+[ -help ] : print this help message
+"  (!topdir) (!project) (!revisiondir);
+failwith "Exit";
+
+;;
+ 
+
+(*
+** All found differences between the saved statefile and the
+** new scanned filesystem directories are reported in this string list.
+*)
+let difflist = ref [];;
+
+type fileentry = {
+    filename:string;
+    filestats:Unix.stats;
+};;
+
+type direntry = {
+    dirname:string;
+    dirstats:Unix.stats;
+    mutable flist: fileentry list;
+};;
+
+
+let rec array_of_list (list: 'a list) =
+    match (list) with
+        [] -> [||] 
+    |   hd::tl -> Array.append [| hd |] (array_of_list tl)
+;;
+
+
+let head list =
+    match (list) with
+    | (hd::tl) -> hd;
+    | [] -> failwith "tail:empty list";
+;;
+
+(*
+** Find exclude path or file name components. If found, return true, else
+** false. The match keywords are taken from the path_exlude_list.
+*)
+
+let find_exclude_path path =
+    if (!path_exclude_list<>[]) then
+    begin
+        let key_arr   = array_of_list !path_exclude_list in
+        let key_num   = Array.length key_arr in
+
+        let found = ref false in
+
+        for j = 1 to key_num
+        do
+            let regx = regexp (".+"^(key_arr.(j-1))) in
+            let regs = regexp (key_arr.(j-1)) in
+
+            if((string_match regx path 0)=true) then
+                    found:=true;
+            if((string_match regs path 0)=true) then
+                    found:=true;
+        done;
+        !found;
+    end
+    else
+        false;    
+;;
+
+(*
+** Scan recursively a directory tree on the filesystem and store all 
+** directories in the dirlist and append all files from a directoty in the 
+** flist of each directory list.
+*)
+
+let rec scandir dir direntry dirlist=
+    let dh = opendir ((!topdir)^"/"^dir) in
+    let eof = ref false in
+
+    while(!eof=false) 
+    do
+        let dstr = try readdir dh with
+            | End_of_file -> "";
+        in
+        
+        if (dstr="") then
+            eof:=true
+        else if (dstr<>"." && 
+                 dstr<>".." && 
+                 (find_exclude_path (dir^"/"^dstr))=false) then
+        begin
+            let fstr = (dir^"/"^dstr) in
+            let sh = stat ((!topdir)^"/"^fstr) in
+
+            if (sh.st_kind=S_DIR) then
+            begin
+                let newdirentry = 
+                            {dirname=fstr;
+                             dirstats=sh;
+                             flist=[];} in
+                dirlist :=  !dirlist @  [newdirentry];
+
+                if (!verbose=true) then fprintf ppf "scanning %s ...@." fstr;
+                scandir fstr newdirentry dirlist; 
+            end
+            else
+            begin
+                if (!verbose=true) then fprintf ppf "found file %s@." fstr;
+                direntry.flist <- direntry.flist @ [ 
+                                          {filename=fstr;
+                                           filestats=sh;}];                     
+            end;  
+        end;
+    done;
+
+;;
+
+exception Not_Found;;
+
+(*
+** Find a directory name in the dirlist and return the dirlist state
+** entry. If not found, return a dummy empty dirstate entry to indicate
+** this case. 
+*)
+
+let rec finddir dirlist direntry =
+    match (dirlist) with
+    | (hd::tl)  ->  if (hd.dirname<>direntry.dirname) then
+                        finddir tl direntry
+                    else
+                        hd;
+    | []        ->  {dirname="";                (* not found *)
+                     dirstats=direntry.dirstats;
+                     flist=direntry.flist};
+;;
+
+(*
+** Find a file name in the filelist and return the state entry. If not 
+** found, return a empty dummy state structure to indicate this case. 
+*)
+
+let rec findfile filelist fileentry =
+    match (filelist) with
+    | (hd::tl)  ->  if (hd.filename<>fileentry.filename) then
+                        findfile tl fileentry
+                    else
+                        hd;
+    | []        ->  {filename="";               (* not found *)
+                     filestats=fileentry.filestats};
+;;
+
+(*
+** Compare a scanned file list with a file list from the saved state list.
+*)
+
+let rec comparefiles scannfiles statefiles =
+    let file =
+        match (scannfiles) with
+        | (hd::tl)  ->  
+                        if (tl<>[]) then
+                            comparefiles tl statefiles;
+                        hd;
+        | []        ->   failwith "revision: programming error";
+
+
+    in
+
+    if (!verbose=true) then fprintf ppf "checking %s..." (file.filename);
+
+    (*
+    ** Find the state file structure in the saved state file list.
+    *)
+    let state = findfile statefiles file in
+
+    if (state<>file) then
+    begin
+        
+        if (state.filename="") then
+        begin
+            (*
+            ** New entry in the current directory. Append it to the
+            ** diff list.
+            *)
+            if (!verbose=true) then 
+                fprintf ppf " - new.@."
+            else
+                fprintf ppf "file %s new.@." (file.filename);
+            difflist := !difflist @ [file.filename];
+        end
+        else
+        begin
+            (*
+            ** Resolve differences between saved state and scanned
+            ** file version.
+            *)
+            if (!check_size=true && 
+                state.filestats.st_size<>file.filestats.st_size) then
+            begin
+                if (!verbose=true) then 
+                    fprintf ppf " - different size.@."
+                else
+                    fprintf ppf "file %s : different size.@." (file.filename);
+                difflist := !difflist @ [file.filename];
+            end 
+            else if (!check_atime=true && 
+                     state.filestats.st_atime<>file.filestats.st_atime) then
+            begin
+                if (!verbose=true) then 
+                    fprintf ppf " - different access time.@."
+                else
+                    fprintf ppf "file %s : different access time.@." (file.filename);
+                difflist := !difflist @ [file.filename];
+            end 
+            else if (!check_mtime=true && 
+                     state.filestats.st_mtime<>file.filestats.st_mtime) then
+            begin
+                if (!verbose=true) then 
+                    fprintf ppf " - different modification time.@."
+                else
+                    fprintf ppf "file %s : different modification time.@." (file.filename);
+
+                difflist := !difflist @ [file.filename];
+            end 
+            else if (!check_ctime=true && 
+                     state.filestats.st_ctime<>file.filestats.st_ctime) then
+            begin
+                if (!verbose=true) then 
+                    fprintf ppf " - different status change time.@."
+                else
+                    fprintf ppf "file %s : different status change time.@." (file.filename);
+                difflist := !difflist @ [file.filename];
+            end 
+            else
+                if (!verbose=true) then fprintf ppf " Ok.@.";
+        end;
+    end
+    else
+        if (!verbose=true) then fprintf ppf " Ok.@.";
+        
+;;
+
+(*
+** Compare a scanned dir list with a saved statefile list.
+*)
+
+let rec comparedir dirlist statelist =
+
+    let dir =
+        match (dirlist) with
+        | (hd::tl)  ->  
+                        if (tl<>[]) then
+                            comparedir tl statelist;
+                        hd;
+        | []        ->  failwith "revision: programming error";
+
+    in
+
+
+    if (!verbose=true) then fprintf ppf "comparing dir %s..." (dir.dirname);
+
+    let state = finddir statelist dir
+    in
+
+    if (state.dirname="") then
+    begin
+        (* not found - new directory (tree) *)
+        if (!verbose=true) then 
+            fprintf ppf " - new directory.@."
+        else
+            fprintf ppf "new directory: %s@." (dir.dirname);
+
+        difflist := !difflist @ [dir.dirname];
+        
+    end
+    else
+    begin
+        if (dir.flist <> state.flist) then
+        begin
+            if (dir.flist=[]) then
+            begin
+                (*
+                ** Oops, something really changed here. Append the
+                ** full directory tree dir.dirname to the diff list.
+                *) 
+                difflist := !difflist @ [dir.dirname];
+                if (!verbose=true) then 
+                    fprintf ppf " - new directory.@."
+                else
+                    fprintf ppf "new directory: %s@." (dir.dirname);
+ 
+            end
+            else
+            begin
+                (*
+                ** There are differences between the scanned directory
+                ** and the saved statefile directory. Resolve
+                ** the differences.
+                *)
+                if (!verbose=true) then 
+                    fprintf ppf " diff in file list found.@.";
+                comparefiles dir.flist state.flist;
+            end;
+        end
+        else
+            if (!verbose=true) then fprintf ppf " Ok.@.";
+    end;
+;;
+
+(*
+** Write the diff list results to a file (<project>.diff.---) 
+*)
+
+let rec writediff dlist oc =
+    match (dlist) with
+    | (hd::tl) ->   output_string oc (hd);
+                    output_string oc "\n";
+                    writediff tl oc;
+    | []       ->   ();
+;;
+
+(*
+** Parse the command line options.
+*)
+ 
+let rec parsecommandline argn  =
+
+    let argmax = Array.length Sys.argv in
+
+    if (argmax<2) then
+    begin
+        fprintf ppf "revision: no arguments specified";
+        usage();
+    end;
+
+    let arg = Sys.argv.(argn) in
+
+    let next =
+        match (arg) with
+        | "-freeze"  ->  freeze:=true; (argn+1); 
+        | "-compare" ->  compare:=true; (argn+1); 
+        | "-topdir"  ->  topdir:= if (argn<argmax+1) then
+                                    Sys.argv.(argn+1)
+                                 else
+                                    failwith "revision: topdir without argument";
+                                 (argn+2);
+        | "-revisiondir"  ->  revisiondir:= if (argn<argmax+1) then
+                                    Sys.argv.(argn+1)
+                                 else
+                                    failwith "revision: revisondir without argument";
+                                 (argn+2);
+        | "-verbose" ->  verbose:=true; (argn+1);
+        | "-archive" ->  archive:=true; (argn+1);
+        | "-project" ->  project:= if (argn<argmax+1) then
+                                    Sys.argv.(argn+1)
+                                  else
+                                    failwith "revision: project without argument"; 
+                                  (argn+2);
+        | "-help"   ->  usage();
+        | (_)       ->  failwith "revision: inavlid argument";
+
+    in
+
+    if (next<argmax) then
+        parsecommandline next;
+
+;;
+
+(*
+** The main function front end.
+*)
+
+let main () =
+
+    (*
+    ** prepare the path_exclude_list 
+    *)
+    if (path_exclude<>[]) then
+    begin
+        let path_arr = array_of_list path_exclude in
+        let path_num = Array.length path_arr in
+
+        (*
+        ** First remove all starts "*", and put a backslash
+        ** before each dot "." for our exclude compare.
+        *)
+
+        for i = 1 to path_num
+        do
+            let s1 = replace_first (regexp "\*") "" path_arr.(i-1) in
+            let s2 = replace_first (regexp "\.") "\." s1 in
+
+            path_exclude_list := (!path_exclude_list) @ [s2];
+        done;
+    end
+    else
+        path_exclude_list := [];
+
+    let homedir = getenv("HOME") in
+    
+    (*
+    ** Create time of the day strings ...
+    *)
+
+    let tdm  = localtime (time ()) in
+
+    let ty = if (tdm.tm_year>99) then 
+                (tdm.tm_year-100) 
+             else (tdm.tm_year) in
+    let tm = tdm.tm_mon + 1 in
+    let td = tdm.tm_mday in
+    let th = tdm.tm_hour in
+    let tmi= tdm.tm_min in
+
+    let today = 
+        (if ty < 10 then sprintf "0%d" ty else sprintf "%d" ty) ^
+        (if tm < 10 then sprintf "0%d" tm else sprintf "%d" tm) ^
+        (if td < 10 then sprintf "0%d" td else sprintf "%d" td) ^
+        "@" ^
+        (if th < 10 then sprintf "0%d" th else sprintf "%d" th) ^
+        (if tmi< 10 then sprintf "0%d" tmi else sprintf "%d" tmi) in
+
+    revisiondir := homedir ^ "/" ^ !revisiondir ^ "/" ; 
+
+    (*
+    ** Extract all options
+    *)
+    parsecommandline 1 ;
+
+    if (!project<>"") then
+    begin
+        statefile := !project ^ ".state" ;
+        difffile  := !project ^ ".diff" ;
+    end;
+
+    statefile := (!revisiondir ^ "/" ^ !statefile);
+    difffile  := (!revisiondir ^ "/" ^ !difffile ^ "." ^ today);
+
+
+    
+    let strli = split (regexp "[/]+") (!topdir) in
+    let strar = array_of_list strli in
+    let stran = Array.length strar in
+
+    let basedir = if (stran>1) then 
+                        strar.(stran-1) 
+                  else
+                        strar.(0)
+    in 
+    
+    if (stran=1) then
+        topdir := "/"
+    else
+    begin
+        topdir := "";
+        for i = 1 to stran-1 
+        do
+            topdir := (!topdir)^"/"^strar.(i-1);
+        done;
+    end;    
+
+    (* 
+    ** Freeze the project tree, create a statefile. 
+    ** Create an archive file of the full project tree if desired
+    ** (-archive option set)
+    *)
+
+    if (!freeze=true) then
+    begin
+        let topdirentry = {dirname = basedir;
+                           dirstats=(stat ((!topdir)^"/"^basedir));
+                           flist=[]} in
+        let dirlist = ref [topdirentry] in
+
+        fprintf ppf "Scanning project tree...@.";
+
+        scandir basedir topdirentry dirlist;
+
+        fprintf ppf "Writing statefile %s...@." (!statefile);
+
+        (* write dir list file without today extension *)
+        let oc = open_out !statefile in
+        output_value oc (!dirlist)  ;
+        close_out oc ;
+
+        (* and again with today extension *)
+        statefile := !statefile ^ "." ^ today;
+        let oc = open_out !statefile in
+        output_value oc (!dirlist)  ;
+        close_out oc ;
+
+        if (!archive=true) then
+        begin
+            (* 
+            ** create the tar exclude list 
+            *)
+            if(path_exclude<>[]) then
+            begin
+                let key_arr = array_of_list path_exclude in
+                let key_num = Array.length key_arr in
+        
+
+                for i = 1 to key_num
+                do
+                    (*
+                    ** Put a backslash in front of stars "*"
+                    *)
+                    let s = global_replace (regexp "\*") "\*" key_arr.(i-1) in
+
+                    tar_exclude_list := (!tar_exclude_list)^" "^
+                                        tar_exclude^" "^s;
+                                
+                done;
+            end;
+        
+            let archfile = !revisiondir ^ "/" ^ 
+                           ( if ( !project <> "" ) then
+                                 !project
+                             else
+                                 "revision"
+                           ) ^ ".backup." ^ today ^ !tarsuffix
+            in
+
+            let command = "cd " ^ !topdir ^ " ;" ^
+                            !tarprog ^ " " ^ !tarcreate ^ " " ^
+                            archfile ^ " " ^ basedir ^ " " ^
+                            !tar_exclude_list
+            in
+
+            if (!verbose=false) then
+                fprintf ppf "command:@.%s@." command;
+
+            fprintf ppf "Creating archive %s...@." archfile;
+
+            (* create archive file *)
+            let (ic,oc) = open_process command
+            in
+            
+            ignore (close_process (ic,oc));
+                                           
+        end;
+    end;
+
+    (*
+    ** Compare current porject tree with statefile
+    ** <project>.state and create difference file.
+    ** Create a difference archive if desired (-archive option set).
+    *)
+
+    if(!compare=true) then
+    begin
+        let topdirentry = {dirname = basedir;
+                           dirstats=(stat ((!topdir)^"/"^basedir));
+                           flist=[]} in
+        let dirlist = ref [topdirentry] in
+
+        scandir basedir topdirentry dirlist;
+
+        (*
+        ** read the statefile:
+        **
+        ** find the date extension ...
+        *)
+
+        fprintf ppf "Reading statefile %s...@." (!statefile);
+
+        let ic = open_in !statefile in
+        let statelist = input_value ic in
+        close_in ic ;
+
+        comparedir !dirlist statelist;
+
+        (*
+        ** write the result to the diff file 
+        *)
+
+        fprintf ppf "Writing differences to  difffile %s...@." (!difffile);
+
+        let oc = open_out !difffile in
+        writediff !difflist oc;
+        close_out oc;
+
+
+        if (!archive=true) then
+        begin
+            (* write new dir list to state file *)
+            let oc = open_out !statefile in
+            output_value oc (!dirlist)  ;
+            close_out oc ;
+
+            (* and again with today extension *)
+            statefile := !statefile ^ "." ^ today;
+            let oc = open_out !statefile in
+            output_value oc (!dirlist)  ;
+            close_out oc ;
+
+            let archfile = !revisiondir ^ "/" ^ 
+                           ( if ( !project <> "" ) then
+                                 !project
+                             else
+                                 "revision"
+                           ) ^ ".diff." ^ today ^ !tarsuffix
+            in
+
+            let command = "cd " ^ !topdir ^ " ;" ^
+                            !tarprog ^ " " ^ !tarcreate ^ " " ^
+                            archfile ^ " " ^ basedir ^ " " ^ 
+                            !tarfilelist ^ " " ^ !difffile 
+            in
+            if (!verbose=true) then
+                fprintf ppf "command:@.%s@." command;
+
+            fprintf ppf "Creating difference archive %s...@." archfile;
+
+            (* create archive file *)
+            let (ic,oc) = open_process command
+            in
+            
+            ignore (close_process (ic,oc));
+                                           
+        end;
+    end;
+;;
+
+main () ;;
