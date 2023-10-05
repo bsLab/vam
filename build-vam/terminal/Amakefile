@@ -1,0 +1,84 @@
+#
+# Amoeba Module Amakefile
+#
+
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include $VAMDIR/src/terminal/Amake.srclist;
+
+
+#
+# Special include paths
+#
+
+CINCLUDES = {
+    -I$VAMDIR/src/terminal,
+    -I$VAMDIR/build-vam/terminal,
+};
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/terminal,
+    -I,
+    $VAMDIR/build-vam/terminal,
+};
+
+
+
+#
+# All the sources together
+#
+
+CAMLSRC = {
+    $TERMINAL_ML,
+    $TERMINAL_CC
+};
+
+#
+# Target libraries
+#
+
+#
+# CaML library
+#
+
+CAMLLIB     = terminal.cma;
+
+#
+# C library (for Custom link mode), if any.
+#
+
+CUSTOMLIB   = libterminal_c.a;
+
+
+#
+# First build the config.h from the machine and system defintions
+# from Amakefile.sys
+#
+
+%tool config-h-build (
+    src:       %in %list           [ type = config-templ ];
+    dest:      %out                [ type = CC-incl ] => config.h;
+    flags:     %string %list                          => {};
+    program:   %in                 [ type = command ]
+                                                => $VAM_BUILD_CONFIG_H;
+)
+{
+    exec($program,
+            args => $src + $dest + $flags
+            );
+};
+%cluster config.h
+{
+    %targets    config.h;
+    %sources    $VAM_CONFIG_H_TEMPL[type = config-templ];
+    %use        config-h-build(flags => {$VAM_TERMCAP_DEF});
+};
+
+
+%include $VAMDIR/toolset/ocaml.lib;
+%instance customlibcluster($CAMLLIB,$CUSTOMLIB,$CAMLSRC);
+
+ 
