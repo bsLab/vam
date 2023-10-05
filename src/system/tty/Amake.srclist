@@ -1,0 +1,9 @@
+SRC_TTY = {
+    $PWD/dummy.mli,
+    $PWD/io.ml,
+    $PWD/tty.ml
+};
+
+SRC_TTY_MAIN = {
+    $PWD/main.ml
+};
