@@ -1,0 +1,595 @@
+(*
+**      ==================================
+**      OOOO   OOOO OOOO  O      O   OOOO
+**      O   O  O    O     O     O O  O   O
+**      O   O  O    O     O     O O  O   O
+**      OOOO   OOOO OOOO  O     OOO  OOOO
+**      O   O     O    O  O    O   O O   O
+**      O   O     O    O  O    O   O O   O
+**      OOOO   OOOO OOOO  OOOO O   O OOOO
+**      ================================== 
+**      BSSLAB, Dr. Stefan Bosse sci@bsslab.de
+**
+**    PROTECTED BY AND DISTRIBUTED UNDER THE TERMS OF: 
+**    Free Software Foundation-Europe, GNU GPL License, Version 2
+**
+**    $MODIFIEDBY:  BSSLAB
+**    $AUTHORS:     Fabrice Le Fessant, 
+**                  Stefan Bosse
+**    $INITIAL:     Derived from wXlib / INRIA, 2005 BSSLAB
+**    $CREATED:     11.5.2005
+**    $VERSION:     1.22
+**
+**    $INFO:
+**
+**  VXlib generic object management. This class generates and configure
+**  new objects.
+**
+** HOW WIDGETS ARE RESIZED:
+**
+** method update_size : unit ---> 
+**  Computes the new size of the widget. Call parent#update_top_size in most
+**  contained widgets.
+**  
+** method update_top_size : unit --->
+**  Computes the new size of the widget when an inferior size changed. Call
+**  self#update_size in most container widgets.
+**
+** In top widgets, call child#sizes for children to compute their sizes,
+** and child#resize with the final size.
+**
+**    $ENDOFINFO
+**
+*)
+
+
+open Xtypes
+open VX_types
+open VX_common
+open Debug
+
+let next_id = ref 0
+let dl = 0
+  
+let new_szhints _ = {
+    requested_width = 1;
+    requested_height = 1;
+    min_width = 1;
+    min_height = 1;
+    max_width = max_int;
+    max_height = max_int;
+    expand_x = false;
+    expand_y = false;
+    retract_x = false;
+    retract_y = false;
+    inc_x = 0;
+    inc_y = 0;
+    pad_x = 0;
+    pad_y = 0;
+    pos_x = -1;
+    pos_y = -1;
+    comp_timestamp = -1; (* Never computed *)
+} 
+
+class t (parent : container) attributes =
+    let window = { 
+        w_clear = false;
+        w_clipped = false;
+        w_window = noWindow;
+        w_shown = false;
+        w_geometry = { x= 0; y= 0; border=0; width = 1; height = 1; } ;
+        w_clipping = { x= 0; y= 0; border=0; width = 0; height = 0; } ;
+        w_override = true;
+
+        (*
+        ** Default colors inherited from parent.
+        *)
+        w_background = parent#win.w_background;
+        w_foreground = parent#win.w_foreground;
+
+        w_frame = empty_frame;
+        w_cursor = noCursor;
+        w_mask =   [
+            ExposureMask; FocusChangeMask;
+        ];
+        w_size_timestamp = -1;
+        w_refresh_timestamp = -1;
+        w_inverse = false;
+        w_enter_window = null_handler;
+        w_leave_window = null_handler;
+        w_button_released = null_handler;
+        w_button_press = null_handler;
+        w_key_press = null_handler;
+        w_key_release = null_handler;
+        w_button_motion = null_handler;
+        w_pointer_motion = null_handler;
+        w_focus_out = null_handler;
+        w_focus_in = null_handler;
+        w_actions = [];
+        w_ipad_x = 0;
+        w_ipad_y = 0;
+        w_adjust_x = false;
+        w_adjust_y = false;
+        w_size_modified = true;
+        } in
+
+    let szhints = new_szhints () in
+    object (self)
+    
+    inherit VX_base.t window parent#screen
+    
+    initializer 
+        w.w_button_press <- (fun _ -> self#handle_button ());
+        w.w_key_press <- (fun _ -> self#handle_key ());
+        w.w_key_release <- (fun _ -> ());
+        __(self#configure attributes)
+    
+    val id = incr next_id; !next_id
+    val mutable parent = parent
+    val mutable szhints = szhints
+
+    method parent = parent
+
+    (*
+    ** Compute and return size structure
+    *)
+    method size_request = 
+Db.Pr.ss 10 "VX_object#size_request" self#name;
+        let sz = szhints in
+        sz.requested_width <- max sz.requested_width sz.min_width;
+        sz.requested_height <- max sz.requested_height sz.min_height;
+
+        debug dl "VX_object.size_request: dx=%d dy=%d\n"
+                 sz.requested_width sz.requested_height;
+
+        sz
+
+    (*
+    ** Return window structure
+    *)
+    method win_request =
+        w
+    
+    method set_parent p = 
+        assert (w.w_window == noWindow || parent == p);
+        parent <- p
+    
+    method realize =
+        let s = parent#screen in
+        let cwa = [CWEventMask w.w_mask;
+                   CWOverrideRedirect w.w_override] in
+        let cwa = 
+            let b = w.w_background in
+            if b == noColor 
+                then cwa 
+                else (CWBackPixel b.c_pixel) :: cwa in
+        let cwa = 
+            let c = w.w_cursor in
+            if c == noCursor 
+                then cwa 
+                else (CWCursor c.curs_id):: cwa in
+        w.w_window <- X.createWindow s.s_display parent#window 
+                                     w.w_geometry.x w.w_geometry.y 
+                                     (max w.w_geometry.width 1) 
+                                     (max w.w_geometry.height 1)
+                                     copyDepthFromParent InputOutput 
+                                     copyVisualFromParent 
+                                     w.w_geometry.border cwa;
+        Eloop.add_window s.s_eloop w.w_window (self#xevents);
+        set_grabs s.s_display w.w_window self#actions;
+        self#iter (fun o -> o#realize)
+    
+    method iter (f : contained -> unit) = ()
+    method iter_visible f = self#iter f  
+
+    (*
+    ** Update clippling if any
+    *)
+    method update_clipping = ()
+
+    (*
+    **
+    ** (Re)Size this object and (re)size the X window associated
+    ** with this object widget.
+    **     
+    **  Args:
+    **      x y dx dy -> Maximal available area!
+    **
+    *)
+    method size_allocate x y dx dy =
+Db.Pr.ss 10 "VX_object#size_allocate" self#name;
+
+        w.w_size_modified <- false;    
+        let wg = w.w_geometry in
+        let s = self#screen in
+        let sz = szhints in
+        if not sz.expand_x && dx > sz.requested_width then
+        begin
+            (*
+            ** not expanded - simply moved to center of expansion area
+            *)
+            let plus = dx - sz.requested_width in
+            wg.x <- x + plus/2;
+            wg.width <-  sz.requested_width;
+        end
+        else 
+        begin
+            (*
+            ** expanded to desired width
+            *)
+            wg.x <- x;
+            wg.width <- dx;
+        end;
+        if not sz.expand_y && dy > sz.requested_height then
+        begin
+            (*
+            ** not expanded - simply moved to center of expansion area
+            *)
+            let plus = dy - sz.requested_height in
+            wg.y <- y + plus/2;
+            wg.height <- sz.requested_height;  
+        end
+        else 
+        begin
+            (*
+            ** expanded to desired height
+            *)
+            wg.y <- y;
+            wg.height <- dy;
+        end;
+        w.w_size_timestamp <- s.s_timestamp;
+
+        debug dl "VX_object.size_allocate: resized?: x=%d y=%d dx=%d dy=%d\n"
+                 wg.x wg.y wg.width wg.height;
+
+        if not (w.w_window == noWindow) then
+            Xlib.moveResizeWindow s.s_display w.w_window 
+                                  wg.x wg.y wg.width wg.height;
+
+        true
+    
+    method destroy =
+        if not (w.w_window == noWindow) then
+        begin
+            let s = self#screen in
+            self#iter (fun o -> o#destroy);
+            X.destroyWindow s.s_display w.w_window;
+            Eloop.remove_window s.s_eloop w.w_window;      
+            w.w_window <- noWindow
+        end;
+
+    method show =
+        if not w.w_shown then
+        begin
+            if w.w_window == noWindow then self#realize;
+            X.mapWindow s.s_display w.w_window;
+            w.w_shown <- true;
+            self#iter_visible (fun o -> o#show)
+        end
+    
+    method hide =
+        if not (w.w_window == noWindow) && w.w_shown then
+        begin
+            w.w_shown <- false;
+            X.unmapWindow s.s_display w.w_window;
+            self#iter_visible (fun o -> o#hide)
+        end
+    
+    method refresh = 
+Db.Pr.ss 10 "VX_object#refresh" self#name;
+        if s.s_timestamp > w.w_refresh_timestamp && 
+           not (w.w_window == noWindow) then
+        begin
+            let s = self#screen in
+            w.w_refresh_timestamp <- s.s_timestamp;
+        end;
+        if w.w_clear then 
+        begin
+Db.Pr.ss 10 "VX_object#refresh: clear" self#name;
+            X.clearWindow s.s_display w.w_window; 
+            w.w_clear <- false
+        end;
+        self#draw_frame
+    
+    (*
+    ** Draw (X) and print (PS) frame of object
+    *)
+    method draw_frame = 
+        (*
+        ** Update bounding box and parent color. Maybe changed.
+        *)
+        let g = w.w_geometry in
+        let wi,he = g.width, g.height in
+        w.w_frame.f_bbox <- bbox_of_xywh 0 0 wi he;
+        w.w_frame.f_background <- (parent#win).w_background;
+        if w.w_frame.f_foreground = noColor then
+            w.w_frame.f_foreground <- w.w_foreground;
+        if w.w_frame.f_fillground = noColor then
+            w.w_frame.f_fillground <- w.w_background;
+        drawFrame s.s_display w s.s_gcs w.w_frame false
+
+    method print_frame ps x0 y0 =
+        (*
+        ** Update bounding box. Maybe changed.
+        *)
+        let g = w.w_geometry in
+        let wi,he = g.width, g.height in
+        w.w_frame.f_bbox <- bbox_of_xywh 0 0 wi he;
+        w.w_frame.f_background <- (parent#win).w_background;
+        if w.w_frame.f_foreground = noColor then
+            w.w_frame.f_foreground <- w.w_foreground;
+        if w.w_frame.f_fillground = noColor then
+            w.w_frame.f_fillground <- w.w_background;
+        (*
+        ** Fill window with background color
+        *)
+        VX_ps.polyFillRectangle ps x0 y0 w.w_background 
+                    [0.0,0.0,i2f wi,i2f he];
+        printFrame ps w x0 y0 w.w_frame false
+    
+    method update_top_size = self#update_size
+    method update_size = 
+        if s.s_timestamp > w.w_size_timestamp then
+            parent#update_top_size
+
+    method contained = (self :> contained)
+    
+    (*
+    ** Default widget configure method. May be overriden by 
+    ** class which ineherits the VX_object class.
+    ** The configure method retunts list of ignored/not handled 
+    ** attributes
+    *)
+    method configure attributes =
+        let remains = ref [] in
+        let sz = szhints in
+        let w = w in
+        (*
+        ** The window has already been created 
+        *)
+      
+        (*
+        ** The problem here is that we don't want to modify several times
+        ** all the toplevels. Instead, such modifications should only be 
+        ** taken into account when the root#update function is called. 
+        *)
+        let old_grabs = w.w_actions in
+        let size_changed = ref false in
+        let draw_changed = ref false in
+        let mask_changed = ref false in
+        let grab_changed = ref false in
+        let post_conf = ref false in
+
+        List.iter (fun t ->
+          match t with
+          | Width int -> size_changed := true; 
+                         sz.min_width <- int;
+                         sz.max_width <- int;
+          | Height int -> size_changed := true; 
+                          sz.min_height <- int;
+                          sz.max_height <- int;
+          | MinWidth int -> size_changed := true; sz.min_width <- int
+          | MinHeight int -> size_changed := true;sz.min_height <- int
+          | MaxWidth int -> size_changed := true; sz.max_width <- int
+          | MaxHeight int ->  size_changed := true; sz.max_height <- int
+          | ExpandX bool ->  size_changed := true; sz.expand_x <- bool
+          | ExpandY bool ->  size_changed := true; sz.expand_y <- bool
+          | IncX int ->  size_changed := true; sz.inc_x <- int
+          | IncY int ->  size_changed := true; sz.inc_y <- int
+          | IpadX int ->  size_changed := true; w.w_ipad_x <- int
+          | IpadY int ->  size_changed := true; w.w_ipad_y <- int
+          | OpadX int ->  size_changed := true; sz.pad_x <- int
+          | OpadY int ->  size_changed := true; sz.pad_y <- int
+          | AdjustX bool -> size_changed := true; w.w_adjust_x <- bool
+          | AdjustY bool -> size_changed := true; w.w_adjust_y <- bool
+          | RetractX bool -> size_changed := true; sz.retract_x <- bool
+          | RetractY bool -> size_changed := true; sz.retract_y <- bool
+          | PosX x -> size_changed := true; sz.pos_x <- x;
+          | PosY y -> size_changed := true; sz.pos_y <- y;
+          | Position (x,y) ->
+              let g = w.w_geometry in
+              g.x <- x; g.y <- y;
+              if not (w.w_window == noWindow) then
+                X.configureWindow s.s_display w.w_window [CWX x; CWY y]
+          | Background bg -> 
+              draw_changed := true;
+              w.w_background <- parent#color_make bg true;
+              post_conf := true;
+          | Border attrs -> 
+                draw_changed := true; 
+                w.w_frame <- create_frame w 
+                                          (fun c -> parent#color_make c true)
+                                          attrs;
+                w.w_frame.f_background <- (parent#win).w_background;
+                if w.w_frame.f_foreground = noColor then
+                    w.w_frame.f_foreground <- w.w_foreground;
+                if w.w_frame.f_fillground = noColor then
+                    w.w_frame.f_fillground <- w.w_background;
+                post_conf := true;
+          | Cursor c ->
+              w.w_cursor <- parent#cursor_make c true;
+              if not (w.w_window == noWindow) then
+                X.changeWindowAttributes s.s_display w.w_window 
+                  [CWCursor w.w_cursor.curs_id]
+          | EventMask (op,mask) -> 
+              w.w_mask <- (match op with
+                | Append -> mask @ w.w_mask;
+                | Replace -> mask
+                | Remove -> List.fold_left (fun mask ev ->
+                        Utils.list_removeq mask ev) w.w_mask mask);
+              mask_changed := true
+          | Foreground fg ->
+              w.w_foreground <- parent#color_make fg true;
+              draw_changed := true
+          | Bindings list ->
+              List.fold_right (fun (event, handler) () ->
+                    match event with
+                    | EnterWindow -> 
+                        let old = w.w_enter_window in
+                        w.w_enter_window <- (fun _ -> old (); handler ());
+                        if not (List.memq EnterWindowMask w.w_mask) then
+                            w.w_mask <- EnterWindowMask :: w.w_mask
+                    | LeaveWindow -> 
+                        let old = w.w_leave_window in
+                        w.w_leave_window <- (fun _ -> old (); handler ());
+                        if not (List.memq LeaveWindowMask w.w_mask) then
+                            w.w_mask <- LeaveWindowMask :: w.w_mask
+                    | ButtonReleased ->
+                        let old = w.w_button_released in
+                        w.w_button_released <- (fun _ -> old (); handler ());
+                        if not (List.memq ButtonReleaseMask w.w_mask) then
+                            w.w_mask <- ButtonReleaseMask :: w.w_mask;
+                    | FocusIn ->
+                        let old = w.w_focus_in in
+                        w.w_focus_in <- (fun _ -> old (); handler ());
+                        if not (List.memq FocusChangeMask w.w_mask) then
+                            w.w_mask <- FocusChangeMask :: w.w_mask;
+                    | FocusOut ->
+                        let old = w.w_focus_out in
+                        w.w_focus_out <- (fun _ -> old (); handler ());
+                        if not (List.memq FocusChangeMask w.w_mask) then
+                            w.w_mask <- FocusChangeMask :: w.w_mask;
+                    | ButtonMotion ->
+                        let old = w.w_button_motion in
+                        w.w_button_motion <- (fun _ -> old (); handler ());
+                        if not (List.memq ButtonMotionMask w.w_mask) then
+                            w.w_mask <- 
+                                ButtonMotionMask :: OwnerGrabButtonMask 
+                                :: w.w_mask;
+                    | PointerMotion ->
+                        let old = w.w_pointer_motion in
+                        w.w_pointer_motion <- (fun _ -> old (); handler ());
+                        if not (List.memq PointerMotionMask w.w_mask) then
+                            w.w_mask <-
+                                ButtonMotionMask :: OwnerGrabButtonMask :: 
+                                PointerMotionMask :: w.w_mask;
+                    | KeyPress ->
+                        let old = w.w_key_press in
+                        w.w_key_press <- (fun _ -> old (); handler ());
+                        if not (List.memq KeyPressMask w.w_mask) then
+                            w.w_mask <- KeyPressMask :: KeyReleaseMask :: 
+                                        w.w_mask;
+                    | KeyRelease ->
+                        let old = w.w_key_release in
+                        w.w_key_release <- (fun _ -> old (); handler ());
+                        if not (List.memq KeyReleaseMask w.w_mask) then
+                            w.w_mask <- KeyReleaseMask :: KeyPressMask :: 
+                                        w.w_mask;
+                    | ButtonPress ->
+                        let old = w.w_button_press in
+                        w.w_button_press <- (fun _ -> old (); handler ());
+                        if not (List.memq ButtonPressMask w.w_mask) then
+                            w.w_mask <- ButtonPressMask :: 
+                                        ButtonReleaseMask :: w.w_mask;
+                    | Key _ ->
+                        w.w_actions <- (event, handler) :: w.w_actions;
+                        if not (List.memq KeyPressMask w.w_mask) then
+                            w.w_mask <- KeyPressMask :: KeyReleaseMask ::
+                                        w.w_mask;
+                    | Button _ ->
+                        w.w_actions <- (event, handler) :: w.w_actions;
+                        if not (List.memq ButtonPressMask w.w_mask) then
+                            w.w_mask <- ButtonPressMask :: 
+                                        ButtonReleaseMask :: w.w_mask;
+                    | GrabbedKey _ ->
+                        w.w_actions <- (event, handler) :: w.w_actions;
+                        if not (List.memq KeyPressMask w.w_mask) then
+                            w.w_mask <- KeyPressMask :: KeyReleaseMask ::
+                                        w.w_mask;
+                        grab_changed := true;
+                    | GrabbedButton _ ->
+                        w.w_actions <- (event, handler) :: w.w_actions;
+                        if not (List.memq ButtonPressMask w.w_mask) then
+                            w.w_mask <- ButtonPressMask :: 
+                                        ButtonReleaseMask :: w.w_mask;                    
+                        grab_changed := true;
+                  ) list ();
+              mask_changed := true;
+          | _ -> remains := !remains @ [t];
+          ) attributes;
+
+        if !post_conf then
+        begin
+            (*
+            ** Update colors.
+            *)
+            w.w_frame.f_background <- (parent#win).w_background;
+            if w.w_frame.f_foreground = noColor then
+                w.w_frame.f_foreground <- w.w_foreground;
+            if w.w_frame.f_fillground = noColor then
+                w.w_frame.f_fillground <- w.w_background;
+
+            (*
+            ** Get hilite and shadow color for Relief
+            *)
+            match w.w_frame.f_type with
+            | ReliefRaised
+            | ReliefSunken ->
+                w.w_frame.f_auxiliary <- self#getHilite w.w_background;
+                w.w_frame.f_foreground <- self#getShadow w.w_background;
+                w.w_frame.f_fillground <- w.w_background;
+            | _ -> ();
+        end;
+
+        if not (w.w_window == noWindow) then
+        begin
+            if !mask_changed then
+                X.changeWindowAttributes s.s_display w.w_window
+                                         [CWEventMask w.w_mask];      
+            if !grab_changed then
+            begin
+                unset_grabs s.s_display w.w_window w.w_actions;
+                set_grabs s.s_display w.w_window w.w_actions;
+            end;
+            if !size_changed then self#wait_resize;
+            if !draw_changed then self#wait_refresh true 0 0 0 0;
+        end;
+        !remains
+    
+    method focus =
+        if not (w.w_window == noWindow) then
+                X.setInputFocus s.s_display w.w_window 
+                                RevertToPointerRoot currentTime ;
+        (*
+        **  Don't know why, but specifying a time does not work with VX_filesel ..
+        ** (Eloop.last_time s.s_eloop) 
+        *)
+    
+    method wait_refresh clear x y dx dy = 
+        if w.w_shown then
+        begin
+            w.w_clear <- true;
+            s.s_wait_refresh <- self#to_refresh :: s.s_wait_refresh
+        end;
+    
+    method wait_resize =
+        w.w_size_modified <- true;
+        szhints.comp_timestamp <- 0;
+        parent#wait_resize
+    
+    method to_refresh = (self :> refresh_widget)
+    method to_resize = (self :> resize_widget)
+    
+
+    
+    method reverse =
+        w.w_inverse <- not w.w_inverse;
+        let bg = w.w_background in
+        let fg = w.w_foreground in
+        w.w_background <- fg;
+        w.w_foreground <- bg;
+        self#wait_refresh true 0 0 0 0;
+        w.w_inverse
+
+    method print (ps : ps) (x0: int) (y0 : int) =
+        Db.Pr.sdd 0 "VX_object.print" x0 y0;
+        self#print_frame ps x0 y0
+    
+    method normal = if w.w_inverse then let _ = self#reverse in ()
+    method inverse = if not w.w_inverse then let _ = self#reverse in ()
+    method default_font = parent#default_font          
+    method geometry = w.w_geometry
+    method id = self#name ^ ":" ^(string_of_int id)
+end
+
+
