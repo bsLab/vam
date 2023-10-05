@@ -1,0 +1,96 @@
+##
+##      ==================================
+##      OOOO   OOOO OOOO  O      O   OOOO
+##      O   O  O    O     O     O O  O   O
+##      O   O  O    O     O     O O  O   O
+##      OOOO   OOOO OOOO  O     OOO  OOOO
+##      O   O     O    O  O    O   O O   O
+##      O   O     O    O  O    O   O O   O
+##      OOOO   OOOO OOOO  OOOO O   O OOOO
+##      ================================== 
+##      BSSLAB, Dr. Stefan Bosse sci@bsslab.de
+##
+##    PROTECTED BY AND DISTRIBUTED UNDER THE TERMS OF: 
+##    Free Software Foundation-Europe, GNU GPL License, Version 2
+##
+##    $MODIFIEDBY:  BSSLAB
+##    $AUTHORS:     Stefan Bosse
+##    $INITIAL:     (C) BSSLAB 2003
+##    $CREATED:     
+##    $VERSION:     1.01
+##
+##    $INFO:
+##
+##  Amoeba module
+##
+##    $ENDOFINFO
+##
+
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include $VAMDIR/src/amoeba/Amake.srclist;
+
+
+#
+# Special include paths
+#
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/amoeba,
+    -I,
+    $VAMDIR/src/buffer,
+    -I,
+    $VAMDIR/build-vam/threads/interface,
+    -I,
+    $VAMDIR/build-vam/mldoc/interface,
+    -I,
+    $VAMDIR/build-vam/buffer/interface,
+    -I,
+    $VAMDIR/build-vam/unix/interface,
+    -I,
+    $VAMDIR/build-vam/os/interface,
+    -I,
+    $VAMDIR/build-vam/debug/interface,
+
+};
+
+CINCLUDES = {
+    -I$VAMDIR/src/buffer,
+    -I$AMOEBA_SRC_DIR/h/machdep/arch/$ARCH,
+};
+
+#
+# All the sources together
+#
+
+CAMLSRC = {
+    $MODULE_AMOEBA_MLI,
+    $MODULE_AMOEBA_ML, 
+    $MODULE_AMOEBA_C
+};
+
+#
+# Target libraries
+#
+
+#
+# CaML library
+#
+
+CAMLLIB     = amoeba.cma;
+
+#
+# C library (for Custom link mode), if any.
+#
+
+CUSTOMLIB   = libamoeba_ext.a;
+
+
+%include $VAMDIR/toolset/ocaml.lib;
+
+%instance customlibcluster($CAMLLIB,$CUSTOMLIB,$CAMLSRC);
+
+ 
