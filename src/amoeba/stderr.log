@@ -1,0 +1,7 @@
+
+2003.0.0:
+    added std_IOERR
+    added std_WRONGSRV
+
+2005.01.01:
+    added std_OBJBAD
