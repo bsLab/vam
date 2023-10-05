@@ -1,0 +1,264 @@
+(***********************************************************************)
+(*                                                                     *)
+(*                           xlib for Ocaml                            *)
+(*                                                                     *)
+(*       Fabrice Le Fessant, projet Para/SOR, INRIA Rocquencourt       *)
+(*    && Stefan Bosse, University Bremen                               *)
+(*                                                                     *)
+(*  Copyright 1998 Institut National de Recherche en Informatique et   *)
+(*  Automatique.  Distributed only by permission.                      *)
+(*                                                                     *)
+(***********************************************************************)
+
+
+(*
+** Generic image support. Derived from the Zpixmap module.
+** Images are stored in packed fromat in a generic string buffer.
+**
+** Each time an image is put to the screen, this image must
+** be converted to the display depth and probably a color index
+** transformartion must be performed (display_depth = 8,16 BPP).
+**
+** Gray level images consume one byte per pixel, RGB images
+** consume 3 bytes per pixel [R,G,B].
+**
+*)
+
+(*
+** Image format types. 
+*)
+
+type image_type = 
+    Image_Gray |
+    Image_RGB
+
+
+open Xtypes;;
+
+
+exception DepthNotSupported;;
+
+
+type t = {
+
+    (*
+    ** The real image of depth image_depth.
+    *)
+
+    image : string;
+
+    (*
+    ** The zpixmap raw image of depth display_depth.
+    *)
+
+    raw_image : string;
+
+    (* informations about the image and the display *)
+
+    dx : size;
+    dy : size;
+
+
+    image_format: image_type;
+   
+    image_bits_per_pixel : int;
+    image_bytes_per_line : int;
+
+    display_bits_per_pixel : int;
+    display_bytes_per_line : int;
+
+    (*
+    ** Color index table (only needed for display depth 8,16)
+    *)
+
+    color_map: int array;
+
+
+    (* was the image modified ? *)
+    mutable modified : bool 
+  }
+
+
+(*
+** Transform the image [image] to the X pixmap format [raw_image].
+*)
+
+let to_ximage image =
+      if image.modified then
+      begin
+        let cmap = image.color_map in
+
+        match image.image_format with
+        | Image_Gray ->
+        (
+            match image.display_bits_per_pixel with
+            | 8 ->  (
+                        for y = 0 to image.dy -1 
+                        do
+                            for x = 0 to image.dx -1 
+                            do
+                                let ipos = y*image.image_bytes_per_line+x in
+                                let rpos = y*image.display_bytes_per_line+x in
+                                let col  = int_of_char image.image.[ipos] in
+                                image.raw_image.[rpos] <-
+                                            (char_of_int cmap.(col));
+                            done
+                        done;
+            
+                    );
+            | 16 -> (
+                        for y = 0 to image.dy -1 
+                        do
+                            for x = 0 to image.dx -1 
+                            do
+                                let ipos = y*image.image_bytes_per_line
+                                           +x in
+                                let rpos = y*image.display_bytes_per_line
+                                           +x*2 in
+                                let col  = int_of_char image.image.[ipos] in
+                                image.raw_image.[rpos] <-
+                                        (char_of_int (cmap.(col) land 0xff ));
+                                image.raw_image.[rpos+1] <-
+                                (char_of_int ((cmap.(col) lsr 8) land 0xff ));
+                            done
+                        done;
+
+                    );
+            | 24 -> (
+                        for y = 0 to image.dy -1 
+                        do
+                            for x = 0 to image.dx -1 
+                            do
+                                let ipos = y*image.image_bytes_per_line
+                                           +x in
+                                let rpos = y*image.display_bytes_per_line
+                                           +x*3 in
+                                image.raw_image.[rpos] <-
+                                        image.image.[ipos];
+                                image.raw_image.[rpos+1] <-
+                                        image.image.[ipos];
+                                image.raw_image.[rpos+2] <-
+                                        image.image.[ipos];
+                            done
+                        done;
+
+                    );
+            | _ -> raise DepthNotSupported;
+        );
+                    
+        | Image_RGB ->
+        (
+            match image.display_bits_per_pixel with
+            | 8 -> ();
+            | 16 -> ();
+            | 24 -> ();
+            | _ -> raise DepthNotSupported;
+        );        
+      end;
+      image.modified <- false
+    
+  
+
+
+
+(*
+** Create a new Image. Setup the color index map array if
+** needed.
+*)
+
+let createImage 
+    dpy 
+    cmap
+    width 
+    height 
+    depth 
+    img_format
+  =
+
+  let dpy_bits_per_pixel =  depth in 
+  let dpy_bytes_per_line =  (depth / 8) * width in
+
+  let img_bits_per_pixel = match img_format with
+                    | Image_Gray -> 8;
+                    | Image_RGB  -> 24;
+  in
+ 
+  let img_bytes_per_line =  (img_bits_per_pixel / 8) * width in
+
+  (*
+  ** Build a colormap if needed
+  *)  
+
+  let img_cmap =
+      if (dpy_bits_per_pixel < 24 ) then
+      begin
+        match img_format with
+        | Image_Gray ->
+          (
+            let gcmap = Array.create 256 (id_to_pixel (-1)) in 
+            for i = 0 to 255 
+            do
+                gcmap.(i) <-
+                            let ac = X.allocColor dpy cmap
+                                    (i*256) (i*256) (i*256)
+                            in
+                            ac.ac_pixel;
+            done;
+            gcmap
+          );
+        | Image_RGB ->
+          (
+            let bits_per_col =
+                match dpy_bits_per_pixel with
+                | 8  -> 2;
+                | 16 -> 5;
+                | _ -> raise DepthNotSupported;
+            in
+            let cmap_size = 2 lsl (bits_per_col*3) in
+
+            let rgbcmap = Array.create cmap_size (id_to_pixel (-1)) in 
+
+            for r = 0 to cmap_one_size-1
+            for g = 0 to cmap_one_size-1
+            for b = 0 to cmap_one_size-1
+            do
+                let i = (r lsl (cmap_one_size*2)) +
+                        (g lsl cmap_one_size) +
+                        b
+                in
+                rgbcmap.(i) <-
+                            let ac = X.allocColor dpy cmap
+                                    (i*256) (i*256) (i*256)
+                            in
+                            ac.ac_pixel;
+            done;
+            rgbcmap
+          );
+        
+          );
+      end
+      else
+        [||]
+  in
+
+  {
+    image = String.create (dpy_bytes_per_line * height);
+
+    raw_image = String.create (img_bytes_per_line * height);
+
+    dx = width;
+    dy = height;
+
+    image_format = img_format;
+
+    image_bits_per_pixel = img_bits_per_pixel;
+    image_bytes_per_line = img_bytes_per_line;
+
+    display_bits_per_pixel = dpy_bits_per_pixel;
+    display_bytes_per_line = dpy_bytes_per_line;
+
+    color_map = img_cmap;
+
+    modified = true
+  }
+  
