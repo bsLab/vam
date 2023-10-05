@@ -1,0 +1,16 @@
+MODULE_LINDA_MLI = {
+    $PWD/dummy.mli,
+};
+
+MODULE_LINDA_ML = {
+    $PWD/linda_common.ml,
+    $PWD/linda_client.ml,
+    $PWD/linda_client_ms.ml,
+    $PWD/linda_server.ml,
+    $PWD/linda.ml,
+    $PWD/linda_ms.ml,
+};
+
+MODULE_LINDA_C = {
+    $PWD/linda_ext.c,
+};
