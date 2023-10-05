@@ -1,0 +1,49 @@
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include $VAMDIR/src/system/bdisk/Amake.srclist;
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/system/bootdisk,
+    -I,
+    $INSTALLDIR/interface,
+    -I,
+    $INSTALLDIR/lib,
+};
+
+
+DEFINES = {
+    -g,
+    -DDEBUG,
+};
+
+SRC = {
+    $SRC_BDISK
+};
+
+LIB = bootdisk.cma;
+
+%include $VAMDIR/toolset/ocaml.lib;
+%include $VAMDIR/toolset/ocaml.sys;
+
+%instance libcluster($LIB,$SRC);
+
+
+PNAME = bdisk;
+PLIBS = {
+    debug.cma,
+    buffer.cma,
+    unix.cma,
+    str.cma,
+    threads.cma,
+    os.cma,
+    amoeba.cma,
+    $VAMDIR/build-vam/server/server.cma,
+    bootdisk.cma,
+};
+
+VM = $INSTALLDIR/bin/vamrun;
+%instance bytecode-exe($PNAME,$PLIBS,$VM,$SRC_BDISK_MAIN);
+
