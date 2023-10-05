@@ -1,0 +1,40 @@
+2003.00.00:
+    fully revised and enhanced backtrace support
+    now loaded modules and toplevel phrases are backtrace capable !!!
+    improved backtracing in the case the exception was
+    raised in a C function 
+
+2003.11.08:
+    Cleanup
+    UNIX related stuff exchanged with OS independent functions
+    fprintf -> chan_std_err,chan_std_out
+    Raw Amoeba split
+
+2003.11.20:
+    Backtracing again fixed:
+    Debug and event Positions now reduced to 24 Bit (&0xFFFFFFF)
+    Fuzzy logic in exception raised from C function extended (+-8 Bytes
+    to nearest closure)
+
+2003.12.31:
+    Changed most CAMLexport to CAMLprim
+
+
+2004.8.26:
+    added backtrace verbose mode (prints outs debugging infos)
+    CAMLRUNPARAM=d
+    modevents bug in read_debug_self fixed
+
+2004.12.25:
+    changed event lookup: if there is no matching event found, a search
+    window is used to find a closure nearest to event location.
+
+2005.1.5:
+    some minor changes 
+    added init_debuginfo ()
+    changed event_for_location: searches now always with increased PC window
+    if there is no event exactly mathing the given PC value (nonetheless the value
+    of exc_ccall_pc!!!)
+    needed for debugging...
+
+ 
