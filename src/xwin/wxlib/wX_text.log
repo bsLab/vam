@@ -1,0 +1,9 @@
+2003.0.0:
+      -- of_string/of_file: added some standard attributes
+      -- font_width replaced with (string_width font str)
+
+2003.11.28:
+    of_string: added set_string (aka set_lines)
+
+2003.11.30:
+    set_font method added
