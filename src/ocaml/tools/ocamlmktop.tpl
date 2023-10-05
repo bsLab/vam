@@ -1,0 +1,28 @@
+#!/bin/sh
+#########################################################################
+#                                                                       #
+#                            Objective Caml                             #
+#                                                                       #
+#            Damien Doligez, projet Para, INRIA Rocquencourt            #
+#                                                                       #
+#   Copyright 1999 Institut National de Recherche en Informatique et    #
+#   en Automatique.  All rights reserved.  This file is distributed     #
+#   under the terms of the Q Public License version 1.0.                #
+#                                                                       #
+#########################################################################
+
+#
+# Toplevellib now splitted: Additionaly teh following libraries are
+# needed:
+#
+#   utils.cma
+#   parsing.cma
+#   typing.cma
+#   bytecomp.cma  
+#   driver.cma
+#   
+
+
+LIBS="utils.cma parsing.cma typing.cma bytecomp.cma driver.cma toplevellib.cma"
+
+exec %%BINDIR%%/ocamlc -linkall $LIBS "$@" topmain.cmo
