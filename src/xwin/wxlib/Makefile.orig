@@ -1,0 +1,24 @@
+include ../../config/Makefile.config
+
+RESULT=wxlib
+LIBINSTALL_SUBDIR=xlib
+SOURCES= wX_types.ml wX_adjust.ml wX_display.ml wX_screen.ml wX_base.ml wX_object.ml wX_root.ml wX_top.ml wX_dummy.ml wX_bar.ml wX_table.ml wX_scrollbar.ml wX_label.ml wX_pixmap.ml wX_viewport.ml wX_text.ml wX_button.ml wX_popup.ml wX_selector.ml wX_deleg.ml wX_port.ml wX_wmtop.ml  wX_appli.ml wX_dialog.ml wX_dummy.ml wX_panel.ml wX_scale.ml wX_ledit.ml wX_radiobutton.ml wX_Graphics.ml wX_xterm.ml wX_filesel.ml wX_tree.ml wX_swap.ml wX_notebook.ml wX_parent.ml
+
+DEPCROSS=-subdir .th
+INC_PACKAGES=wxlib
+HTML=libwxlib.html
+TITLE="The <TT> wXlib <TT> Library"
+
+LIBINSTALL_FILES= *.cm[ia] *.cmxa *.a
+
+byte:: byte-code-library cross-byte-library
+opt:: native-code-library cross-native-library
+install:: install-library
+
+DEMOS=demos-subdir
+
+clean::
+	$(MAKE) -C examples clean
+
+include ../../Makefile.generic
+-include .depend
