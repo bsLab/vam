@@ -1,0 +1,53 @@
+#!/bin/bash
+
+source ../../toolset/build.env
+
+if [ $# = 0 ]
+then
+    echo "Usage: build <targets>"
+    echo "Targets: all clean install"
+    exit 1
+fi
+
+check ()
+{
+    if [ $? != 0 ]
+    then
+        echo "Abort due to errors building target."
+        exit 1
+    fi
+}
+
+
+for TARGET in $@
+do
+    echo "Building target [$TARGET] ..."
+    case $TARGET in
+        all)    $AMAKE vam
+                check
+                $AMAKE vamb
+                check
+                $AMAKE xvam
+                check
+                $AMAKE vamc
+                check
+                ;;
+        clean)  $AMAKE -C
+                $RM interface/*
+		$RM vam vamc xvam vamb
+                ;;
+        install)    
+                $INSTALL -d $INSTALLDIR/bin
+                $INSTALL -d $INSTALLDIR/lib
+                $INSTALL -C vam $INSTALLDIR/bin
+                $INSTALL -C vamb $INSTALLDIR/bin
+                $INSTALL -C xvam $INSTALLDIR/bin
+                $INSTALL -C vamc $INSTALLDIR/bin
+                $INSTALL -C $VAMDIR/src/scripts/vam_init.ml $INSTALLDIR/lib
+                $INSTALL -C $VAMDIR/src/scripts/xvam_init.ml $INSTALLDIR/lib
+                $CHMOD a+x $INSTALLDIR/bin/vam
+                $CHMOD a+x $INSTALLDIR/bin/vamb
+                $CHMOD a+x $INSTALLDIR/bin/xvam
+                $CHMOD a+x $INSTALLDIR/bin/vamc
+    esac
+done
