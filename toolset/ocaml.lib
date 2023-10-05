@@ -1,0 +1,44 @@
+#
+# Build CaML libraries
+#
+
+%include common.amk;
+
+%include $PWD/ocaml.types;
+%include $PWD/ocaml-tools.common;
+
+
+#
+# Build a CaML libraray from the sources.
+#
+
+%generic libcluster(camllib,camlsrc)
+{
+    %default $camllib;
+    %cluster 
+    {
+        %targets    $camllib;
+        %sources    $camlsrc;
+    };
+};
+
+
+#
+# Build a CaML library from the sources, and additionaly
+# a custom mode C library.
+#
+
+%generic customlibcluster(camllib,clib,camlsrc)
+{
+    %default $camllib;
+    %cluster 
+    {
+        %targets    $camllib,
+                    $clib;
+        %sources    $camlsrc;
+        %use ocaml-ar(custom => {'-custom',
+                                 '-cclib',
+                                 '-l'basename($clib,'lib%.a')});
+    };
+};
+
