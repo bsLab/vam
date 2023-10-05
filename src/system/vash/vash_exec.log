@@ -1,0 +1,10 @@
+2004.1.24:
+    exec now transfers all known env caps to the process env
+
+2004.3.31:
+    stun added
+
+2005.12.12:
+    enhanced path control
+
+
