@@ -1,0 +1,20 @@
+
+OCAML_LEX_SRC = {
+    $PWD/parser.mly,
+    $PWD/syntax.mli,
+    $PWD/parser.mli,
+    $PWD/parser.ml,
+    $PWD/lexer.mll[flags={$PWD/lexer.mli}],
+    $PWD/lexer.mli,
+    $PWD/lexer.ml,
+    $PWD/lexgen.mli,
+    $PWD/lexgen.ml,
+    $PWD/compact.mli,
+    $PWD/compact.ml,
+    $PWD/output.mli,
+    $PWD/output.ml,
+};
+
+OCAML_LEX_MAIN = {
+    $PWD/main.ml
+};
