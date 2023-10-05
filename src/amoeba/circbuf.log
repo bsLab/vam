@@ -1,0 +1,6 @@
+2002.0.0:
+    bytebuf management introduced
+
+2003.12.08:
+    cb_gets fixed for the case not enough bytes available (get_bytes
+)
