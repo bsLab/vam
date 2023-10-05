@@ -1,0 +1,49 @@
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include $VAMDIR/src/system/vpd/Amake.srclist;
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/system/vpd,
+    -I,
+    $INSTALLDIR/interface,
+    -I,
+    $INSTALLDIR/lib,
+};
+
+
+DEFINES = {
+    -g,
+    -DDEBUG,
+};
+
+SRC = {
+    $SRC_VPD
+};
+
+LIB = vpd.cma;
+
+%include $VAMDIR/toolset/ocaml.lib;
+%include $VAMDIR/toolset/ocaml.sys;
+
+%instance libcluster($LIB,$SRC);
+
+
+PNAME = vpd;
+PLIBS = {
+    debug.cma,
+    buffer.cma,
+    unix.cma,
+    str.cma,
+    threads.cma,
+    os.cma,
+    $VAMDIR/lib/amoeba.cma,
+    server.cma,
+    vpd.cma,
+};
+
+VM = $INSTALLDIR/bin/vamrun;
+%instance bytecode-exe($PNAME,$PLIBS,$VM,$SRC_VPD_MAIN);
+
