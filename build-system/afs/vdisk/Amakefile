@@ -1,0 +1,48 @@
+
+%include ../../../Amakefile.sys;
+%include ../../../Amakefile.common;
+
+%include $VAMDIR/src/system/afs/vdisk/Amake.srclist;
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/system/afs/vdisk,
+    -I,
+    $INSTALLDIR/interface,
+    -I,
+    $INSTALLDIR/lib,
+};
+
+
+DEFINES = {
+    -g,
+};
+
+SRC = {
+    $SYS_AFS_SRC
+};
+
+LIB = afs_vdisk.cma;
+
+%include $VAMDIR/toolset/ocaml.lib;
+%include $VAMDIR/toolset/ocaml.sys;
+
+%instance libcluster($LIB,$SRC);
+
+
+PNAME = afs;
+PLIBS = {
+    debug.cma,
+    buffer.cma,
+    unix.cma,
+    str.cma,
+    threads.cma,
+    os.cma,
+    $VAMDIR/build-vam/amoeba/amoeba.cma,
+    $VAMDIR/build-vam/server/server.cma,
+    afs_vdisk.cma,
+};
+PSRC = $SYS_AFS_MAIN_SRC;
+VM = $INSTALLDIR/bin/vamrun;
+%instance bytecode-exe($PNAME,$PLIBS,$VM,$PSRC);
+
