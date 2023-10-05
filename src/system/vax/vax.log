@@ -1,0 +1,6 @@
+2005.4.24:
+    removed vax_file.ml
+    changed to Afu_server module instead
+
+2006.2.4:
+    boot_kernel, exec_start: now starting two afu_server_loop threads!
