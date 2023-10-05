@@ -1,0 +1,20 @@
+
+MODULE_MATH_MLI = {
+    $PWD/complex.mli,
+    $PWD/math.mli,
+};
+
+MODULE_MATH_ML = {
+    $PWD/complex.ml,
+    $PWD/math.ml,
+};
+
+MODULE_MATH_C = {
+    $PWD/zlog.c,
+    $PWD/zexp.c,
+    $PWD/zsqrt.c,
+    $PWD/zabs.c,
+    $PWD/complex.c,
+    $PWD/math.c,
+};
+
