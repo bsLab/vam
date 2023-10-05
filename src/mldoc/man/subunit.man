@@ -1,0 +1,68 @@
+  .S2
+    .NA Subunits .AN
+    Subunits are special paragraphs. They can be used in all structure
+    elements above.
+    
+    .TB
+      .TH Available subunits (paragraphs) .HT
+      .TR
+        .TC .B Name .R .CT
+        .TC .B begin .R .CT
+        .TC .B end .R .CT 
+        .TC .B Comment .R .CT
+      .RT
+      .TR
+        .TC Named Paragraph .CT
+        .TC .[ .PA .] .CT 
+        .TC .[ .AP .] .CT
+        .TC Name argument optional .CT
+      .RT
+      .TR
+        .TC Interface .CT
+        .TC .[ .IN .] .CT 
+        .TC .[ .NI .] .CT
+        .TC Name argument optional .CT
+      .RT
+      .TR
+        .TC Example .CT
+        .TC .[ .EX .] .CT 
+        .TC .[ .XE .] .CT
+        .TC Name argument optional .CT
+      .RT
+      .TR
+        .TC Preformatted text .CT
+        .TC .[ .{ .] .CT 
+        .TC .[ .} .] .CT
+        .TC .CT
+      .RT
+      .TR
+        .TC Generic Subunit S4 .CT
+        .TC .[ .S4 .] .CT 
+        .TC .[ .4S .] .CT 
+        .TC Name argument required .CT
+      .RT
+    .BT
+    Except for a generic subunit, the name argument .[ .NA XXX .AN .] 
+    is optional and can be used for a further description head. .NL
+    The interface subunit is used to wrap function, value, type or other
+    interfaces. This subunit is used in conjunction with the 
+
+    .UL
+      .LI ML-Function .IL
+      .LI ML-Value .IL
+      .LI ML-Type (abstract types) .IL
+      .LI ML-Structure .IL
+      .LI ML-Module .IL
+      .LI ML-Class .IL
+      .LI C-Function/variables .IL
+    .LU 
+
+    special interfaces. 
+
+    See .LK Special Interfaces .KL for more details. The .NA example .AN 
+    and the .NA preformatted .AN text subunits are used to display source code
+    or other example lines in a new centered paragraph. The .NA example .AN
+    subunit is put in a box. The .NA preformatted .AN subunit can spawn several
+    pages. 
+
+  .2S
