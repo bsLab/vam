@@ -1,0 +1,66 @@
+  .MD
+    .NA doc_text .AN
+    .S4 .NA Description .AN
+    This is the ASCII-Text backend module used to convert .NA MlDoC .AN documents in
+    generic Text format.
+    This .NA text_of_tree .AN function is used to convert the 
+    .NA structure_block .AN graph to text output. 
+    .4S
+    
+    .IN
+      .IF
+        .NA text_of_tree .AN
+        .RV unit .VR
+        .AR ~ds: structure_block .RA
+        .AR ~options: text_options list .RA
+        .AR ~sections: section_names list .RA
+      .FI
+    .NI
+
+    The .NA text_of_tree .AN function needs three arguments:
+    .PL
+      .NA Arguments .AN 
+      .LI 
+        .NA ds .AN
+        This is the structure block tree previously generated with
+        the .NA atoms_of_ .AN function family.
+      .IL
+      .LI
+        .NA options .AN
+        Several options can control the converting behaviour and the output.
+        Available options:
+        .TB
+          .TR
+            .TC .T TEXT_doc_name of string .R .CT
+            .TC 
+              The output file name if any. Without this option, the
+              output is printied to the current standard out channel.
+            .CT
+          .RT
+          .TR
+            .TC .T TEXT_terminal .R .CT
+            .TC Enhanced text ouput with special terminal control
+            command (underlined...). Default is no special commands.
+            .CT
+          .RT
+          .TR
+            .TC .T TEXT_notoc .R .CT
+            .TC Don't print a table of content. .CT
+          .RT
+        .BT
+      .IL
+      .LI
+        .NA sections .AN
+        To convert only a part of a manual, for example a module like this,
+        some informations are needed about sections above this section. 
+      .IL
+    .LP
+    
+    .S4
+      .NA Module dependencies: .AN
+      .UL
+      .LI .T Terminfo .R (OCaML) .IL
+      .LI .T Doc_core .R .IL
+      .LU
+    .4S
+  .DM
