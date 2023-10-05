@@ -1,0 +1,108 @@
+_opt0={-g, -thread};
+_opt1={-I, interface, -I, '../../interface'};
+_opt2={-g};
+_opt3={-g, -thread};
+_opt4={-I, interface, -I, '../../interface'};
+_opt5={-g, -thread};
+_opt6={-I, interface, -I, '../../interface'};
+_opt7={-g, -thread};
+_opt8={-I, interface, -I, '../../interface'};
+_opt9={-g, -thread};
+_opt10={-I, interface, -I, '../../interface'};
+_opt11={-g, -thread};
+_opt12={-g};
+_111=debug.cma[cid=0];
+_112=buffer.cma[cid=0];
+_113=unix.cma[cid=0];
+_114=str.cma[cid=0];
+_115=threads.cma[cid=0];
+_116=os.cma[cid=0];
+_90=/amoeba/vam-2.0/lib;
+_91=$_90/amoeba.cma[cid=1133294142];
+_117=server.cma[cid=0];
+_89=vpd.cma[cid=1134297636];
+_94=.Amake/version00;
+_58=/amoeba/Vam-2.0/ocamlsys/bin;
+_59=$_58/ocamlrun[cid=1130666939];
+_=bytecode-build(
+	{$_111[cid=0],$_112[cid=0],$_113[cid=0],$_114[cid=0],$_115[cid=0],$_116[cid=0],$_91[cid=1133294142],$_117[cid=0],$_89[cid=1134297636]},
+	{vpd.cmo[cid=1134297704]},
+	$_94/vpd[cid=1134297704],
+	{'/amoeba/Vam-2.0/bin/vamrun'},
+	$_opt7,
+	$_opt8,
+	$_59
+)==%true;
+_75=/amoeba/vam-2.0/src/system/vpd;
+_77=$_75/vpd_proc.ml[cid=1134295670];
+_106=.Amake/version01;
+_53=/amoeba/vam-2.0/toolset;
+_54=$_53/ocamlmvcmi.sh[cid=1019717890];
+_=ocaml-c-impl(
+	$_77[cid=1134297633],
+	$_106/vpd_proc.cmo[cid=1134297636],
+	$_opt5,
+	{},
+	$_opt6,
+	$_59,
+	$_54,
+	$_106/vpd_proc.ml.d[cid=1134297636],
+	{},
+	{}
+)==%true;
+_78=$_75/dummy.mli[cid=1134295707];
+_=ocaml-c-intf(
+	$_78[cid=1134295707],
+	$_106/dummy.cmi[cid=1134295734],
+	$_opt5,
+	{},
+	$_opt6,
+	$_59,
+	$_106/dummy.mli.d[cid=1134295734],
+	{},
+	{}
+)==%true;
+_=ocaml-c-intf(
+	dummy.mli[cid=0],
+	$_94/dummy.cmi[cid=1134295708],
+	$_opt3,
+	{},
+	$_opt4,
+	$_59,
+	$_94/dummy.mli.d[cid=1134295708],
+	{},
+	{}
+)==%true;
+_=ocaml-c-impl(
+	vpd_proc.ml[cid=0],
+	$_94/vpd_proc.cmo[cid=1134295708],
+	$_opt3,
+	{},
+	$_opt4,
+	$_59,
+	$_54,
+	$_94/vpd_proc.ml.d[cid=1134295708],
+	{},
+	{}
+)==%true;
+_=ocaml-ar(
+	{vpd_proc.cmo[cid=1134297636]},
+	{dummy.cmi[cid=1134295734]},
+	$_94/vpd.cma[cid=1134297636],
+	{},
+	$_opt2,
+	$_59
+)==%true;
+_79=$_75/vpd.ml[cid=1134296927];
+_=ocaml-c-impl(
+	$_79[cid=1134297702],
+	$_94/vpd.cmo[cid=1134297704],
+	$_opt0,
+	{},
+	$_opt1,
+	$_59,
+	$_54,
+	$_94/vpd.ml.d[cid=1134297704],
+	{$_77[cid=1134297633]},
+	{}
+)==%true;
