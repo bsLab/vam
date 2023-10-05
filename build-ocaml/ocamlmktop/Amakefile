@@ -1,0 +1,27 @@
+
+# version 1.01
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include common.amk;
+
+%include $VAMDIR/src/ocaml/tools/Amake.srclist;
+
+%tool build-ocamlmktop
+(
+    src:    %in     [type = mktop-templ];
+    dest:   %out    [type = shell-script] => ocamlmktop;
+    prog:   %in     [type = command] => $VAMDIR/src/ocaml/toolset/make-ocamlmktop.sh;
+)
+{
+    exec($prog,
+        args => $SED + $CHMOD + $OCAML_BINDIR + $src + $dest);
+};
+
+%cluster ocamlmktop
+{
+    %targets    ocamlmktop[type = shell-script];
+    %sources    $OCAML_MKTOP_TEMPL[type = mktop-templ];
+    %use        build-ocamlmktop();
+};
