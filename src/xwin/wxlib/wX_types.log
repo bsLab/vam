@@ -1,0 +1,13 @@
+
+2002-2004:
+    -- background/foreground defaults changed
+    -- method pixmap_get added
+    -- method image_make/get and type image_desc added
+    -- default font changed
+    -- create now used the default_font
+    -- KeyRelease event added
+    -- w_key_release added
+
+2004.12.06:
+    PointerMotion to type event_desc added
+    w_pointer_motion to type window addded
