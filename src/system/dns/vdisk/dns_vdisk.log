@@ -1,0 +1,5 @@
+2005.4.22:
+    start_vdisk_fs now returns the root capability
+
+2005.5.8:
+    change from print to sys_log
