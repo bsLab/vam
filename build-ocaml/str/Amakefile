@@ -1,0 +1,50 @@
+
+
+# version 1.01
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include common.amk;
+%include $VAMDIR/toolset/ocaml.types;
+%include $VAMDIR/src/ocaml/toolset/ocaml-tools.common;
+%include $VAMDIR/src/ocaml/toolset/ocaml.sys;
+%include $VAMDIR/src/ocaml/otherlibs/str/Amake.srclist;
+
+CINCLUDES = {
+    -I./,
+    -I$VAMDIR/src/ocaml/otherlibs/str,
+    -I$VAMDIR/src/ocaml/otherlibs/str/regex-0.12,
+    -I$INSTALLDIR/ocamlsys/lib/ocaml/caml,
+    -I$VAMDIR/src/ocaml/byterun,
+};
+
+INCLUDES = {
+    -I, $VAMDIR/ocamlsys/lib/ocaml,
+    -I, $VAMDIR/ocamlsys/lib/ocaml/caml,
+};
+
+CSRC = {
+    $OCAML_STRLIB_CSRC[flags={-DHAVE_CONFIG_H}]
+};
+
+
+CLIB = libstr.a;
+CAMLLIB = str.cma;
+
+CAMLSRC = {
+    $OCAML_STRLIB_CAMLSRC
+};
+
+
+SRC = {
+    $CSRC,
+    $CAMLSRC
+};
+
+
+
+
+%include $VAMDIR/src/ocaml/toolset/ocaml.lib;
+%instance customlibcluster ($CAMLLIB,$CLIB,$SRC);
+
