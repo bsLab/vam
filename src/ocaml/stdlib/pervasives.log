@@ -1,0 +1,11 @@
+2005.5.1:
+    added __ <expr> alias for ignore <expr>
+
+2005.6.16:
+    added progerr
+
+2005.6.17:
+    added get_some
+
+2005.6.20:
+    added file_size 
