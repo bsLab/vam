@@ -1,0 +1,13 @@
+
+
+MODULE_MATRIX_MLI = {
+    $PWD/matrix.mli,
+};
+
+MODULE_MATRIX_ML = {
+    $PWD/matrix.ml,
+};
+
+MODULE_MATRIX_C = {
+    $PWD/matrix_ext.c,
+};
