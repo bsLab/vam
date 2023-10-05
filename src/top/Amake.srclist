@@ -1,0 +1,15 @@
+#
+# Module VAMTOP
+#
+
+MODULE_VAMTOPLOOP_MLI = {
+    $PWD/vamtoploop.mli
+};
+
+MODULE_VAMTOPLOOP_ML = {
+    $PWD/vamtoploop.ml
+};
+
+MAIN_SRC = {
+    $PWD/main.ml
+};
