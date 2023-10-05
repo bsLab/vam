@@ -1,0 +1,42 @@
+#!/bin/bash
+
+source ../../toolset/build.env
+
+
+if [ $# = 0 ]
+then
+    echo "Usage: build <targets>"
+    echo "Targets: all clean install"
+    exit 1
+fi
+
+check ()
+{
+    if [ $? != 0 ]
+    then
+        echo "Abort due to errors building target."
+        exit 1
+    fi
+}
+
+
+for TARGET in $@
+do
+    echo "Building target [$TARGET] ..."
+    case $TARGET in
+        all)    
+                $AMAKE 
+                check
+                ;;
+        clean)  $AMAKE -C
+                ;;
+        install)    
+                $INSTALL -d $INSTALLDIR/ocamlsys
+                $INSTALL -d $INSTALLDIR/ocamlsys/bin
+                $INSTALL -C ocamlmktop $INSTALLDIR/ocamlsys/bin
+                ;;
+        
+    esac
+done
+
+echo "Done."
