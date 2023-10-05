@@ -1,0 +1,241 @@
+#
+# Top Module Amakefile
+#
+
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include $VAMDIR/src/top/Amake.srclist;
+
+
+#
+# Special include paths
+#
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/xwin/common,
+    -I,
+    $VAMDIR/src/xwin/xlib,
+    -I,
+    $VAMDIR/src/xwin/wxlib,
+    -I,
+    $VAMDIR/build-vam/threads/interface,
+    -I,
+    $VAMDIR/build-vam/os/interface,
+    -I,
+    $VAMDIR/build-vam/math/interface,
+    -I,
+    $VAMDIR/build-vam/matrix/interface,
+    -I,
+    $VAMDIR/build-vam/buffer/interface,
+    -I,
+    $VAMDIR/build-vam/amoeba/interface,
+    -I,
+    $VAMDIR/build-vam/unix/interface,
+    -I,
+    $VAMDIR/build-vam/server/interface,
+    -I,
+    $VAMDIR/build-vam/shell/interface,
+    -I,
+    $VAMDIR/build-vam/ddi/interface,
+    -I,
+    $VAMDIR/build-vam/mandoc/interface,
+    -I,
+    $VAMDIR/build-vam/xwin/interface,
+    -I,
+    $VAMDIR/build-vam/vxlib/interface,
+    -I,
+    $VAMDIR/build-vam/linda/interface,
+    -I,
+    $INSTALLDIR/ocamlsys/lib/ocaml/sys,
+    -I,
+    $VAMDIR/build-vam/threads,
+    -I,
+    $VAMDIR/build-vam/buffer,
+    -I,
+    $VAMDIR/build-vam/math,
+    -I,
+    $VAMDIR/build-vam/matrix,
+    -I,
+    $VAMDIR/build-vam/amoeba,
+    -I,
+    $VAMDIR/build-vam/unix,
+    -I,
+    $VAMDIR/build-vam/server,
+    -I,
+    $VAMDIR/build-vam/ddi,
+    -I,
+    $VAMDIR/build-vam/mldoc,
+    -I,
+    $VAMDIR/build-vam/xwin,
+    -I,
+    $VAMDIR/build-vam/vxlib,
+    -I,
+    $VAMDIR/build-vam/linda,
+    -I,
+    $VAMDIR/build-vam/test,
+    
+};
+
+#
+# All the sources together
+#
+
+CAMLSRC_VAMTOPLOOP = {
+    $MODULE_VAMTOPLOOP_MLI,
+    $MODULE_VAMTOPLOOP_ML, 
+};
+
+VAM_CC_LIBS = {
+    $VAM_CC_LIBS,
+    $AMUNIX_LIB_DIR/liblinda.a,
+    $AMUNIX_LIB_DIR/liblinda_server.a,
+};
+
+#
+# Target libraries
+#
+
+#
+# CaML library
+#
+
+CAMLLIB_VAMTOP     = vamtoploop.cma;
+
+#
+# Virtual machine
+#
+
+VM_NAME = vamrun;
+
+VM_CAMLLIBS = {
+
+# core modules
+
+    str.cma,
+    threads.cma,
+    utils.cma,
+    parsing.cma,
+    typing.cma,
+    bytecomp.cma,
+    driver.cma,
+    toplevellib.cma,
+
+# vam modules 
+
+    $VAMDIR/build-vam/math/math.cma,
+    $VAMDIR/build-vam/buffer/buffer.cma,
+    $VAMDIR/build-vam/unix/unix.cma,
+    $VAMDIR/build-vam/matrix/matrix.cma,
+
+    $VAMDIR/build-vam/debug/debug.cma,
+    $VAMDIR/build-vam/mandoc/mandoc.cma,
+    $VAMDIR/build-vam/os/os.cma,
+    $VAMDIR/build-vam/amoeba/amoeba.cma,
+    $VAMDIR/build-vam/server/server.cma,
+    $VAMDIR/build-vam/shell/shell.cma,
+    $VAMDIR/build-vam/ddi/ddi.cma,
+
+    $VAMDIR/build-vam/xwin/xlib.cma,
+    $VAMDIR/build-vam/xwin/xcom.cma,
+    $VAMDIR/build-vam/xwin/wxlib.cma,
+    $VAMDIR/build-vam/vxlib/vxlib.cma,
+
+    $VAMDIR/build-vam/linda/linda.cma,
+
+    $VAMDIR/build-vam/test/test.cma,
+# only for dependency generation
+
+    $VAMDIR/build-vam/math/libmath_ext.a,
+    $VAMDIR/build-vam/matrix/libmatrix_ext.a,
+    $VAMDIR/build-vam/amoeba/libamoeba_ext.a,
+    $VAMDIR/build-vam/amoeba/libunix_ext.a,
+    $VAMDIR/build-vam/test/libtest_c.a,
+    $VAMDIR/build-vam/threads/libthreads.a,
+    $VAMDIR/build-vam/ddi/libddi_ext.a,
+    $VAMDIR/build-vam/threads/threads.cma,
+
+    $VAMDIR/build-vam/linda/liblinda_ext.a,
+    
+    $AMUNIX_LIB_DIR/libamoeba.a,
+    $AMUNIX_LIB_DIR/libamuthr.a,
+    $AMUNIX_LIB_DIR/liblinda.a,
+    $AMUNIX_LIB_DIR/liblinda_server.a,
+
+# top loop
+
+    vamtoploop.cma,
+
+};
+
+
+#
+# TOP level system vamsys
+#
+
+TOP_NAME = vam.byte;
+XTOP_NAME = xvam.byte;
+
+#
+# Which modules should be compiled into the core system ?
+#
+
+TOP_CAMLLIBS = {
+
+# core modules
+
+    str.cma,
+    threads.cma,
+    buffer.cma,
+    unix.cma,
+
+    utils.cma,
+    parsing.cma,
+    typing.cma,
+    bytecomp.cma,
+    driver.cma,
+    toplevellib.cma,
+
+    $VAMDIR/build-vam/os/os.cma,
+    $VAMDIR/build-vam/math/math.cma,
+    $VAMDIR/build-vam/matrix/matrix.cma,
+    $VAMDIR/build-vam/debug/debug.cma,
+    $VAMDIR/build-vam/mandoc/mandoc.cma,
+    $VAMDIR/build-vam/amoeba/amoeba.cma,
+    $VAMDIR/build-vam/server/server.cma,
+    $VAMDIR/build-vam/shell/shell.cma,
+    $VAMDIR/build-vam/ddi/ddi.cma,
+    $VAMDIR/build-vam/linda/linda.cma,
+
+    $VAMDIR/build-vam/test/test.cma,
+
+    vamtoploop.cma,
+
+    $MAIN_SRC,
+
+
+};
+
+XTOP_CAMLLIBS = {
+    $TOP_CAMLLIBS,
+
+    $VAMDIR/build-vam/xwin/xlib.cma,
+    $VAMDIR/build-vam/xwin/xcom.cma,
+    $VAMDIR/build-vam/xwin/wxlib.cma,
+    $VAMDIR/build-vam/vxlib/vxlib.cma,
+
+};
+
+
+%include $VAMDIR/toolset/ocaml.lib;
+%include $VAMDIR/toolset/ocaml.sys;
+
+%instance libcluster($CAMLLIB_VAMTOP,$CAMLSRC_VAMTOPLOOP);
+%instance vmbuild($VM_NAME,$VM_CAMLLIBS);
+
+#VAM_VM_FLAGS={-thread};
+%instance maketop($TOP_NAME,$VM_NAME,$TOP_CAMLLIBS);
+%instance maketop($XTOP_NAME,$VM_NAME,$XTOP_CAMLLIBS);
+ 
