@@ -1,0 +1,67 @@
+#
+#  THIS SOFTWARE IS OWNED AND COPYRIGHTED BY
+#
+#    ###     ####   ####               #         ##         #####
+#    #  #    #      #                 #         # #        #     #
+#    #   #   #      #                #         #  #       #      #
+#    #   #   #      #               #         #   #      #      #   
+#    ####    ####   ####  ####     #         ######     ########
+#    #   #      #      #          #         #     #    #      #
+#    #   #      #      #         #         #      #   #       #
+#    #  #       #      #        #         #       #  #       #
+#    ###     ####   ####       ######### #        # #########
+#
+#    Stefan Bosse (c) 2003
+#   
+#  THIS SOFTWARE MAY NOT BE COPIED, EXTRACTED, MODIFIED, OR 
+#  OTHERWISE USED IN A CONTEXT OUTSIDE OF THE VAM SYSTEM.
+# 
+#
+# Version 1.04
+#
+#
+#
+# OCaML type definitions 
+#
+
+%include common.amk;
+
+#
+# CaML file types
+#
+
+#
+# Sources are compiled in order the tools appear!
+# First all lexers are invoked. Then, the interfaces, and finally
+# the implementations are compiled. If there is a implementation
+# without an external interface, mark the the source with the
+# [type=ML-src-impl-int] flag to compile within the interface run.
+#
+
+%instance deftypesuffix(ML-src-yacc, '%.mly');
+%instance deftypesuffix(ML-src-lex, '%.mll');
+%instance deftypesuffix(ML-src-lex-intf, '%.mlli');
+
+%instance deftypesuffix(ML-src-impl, '%.ml');
+%instance deftypesuffix(ML-src-impl-int, '%.ml');
+%instance deftypesuffix(ML-src-impl-dep, '%.ml.d');
+%instance deftypesuffix(ML-obj-impl, '%.cmo');
+%instance deftypesuffix(ML-src-intf, '%.mli');
+%instance deftypesuffix(ML-src-intf-dep, '%.mli.d');
+%instance deftypesuffix(ML-obj-intf, '%.cmi');
+%instance deftypesuffix(ML-lib, '%.cma');
+
+
+#
+# C file types
+#
+
+%instance deftypesuffix(CC-src, '%.c');
+%instance deftypesuffix(S-src, '%.S');
+%instance deftypesuffix(CC-incl, '%.h');
+%instance deftypesuffix(CC-src-dep, '%.c.d');
+%instance deftypesuffix(CC-obj, '%.o');
+%instance deftypesuffix(CC-lib, '%.a');
+
+
+
