@@ -1,0 +1,17 @@
+#!/bin/bash
+
+
+if [ "X$VAMDIR" = "X" ] 
+then
+	VAMDIR=/amoeba/Vam-2.0
+fi
+
+
+$VAMDIR/bin/vamrun -b $VAMDIR/bin/vam.byte 	\
+	-I $VAMDIR/doc				\
+	-I $VAMDIR/ocamlsys/lib/ocaml		\
+	-I $VAMDIR/ocamlsys/lib/ocaml/sys	\
+	-I $VAMDIR/ocamlsys/lib/ocaml/threads	\
+	-I $VAMDIR/interface 			\
+	-I $VAMDIR/lib $@
+
