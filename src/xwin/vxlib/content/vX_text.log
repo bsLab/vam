@@ -1,0 +1,2 @@
+2006.1.5:
+	class edit modified: Key (anyKey, anyModifier) -> !key_string <> ""
