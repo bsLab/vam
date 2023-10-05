@@ -1,0 +1,13 @@
+
+
+MODULE_BUF_MLI = {
+    $PWD/bytebuf.mli,
+};
+
+MODULE_BUF_ML = {
+    $PWD/bytebuf.ml,
+};
+
+MODULE_BUF_C = {
+    $PWD/bytebuf_ext.c,
+};
