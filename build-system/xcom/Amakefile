@@ -1,0 +1,53 @@
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include $VAMDIR/src/system/xcom/Amake.srclist;
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/system/xcom,
+    -I,
+    $INSTALLDIR/interface,
+    -I,
+    $INSTALLDIR/lib,
+};
+
+
+DEFINES = {
+    -g,
+};
+
+SRC = {
+    $XCOM_SRC
+};
+
+LIB = xcomm.cma;
+
+%include $VAMDIR/toolset/ocaml.lib;
+%include $VAMDIR/toolset/ocaml.sys;
+
+%instance libcluster($LIB,$SRC);
+
+
+PNAME = xcom;
+PLIBS = {
+    buffer.cma,
+    unix.cma,
+    str.cma,
+    threads.cma,
+    debug.cma,
+    os.cma,
+    amoeba.cma,
+    math.cma,
+    server.cma,
+    shell.cma,
+    xlib.cma,
+    xcom.cma,
+    vxlib.cma,
+    xcomm.cma,
+};
+PSRC = $XCOM_MAIN_SRC;
+VM = $INSTALLDIR/bin/vamrun;
+%instance bytecode-exe($PNAME,$PLIBS,$VM,$PSRC);
+
