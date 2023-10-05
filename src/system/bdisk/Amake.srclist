@@ -1,0 +1,9 @@
+SRC_BDISK = {
+    $PWD/dummy.mli,
+    $PWD/server.ml,
+    $PWD/create.ml,    
+};
+
+SRC_BDISK_MAIN = {
+    $PWD/main.ml
+};
