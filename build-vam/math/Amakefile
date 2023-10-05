@@ -1,0 +1,81 @@
+##
+##      ==================================
+##      OOOO   OOOO OOOO  O      O   OOOO
+##      O   O  O    O     O     O O  O   O
+##      O   O  O    O     O     O O  O   O
+##      OOOO   OOOO OOOO  O     OOO  OOOO
+##      O   O     O    O  O    O   O O   O
+##      O   O     O    O  O    O   O O   O
+##      OOOO   OOOO OOOO  OOOO O   O OOOO
+##      ================================== 
+##      BSSLAB, Dr. Stefan Bosse sci@bsslab.de
+##
+##    PROTECTED BY AND DISTRIBUTED UNDER THE TERMS OF: 
+##    Free Software Foundation-Europe, GNU GPL License, Version 2
+##
+##    $MODIFIEDBY:  BSSLAB
+##    $AUTHORS:     Stefan Bosse
+##    $INITIAL:     (C) BSSLAB 2003
+##    $CREATED:     
+##    $VERSION:     1.01
+##
+##    $INFO:
+##
+##  Polymorph math module
+##
+##    $ENDOFINFO
+##
+
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include $VAMDIR/src/math/Amake.srclist;
+
+
+#
+# Special include paths
+#
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/math,
+};
+
+CINCLUDES = {
+    -I$VAMDIR/src/math,
+    -I$AMOEBA_SRC_DIR/h/machdep/arch/$ARCH,
+};
+
+#
+# All the sources together
+#
+
+CAMLSRC = {
+    $MODULE_MATH_MLI,
+    $MODULE_MATH_ML, 
+    $MODULE_MATH_C
+};
+
+#
+# Target libraries
+#
+
+#
+# CaML library
+#
+
+CAMLLIB     = math.cma;
+
+#
+# C library (for Custom link mode), if any.
+#
+
+CUSTOMLIB   = libmath_ext.a;
+
+
+%include $VAMDIR/toolset/ocaml.lib;
+
+%instance customlibcluster($CAMLLIB,$CUSTOMLIB,$CAMLSRC);
+
+ 
