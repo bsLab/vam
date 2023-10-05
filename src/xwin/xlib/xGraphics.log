@@ -1,0 +1,7 @@
+2001-2004:
+    -- more comments (in english)
+    -- default event mask changed to support mode_switch
+    -- default font changed
+
+2004.12.06:
+    added draw_rect primitive
