@@ -1,0 +1,141 @@
+
+MODULE_XLIB_MLI = {
+    $PWD/xfifo.mli,
+    $PWD/xequeue.mli,
+    $PWD/xtypes.mli,
+    $PWD/xos.mli,
+    $PWD/xos_init.mli,
+    $PWD/concur.mli,
+    $PWD/conv_event.mli,
+    $PWD/jeton.mli,
+    $PWD/keyBind.mli,
+    $PWD/display.mli,
+    $PWD/eloop.mli,
+    $PWD/icccm.mli,
+    $PWD/ll_trans.mli,
+    $PWD/selection.mli,
+    $PWD/shape.mli,
+    $PWD/shbuf.mli,
+    $PWD/wintbl.mli,
+    $PWD/x.mli,
+    $PWD/xA.mli,
+    $PWD/xC.mli,
+    $PWD/xGraphics.mli,
+    $PWD/xasync.mli,
+    $PWD/xauth.mli,
+    $PWD/xbuffer.mli,
+    $PWD/xdebug.mli,
+    $PWD/xlib.mli,
+    $PWD/xmu.mli,
+    $PWD/xpm.mli,
+    $PWD/xproto.mli,
+    $PWD/xrm.mli,
+    $PWD/xsync.mli,
+    $PWD/xterm.mli,
+    $PWD/xtext.mli,
+    $PWD/zpixmap.mli,
+    $PWD/ximage.mli
+};
+
+
+XOS_INIT = {
+    $PWD/xos/xos_init.ml,   
+};
+
+XOS_AMOEBA = {
+    $PWD/xos/xos_amoeba.mli,
+    $PWD/xos/xos_amoeba.ml,
+};
+
+XOS_UNIX = {
+    $PWD/xos/xos_unix.mli,
+    $PWD/xos/xos_unix.ml,
+};
+
+
+
+
+MODULE_XLIB_ML = {
+    $PWD/xos.ml,
+    $PWD/xos_init.ml,
+    $PWD/xK.ml,
+    $PWD/ll_trans.ml,
+    $PWD/xauth.ml,
+    $PWD/concur.ml,
+    $PWD/xdebug.ml,
+    $PWD/xA.ml,
+    $PWD/xfifo.ml,
+    $PWD/xequeue.ml,
+    $PWD/jeton.ml,
+    $PWD/xtypes.ml,
+    $PWD/wintbl.ml,
+    $PWD/xbuffer.ml,
+    $PWD/conv_event.ml,
+    $PWD/shbuf.ml,
+    $PWD/display.ml,
+    $PWD/xproto.ml,
+    $PWD/x.ml,
+    $PWD/fonts.ml,
+    $PWD/xsync.ml,
+    $PWD/xasync.ml,
+    $PWD/xC.ml,
+    $PWD/keyBind.ml,
+    $PWD/xlib.ml,
+    $PWD/zpixmap.ml,
+    $PWD/xpm.mll[flags = {$PWD/xpm.mli}],
+    $PWD/xrm.mll[flags = {$PWD/xrm.mli}],
+    $PWD/xtext.ml,
+    $PWD/icccm.ml,
+    $PWD/shape.ml,
+    $PWD/xmu.ml,
+    $PWD/eloop.ml,
+    $PWD/xGraphics.ml,
+    $PWD/selection.ml,
+    $PWD/locale.ml,
+    $PWD/ximage.ml
+
+};
+
+MODULE_XLIB_ML_XOS = {
+    $PWD/xos.ml,
+    $PWD/xauth.ml,
+    $PWD/xK.ml,
+    $PWD/ll_trans.ml,
+    $PWD/concur.ml,
+    $PWD/xdebug.ml,
+    $PWD/xA.ml,
+    $PWD/xfifo.ml,
+    $PWD/xequeue.ml,
+    $PWD/jeton.ml,
+    $PWD/xtypes.ml,
+    $PWD/wintbl.ml,
+    $PWD/xbuffer.ml,
+    $PWD/conv_event.ml,
+    $PWD/shbuf.ml,
+    $XOS_AMOEBA,
+    $XOS_UNIX,
+    $XOS_INIT,
+    $PWD/display.ml,
+    $PWD/xproto.ml,
+    $PWD/x.ml,
+    $PWD/fonts.ml,
+    $PWD/xsync.ml,
+    $PWD/xasync.ml,
+    $PWD/xC.ml,
+    $PWD/keyBind.ml,
+    $PWD/xlib.ml,
+    $PWD/zpixmap.ml,
+    $PWD/xpm.mll[flags = {$PWD/xpm.mli}],
+    $PWD/xrm.mll[flags = {$PWD/xrm.mli}],
+    $PWD/xtext.ml,
+    $PWD/icccm.ml,
+    $PWD/shape.ml,
+    $PWD/xmu.ml,
+    $PWD/eloop.ml,
+    $PWD/xGraphics.ml,
+    $PWD/selection.ml,
+    $PWD/locale.ml,
+    $PWD/ximage.ml
+
+};
+
