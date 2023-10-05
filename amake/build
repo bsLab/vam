@@ -1,0 +1,42 @@
+#!/bin/bash
+
+#
+# Edit this file and perhaps the Makefile to build amake 
+# in a coldtstart or standalone environment.
+#
+
+SRCROOT=/amoeba/src
+CC=gcc
+MAKE=make
+CP=cp
+MKDIR=mkdir
+
+export SRCROOT;export CC
+
+$MAKE clean
+$MAKE
+
+if [ $? = 0 ] 
+then
+   if [ ! -d ../../Amunix ]
+   then
+       $MKDIR ../../Amunix
+   fi	
+   if [ ! -d ../../Amunix/bin ]
+   then
+       $MKDIR ../../Amunix/bin
+   fi
+
+   $CP amake ../../Amunix/bin   
+
+   if [ ! -d ../../Amcross ]
+   then
+       $MKDIR ../../Amcross
+   fi	
+   if [ ! -d ../../Amcross/crosstools ]
+   then
+       $MKDIR ../../Amcross/crosstools
+   fi
+
+   $CP amake ../../Amcross/crosstools
+fi
