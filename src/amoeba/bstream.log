@@ -1,0 +1,10 @@
+2003.11.20:
+    fsq_buf_read size bug fixed (>0)
+2003.12.20:
+    renamed to bstream
+2006.1.6:
+    stream_XX_read: now tries to read all requested bytes but only if
+    argument one=0
+
+2006.1.7:
+    stream_XX_read now reads data until NOMOREDATA is signaled!
