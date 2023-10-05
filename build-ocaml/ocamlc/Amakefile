@@ -1,0 +1,41 @@
+
+#version 1.01
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include common.amk;
+%include $VAMDIR/toolset/ocaml.types;
+%include $VAMDIR/src/ocaml/toolset/ocaml-tools.common;
+%include $VAMDIR/src/ocaml/toolset/ocaml.sys;
+
+INCLUDES = {
+    -I, ./,
+    -I, $VAMDIR/build-ocaml/stdlib,
+    -I, $VAMDIR/build-ocaml/utils/interface,
+    -I, $VAMDIR/build-ocaml/parsing/interface,
+    -I, $VAMDIR/build-ocaml/typing/interface,
+    -I, $VAMDIR/build-ocaml/bytecomp/interface,
+    -I, $VAMDIR/build-ocaml/driver/interface,
+};
+
+CAMLLIBS = {
+    $VAMDIR/build-ocaml/utils/utils.cma,
+    $VAMDIR/build-ocaml/parsing/parsing.cma,
+    $VAMDIR/build-ocaml/typing/typing.cma,
+    $VAMDIR/build-ocaml/bytecomp/bytecomp.cma,
+    $VAMDIR/build-ocaml/driver/driver.cma,
+};
+
+CAMLMAIN = {
+    $VAMDIR/build-ocaml/driver/main.cmo
+};
+
+#
+# Create the bytecode program
+#
+
+PROGNAME = ocamlc;
+
+
+%instance bytecode-exe($PROGNAME,$CAMLLIBS,$CAMLMAIN);
