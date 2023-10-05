@@ -1,0 +1,42 @@
+.<< title.man .>>
+.<< intro.man .>>
+.S1
+  .NA MlDoC dot commands .AN
+  .IO
+    In this section, all available dot commands are described. They are
+    sorted into these groups:
+
+    .OL
+      .LI Section headers .IL
+      .LI Subsection headers .IL
+      .LI Unit headers .IL
+      .LI Subunit headers .IL
+      .LI Interfaces .IL
+      .LI Generic paragraph elements .IL
+      .LI Text elements and attributes .IL
+    .LO
+  .OI
+  .<< sechead.man .>>
+  .<< subhead.man .>>
+  .<< unithead.man .>>
+  .<< subunit.man .>>
+  .<< specint.man .>>
+  .<< parelem.man .>>
+  .<< texelem.man .>>
+  .<< dotindex.man .>>
+  .<< comp.man .>>
+.1S
+.PK
+  .NA mldoc .AN
+  .IO
+    The .NA mldoc .AN library is the heart of the .NA MlDoC .AN system. It's
+    divided in the core module and various backend modules and some
+    frontend modules.
+  .OI
+
+  .<< doc_core.man .>>
+  .<< doc_html.man .>>
+  .<< doc_latex.man .>>
+  .<< doc_text.man .>>
+  .<< doc_help.man .>>
+.KP
