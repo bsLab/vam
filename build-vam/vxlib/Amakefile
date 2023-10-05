@@ -1,0 +1,85 @@
+#
+# Xwin Module Amakefile
+#
+
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+VAM_OPT={};
+VAM_PP={};
+
+%include $VAMDIR/src/xwin/Amake.srclist;
+%include $VAMDIR/src/xwin/vxlib/base/Amake.srclist;
+%include $VAMDIR/src/xwin/vxlib/content/Amake.srclist;
+
+
+#
+# Special include paths
+#
+
+INCLUDES = {
+    -I,
+    $VAMDIR/build-vam/os/interface,
+    -I,
+    $VAMDIR/build-vam/math/interface,
+    -I,
+    $VAMDIR/build-vam/unix/interface,
+    -I,
+    $VAMDIR/src/xwin/common,
+    -I,
+    $VAMDIR/src/xwin/xlib,
+    -I,
+    $VAMDIR/src/xwin/wxlib,
+    -I,
+    $VAMDIR/src/xwin/vxlib/base,
+    -I,
+    $VAMDIR/src/xwin/vxlib/content,
+    -I,
+    $VAMDIR/build-vam/pthreads/interface,
+    -I,
+    $VAMDIR/build-vam/amoeba/interface,
+    -I,
+    $VAMDIR/build-vam/shell/interface,
+    -I,
+    $VAMDIR/build-vam/server/interface,
+    -I,
+    $VAMDIR/build-vam/debug/interface,
+    -I,
+    $VAMDIR/build-vam/buffer/interface,
+    -I,
+    $VAMDIR/build-vam/xwin/interface,
+
+};
+
+#
+# All the sources together
+#
+
+
+CAMLSRC_VXLIB = {
+    $VXLIB_BASE_MLI,
+    $VXLIB_BASE_ML,
+    $VXLIB_CONT_ML,
+};
+
+
+#
+# Target libraries
+#
+
+#
+# CaML library
+#
+
+CAMLLIB_VXLIB    = vxlib.cma;
+
+%include $VAMDIR/toolset/ocaml.lib;
+
+
+
+%instance libcluster($CAMLLIB_VXLIB,$CAMLSRC_VXLIB);
+
+
+
+
