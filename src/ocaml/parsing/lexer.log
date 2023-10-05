@@ -1,0 +1,3 @@
+2005.5.1:
+    added protect and protects
+    -> generic exception catchers
