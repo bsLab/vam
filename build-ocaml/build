@@ -1,0 +1,95 @@
+#!/bin/bash
+
+source ../toolset/build.env
+
+
+if [ $# = 0 ]
+then
+    echo "Usage: build <targets>"
+    echo "Targets: all clean install"
+    exit 1
+fi
+
+SUBTARGETS="    \
+byterun         \
+stdlib          \
+ocamlyacc       \
+utils           \
+parsing         \
+typing          \
+bytecomp        \
+driver          \
+ocamlc          \
+ocamldep        \
+ocamllex        \
+ocamlcp         \
+toplevel        \
+ocamlmktop      \
+str             \
+dynlink         \
+"
+
+check ()
+{
+    if [ $? != 0 ]
+    then
+        echo "Abort due to errors building target."
+        exit 1
+    fi
+}
+
+
+for TARGET in $@
+do
+    echo "Building target [$TARGET] ..."
+    case $TARGET in
+        all)    
+                for subtarget in $SUBTARGETS
+                do
+                    $ECHO Entering directory $subtarget...
+                    cd $subtarget
+
+                    build all
+                    check
+                    build install
+                    check
+        
+                    cd ..
+                done
+                ;;
+        clean)  
+                for subtarget in $SUBTARGETS
+                do
+                    $ECHO Entering directory $subtarget...
+                    cd $subtarget
+                    build clean
+                    if [ $? = 0 ]
+                    then
+                        cd ..
+                    else
+                        echo "Abort."
+                        exit 1
+                    fi
+                done
+		rm -rf ../../ocamlsys
+                ;;
+        install)    
+                for subtarget in $SUBTARGETS
+                do
+                    $ECHO Entering directory $subtarget...
+                    cd $subtarget
+                    build install
+                    if [ $? = 0 ]
+                    then
+                        cd ..
+                    else
+                        echo "Abort."
+                        exit 1
+                    fi
+                done
+                ;;
+        
+    esac
+done
+
+echo "Done."
