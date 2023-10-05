@@ -1,0 +1,11 @@
+...
+
+2005.4.3:
+    S_MP: leave_p bug fixed
+
+2005.5.22:
+    changed S_Image: images without eps extension are changed to eps 
+                     filename 
+
+2005.8.8:
+    addedd class inherit (C_Hdr inside Class...)
