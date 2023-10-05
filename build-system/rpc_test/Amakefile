@@ -1,0 +1,47 @@
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include $VAMDIR/src/system/test/Amake.srclist;
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/system/test,
+    -I,
+    $INSTALLDIR/interface,
+    -I,
+    $INSTALLDIR/lib,
+};
+
+
+DEFINES = {
+    -g,
+    -DDEBUG,
+};
+
+
+LIB = vrpc_test.cma;
+
+%include $VAMDIR/toolset/ocaml.lib;
+%include $VAMDIR/toolset/ocaml.sys;
+
+%instance libcluster($LIB,$SRC_VRPC_TEST);
+
+
+PLIBS = {
+    debug.cma,
+    buffer.cma,
+    unix.cma,
+    str.cma,
+    threads.cma,
+    os.cma,
+    amoeba.cma,
+    server.cma,
+    vrpc_test.cma,
+};
+
+VM = $INSTALLDIR/bin/vamrun;
+%instance bytecode-exe(vrpc_client,$PLIBS,$VM,$SRC_VRPC_CLIENT);
+%instance bytecode-exe(vrpc_server,$PLIBS,$VM,$SRC_VRPC_SERVER);
+%instance bytecode-exe(vrpc_self,$PLIBS,$VM,$SRC_VRPC_SELF);
+
