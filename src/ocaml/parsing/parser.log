@@ -1,0 +1,14 @@
+2005.5.1:
+    added protect and protects 
+    -> PROTECT, PROTECT_ERR
+    -> generic exception catchers
+    -> protect <expr> will continue execution
+       even in the case <expr> raised an exception
+    -> protects <expr> returns additional a boolean value:
+       false -> exception
+       true -> no exceptionw as raised
+
+2005.5.17:
+    changed matrix_get -> m.{1,2,3} -> Matrix.Dimn.get m (1,2,3)
+    changed matrix_set -> m.{1,2,3} -> Matrix.Dimn.set m (1,2,3) v
+                                
