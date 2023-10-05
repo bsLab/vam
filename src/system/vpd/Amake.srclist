@@ -1,0 +1,8 @@
+SRC_VPD = {
+    $PWD/vpd_proc.ml,    
+    $PWD/dummy.mli,    
+};
+
+SRC_VPD_MAIN = {
+    $PWD/vpd.ml,
+};
