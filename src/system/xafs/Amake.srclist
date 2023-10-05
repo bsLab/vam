@@ -1,0 +1,12 @@
+
+XAFS_SRC = {
+    $PWD/xafs_widget.ml,
+    $PWD/dummy.ml,
+    $PWD/dummy.mli,
+    $PWD/xafs_file.ml,
+    $PWD/xafs_file.mli,
+};
+
+XAFS_MAIN_SRC = {
+    $PWD/xafs.ml,
+};
