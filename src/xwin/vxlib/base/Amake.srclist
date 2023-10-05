@@ -1,0 +1,27 @@
+VXLIB_BASE_MLI = {
+    $PWD/vX_types.mli ,
+    $PWD/vX_ps.mli,
+    $PWD/vX_common.mli,
+    $PWD/vX_screen.mli,
+    $PWD/vX_root.mli,
+    $PWD/vX_base.mli,
+    $PWD/vX_display.mli,
+    $PWD/vX_object.mli,
+    $PWD/vX_box.mli,
+    $PWD/vX_top.mli,
+    $PWD/vX_wmtop.mli,
+};
+
+VXLIB_BASE_ML = {
+    $PWD/vX_types.ml,
+    $PWD/vX_ps.ml,
+    $PWD/vX_common.ml,
+    $PWD/vX_display.ml,
+    $PWD/vX_screen.ml,
+    $PWD/vX_base.ml,
+    $PWD/vX_root.ml,
+    $PWD/vX_object.ml,
+    $PWD/vX_top.ml,
+    $PWD/vX_wmtop.ml,
+    $PWD/vX_box.ml,
+};
