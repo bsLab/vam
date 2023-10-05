@@ -1,0 +1,39 @@
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include common.amk;
+
+%include $VAMDIR/src/scripts/Amake.srclist;
+
+%tool build-vamscript
+(
+    src:    %in     [type = shell-templ];
+    dest:   %out    [type = shell-script]   => basename($src,'%.tmpl');
+    prog:   %in     [type = command] => $VAMDIR/toolset/make-vamscript.sh;
+)
+{
+    exec($prog,
+        args => $SED + $src + $dest);
+};
+
+%cluster vam
+{
+    %targets    vam[type = shell-script];
+    %sources    $OCAML_VAM_TEMPL[type = shell-templ];
+};
+%cluster vamb
+{
+    %targets    vamb[type = shell-script];
+    %sources    $OCAML_VAMB_TEMPL[type = shell-templ];
+};
+%cluster xvam
+{
+    %targets    xvam[type = shell-script];
+    %sources    $OCAML_XVAM_TEMPL[type = shell-templ];
+};
+%cluster vamc
+{
+    %targets    vamc[type = shell-script];
+    %sources    $OCAML_VAMC_TEMPL[type = shell-templ];
+};
