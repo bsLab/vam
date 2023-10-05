@@ -1,0 +1,7 @@
+2004.12.06:
+    fixed missing width/height specifier problem with graphics widget
+
+2004.12.07:
+    destroy method enhanced (really destroy graphics widget with
+    correct resource freeing)
+
