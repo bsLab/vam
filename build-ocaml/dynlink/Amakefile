@@ -1,0 +1,51 @@
+
+# version 1.01
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include common.amk;
+%include $VAMDIR/toolset/ocaml.types;
+%include $VAMDIR/src/ocaml/toolset/ocaml-tools.common;
+%include $VAMDIR/src/ocaml/toolset/ocaml.sys;
+%include $VAMDIR/src/ocaml/otherlibs/dynlink/Amake.srclist;
+
+INCLUDES = {
+    -I,$VAMDIR/src/ocaml/otherlibs/dynlink,
+    -I,$VAMDIR/build-ocaml/bytecomp/interface,
+    -I,$VAMDIR/build-ocaml/utils/interface,
+    -I,$VAMDIR/build-ocaml/parsing/interface,
+    -I,$VAMDIR/build-ocaml/typing/interface,
+};
+
+CAMLSRC = {
+    $OCAML_DYNLINK_SRC,
+};
+
+
+CAMLLIB = dynlink.cma;
+
+
+
+%include $VAMDIR/src/ocaml/toolset/ocaml.lib;
+%instance libcluster ($CAMLLIB,$CAMLSRC);
+
+CAMLMAIN = {
+    $VAMDIR/build-ocaml/driver/main.cmo
+};
+
+CAMLLIBS = {
+    dynlink.cma,
+    $VAMDIR/build-ocaml/utils/utils.cma,
+    $VAMDIR/build-ocaml/parsing/parsing.cma,
+    $VAMDIR/build-ocaml/typing/typing.cma,
+    $VAMDIR/build-ocaml/bytecomp/bytecomp.cma,
+    $VAMDIR/build-ocaml/driver/driver.cma,
+};
+
+#
+# Create the bytecode program
+#
+
+PROGNAME = extract_crc;
+%instance bytecode-exe($PROGNAME,$CAMLLIBS,$CAMLMAIN);
