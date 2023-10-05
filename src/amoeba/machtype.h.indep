@@ -1,0 +1,27 @@
+/*
+** Must be consistent with machtype.ml(type t)
+*/
+
+#define INT8        0
+#define INT16       1
+#define INT32       2
+#define INT64       3
+#define UINT8       4
+#define UINT16      5
+#define UINT32      6
+#define UINT64      7
+#define WORD8       8
+#define WORD16      9
+#define WORD32      10
+#define WORD64      11
+
+
+typedef unsigned int UINT;
+typedef signed int SINT;
+typedef unsigned char UCHAR;
+typedef signed char SCHAR;
+
+#ifdef HAVE_LONGLONG
+  typedef long long unsigned int LLUINT;
+  typedef long long signed int LLSINT;
+#endif
