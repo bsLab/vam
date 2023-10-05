@@ -1,0 +1,15 @@
+
+TEST_ML = {
+    $PWD/backtrace.ml,
+    $PWD/debugtest.ml,
+    $PWD/cct.ml,
+};
+
+TEST_MLI = {
+    $PWD/backtrace.mli,
+    $PWD/cct.mli,
+};
+
+TEST_CC = {
+    $PWD/cctc.c,
+};
