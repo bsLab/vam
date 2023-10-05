@@ -1,0 +1,118 @@
+
+# version 1.01
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include common.amk;
+%include $VAMDIR/toolset/ocaml.types;
+%include $VAMDIR/src/ocaml/toolset/ocaml-tools.common;
+%include $VAMDIR/src/ocaml/toolset/ocaml.sys;
+%include $VAMDIR/src/ocaml/byterun/Amake.srclist;
+
+CINCLUDES = {
+    -I./,
+    -I$VAMDIR/src/ocaml/byterun,
+};
+
+CSRC = {
+    $OCAMLRUN_SRC,
+    $OCAML_PRIMS_C,
+};
+
+
+CLIB = libcamlrun.a;
+
+VMNAME = ocamlrun;
+
+%include $VAMDIR/src/ocaml/toolset/ocaml.lib;
+
+#
+# First build the config.h from the machine and system defintions
+# from Amakefile.sys
+#
+
+%tool config-h-build (
+    src:       %in %list           [ type = config-templ ];
+    dest:      %out                [ type = CC-incl ] => config.h;
+    flags:     %string %list                          => {};
+    program:   %in                 [ type = command ]
+                                                => $OCAML_BUILD_CONFIG_H;
+)
+{
+    exec($program,
+            args => $src + $dest + $flags
+            );
+};
+
+%cluster config.h
+{
+    %targets    config.h;
+    %sources    $OCAML_CONFIG_H_TEMPL[type = config-templ];
+    %use        config-h-build(flags => {$OCAML_SYSFLAGS,$OCAML_MACHPARAM});
+};
+
+
+#
+# And the jumptable header
+#
+
+%tool jumptbl-h-build (
+    src:       %in %list           [ type = jumptbl-templ ];
+    dest:      %out                [ type = CC-incl ] => jumptbl.h;
+    flags:     %string %list                          => {};
+    program:   %in                 [ type = command ]
+                => $VAMDIR/src/ocaml/toolset/make-jumptblh.sh;
+)
+{
+    exec($program,
+            args => $SED + $src + $dest 
+         );
+};
+
+%cluster jumptbl.h
+{
+    %targets    jumptbl.h;
+    %sources    $OCAML_JUMPTBL_H_TEMPL[type = jumptbl-templ];
+    %use        jumptbl-h-build();
+};
+
+
+#
+# Now the primitives files
+#
+
+%tool prims-build (
+    src:        %in %list          [ type = CC-src-prims ];
+    dest1:      %out               [ type = CC-src ] => prims.c;
+    dest2:      %out               [ type = ML-primitives ] => primitives;
+    flags:      %string %list                          => {};
+    program1:    %in                 [type = command ]  =>
+                                                $OCAML_BUILD_PRIMSC;    
+    program2:    %in                 [type = command ]  =>
+                                                $OCAML_BUILD_PRIMS;    
+)
+{
+    exec($program1, 
+            args   => $SED + $src,
+            stdout => $dest2);
+    exec($program2,
+            args   => $SED,
+            stdout => $dest1);
+
+};
+
+%cluster prims.c
+{
+    %targets    prims.c,primitives[type=ML-primitives];
+    %sources    $OCAML_PRIMS_C[type = CC-src-prims];
+    %use        prims-build();
+};
+
+#
+# And finally the byterun library and VM
+#
+
+%instance clibcluster ($CLIB,{$CSRC,prims.c});
+%instance vmbuild($VMNAME,$CLIB);
+
