@@ -1,0 +1,23 @@
+2003.12.29:
+    fault frame introduced
+
+2003.12.30:
+    thread_info restructrured
+
+2004.3.31:
+    pro_stun added
+
+2005.4.21:
+    pd_read: catch now all execptions
+
+2005.9.11:
+    print_pd: improved stackframe handling
+
+2005.9.13:
+    print_pd: really improved stackframe handling
+
+2005.11.27:
+    print_XX_str functions introduced
+    ps_XX and pro_XX interface completed
+    print_stacktrace improved (now with TEXT seg. check)
+    buf_get_ustate added
