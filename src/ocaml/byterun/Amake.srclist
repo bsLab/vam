@@ -1,0 +1,102 @@
+
+##      ==================================
+##      OOOO   OOOO OOOO  O      O   OOOO
+##      O   O  O    O     O     O O  O   O
+##      O   O  O    O     O     O O  O   O
+##      OOOO   OOOO OOOO  O     OOO  OOOO
+##      O   O     O    O  O    O   O O   O
+##      O   O     O    O  O    O   O O   O
+##      OOOO   OOOO OOOO  OOOO O   O OOOO
+##      ================================== 
+##      BSSLAB, Dr. Stefan Bosse www.bsslab.de
+##
+##    PROTECTED BY AND DISTRIBUTED UNDER THE TERMS OF: 
+##    Free Software Foundation-Europe, GNU GPL License, Version 2
+##
+##    $MODIFIEDBY:  BSSLAB
+##    $AUTHORS:     Stefan Bosse
+##    $INITIAL:     (C) 2003 BSSLAB
+##    $CREATED:     
+##    $VERSION:     1.01
+##
+##    $INFO:
+##
+##  Amake srclist for the VM
+##
+##    $ENDOFINFO
+##
+
+
+
+
+#
+# Source code for the Virtual Machine.
+#
+
+
+OCAMLRUN_SRC = {
+    $PWD/misc.c,    
+    $PWD/fix_code.c,    
+    $PWD/startup.c,    
+    $PWD/main.c,    
+    $PWD/freelist.c,    
+    $PWD/major_gc.c,    
+    $PWD/minor_gc.c,    
+    $PWD/memory.c,    
+    $PWD/roots.c,    
+    $PWD/globroots.c,  
+    $PWD/fail.c,    
+    $PWD/printexc.c,    
+    $PWD/debugger.c,    
+    $PWD/compact.c,    
+    $PWD/custom.c, 
+    $PWD/unix.c,   
+    $PWD/readline.c,
+    $PWD/print.c,
+};
+
+
+OCAML_CONFIG_H_TEMPL = {
+    $PWD/config.h.tmpl
+};
+
+OCAML_JUMPTBL_H_TEMPL = {
+    $PWD/instruct.h
+};
+
+#
+# If you want to add new primitives to the VM, create a
+# new C src file, and append it at the END of the following list!
+#
+
+
+OCAML_PRIMS_C = {
+    $PWD/alloc.c,
+    $PWD/array.c,
+    $PWD/compare.c,
+    $PWD/extern.c,
+    $PWD/floats.c,
+    $PWD/gc_ctrl.c,
+    $PWD/hash.c,
+    $PWD/intern.c,
+    $PWD/interp.c,
+    $PWD/ints.c,
+    $PWD/io.c,
+    $PWD/lexing.c,
+    $PWD/md5.c,
+    $PWD/meta.c,
+    $PWD/obj.c,
+    $PWD/parsing.c,
+    $PWD/signals.c,
+    $PWD/str.c,
+    $PWD/sys.c,
+    $PWD/terminal.c,
+    $PWD/callback.c,
+    $PWD/weak.c,
+    $PWD/finalise.c,
+    $PWD/backtrace.c,
+#    $PWD/dynlink.c,
+    $PWD/dynlink2.c,
+    $PWD/stacks.c,    
+    $PWD/sys_2.c,
+};
