@@ -1,0 +1,1616 @@
+(*
+**      ==================================
+**      OOOO   OOOO OOOO  O      O   OOOO
+**      O   O  O    O     O     O O  O   O
+**      O   O  O    O     O     O O  O   O
+**      OOOO   OOOO OOOO  O     OOO  OOOO
+**      O   O     O    O  O    O   O O   O
+**      O   O     O    O  O    O   O O   O
+**      OOOO   OOOO OOOO  OOOO O   O OOOO
+**      ==================================
+**      BSSLAB, Dr. Stefan Bosse sci@bsslab.de
+**
+**    PROTECTED BY AND DISTRIBUTED UNDER THE TERMS OF:
+**    Free Software Foundation-Europe, GNU GPL License, Version 2
+**
+**    $AUTHORS:     Stefan Bosse
+**    $INITIAL:     (C) 2005 BSSLAB
+**    $CREATED:     24.5.2005
+**    $VERSION:     1.20
+**
+**    $INFO:
+**
+**  Text table widget. This widget support simple text cells editable
+**  or not. The font, the border lines and the width of each cell can
+**  be specified. Furthermore, a user supplied callback function can 
+**  be specified, with or without a status button. 
+**
+**  In the first case, the (editable) text entry gets a
+**  small rectangular box button at the end of the text line. This box shows
+**  the current status of the text entry: modified, unmodified, submitted...
+**  If the user clicks on this field, the callback function is called
+**  with the current status and string. This function returns a status, too. 
+**  The status box content is updated after.
+**  In the latter case, this function is called if the text was modfied.
+**
+**  The height of a row can be specified. If this specification is missing,
+**  the height is determined automatically from the padding, border and
+**  font specification. The maximal value from all column entries of one
+**  row is used.
+**
+**
+**  Regular tables: all rows have same number of columns, and
+**                  all entries of one column have the same width.
+**
+**
+**  The width of each column entry can be specified with the Width
+**  attribute inside the Cols attribute. Either all entries
+**  from one column have a specified width (that means the width is fixed),
+**  or all entries have width 0 (not specified). All entries from one
+**  column must have the same width (regular table), except all 
+**  entries have a specified width (irregular table)!
+**
+**  Column entries can be expanded, specified with the ExpandX attribute
+**  inside the Cols attribute. 
+**  Editable columns entries have either a specified fixed width or will be
+**  expanded according the window size (they consume available space).
+**
+**  Both padding of the table inside widget container AND padding of
+**  cell content of each entry is specified with IpadX and IpadY attributes
+**  in main attribute list (not inside Cols/Rows). IpadY inside Rows
+**  attributes specify additional space between rows!!!  
+**
+**    $ENDOFINFO
+**
+*)
+
+open Xtypes
+open VX_types
+open VX_common
+open VX_text
+open Printf
+open GCCache
+
+let warn str =
+    print_string ("Warning: "^str);
+    print_newline ()
+
+
+
+(*
+** Status of an editable column entry. Displayed in the right
+** upper corner of the text field if col_but list <> []. 
+** Can be changed, and operates like a button.  If the button is missing,
+** but a col_fun function is specified, this function is called always
+** the column entry text was changed!
+** States only used if col_fun is specified.
+*)
+
+
+(*
+** One column entry of a row
+*)
+type col_desc = {
+    (*
+    ** Content
+    *)
+    (*
+    ** The content string can contain embedded symbols if not editable:
+    **  "The distance in \\mu meters" 
+    ** The symbols are displayed with the symbol_font instead.
+    ** The symbols are specified in TeX notation.
+    *)
+    mutable col_str     : string;
+    mutable col_font    : font;         (* normal text font *)
+    mutable col_symbol_font : font;     (* embedded symbols font *)
+    mutable col_align   : align;
+    mutable col_fg      : color;
+    mutable col_bg      : color;
+
+    (*
+    ** Border descriptor
+    *)
+    mutable col_border: frame;
+
+    (*
+    ** Requested width in pixel including 
+    ** border and column padding. Can be zero. Either the column
+    ** entry width is fixed or expandable.
+    *)
+    mutable col_width : int;
+    mutable col_expand : bool;
+    mutable col_fixed : bool;
+
+    mutable col_edit : bool;
+    mutable col_baseline : text_baseline option;
+    mutable col_fun : (string -> status -> status) option;
+    (*
+    ** Which button states should be displayed ? Empty list -> no button
+    *)
+    mutable col_but: symbol_type list;
+}
+
+type row_desc = {
+    (*
+    ** each row contains 1..n columns. 
+    *)
+    mutable row_cols : col_desc array;
+
+    (*
+    ** Requested height in pixel including 
+    ** border and column padding
+    *)
+    mutable row_height : int;
+    
+    (*
+    ** Pad space after this row
+    *)
+    mutable row_pad : int;
+}
+
+type table_desc = {
+    mutable tb_rows : row_desc array;
+    mutable tb_colpad_x : int;
+    mutable tb_colpad_y : int;
+}
+
+
+(*
+** Table entry descriptor. Only for internal usage.
+*)
+
+
+type edit_desc = {
+    (*
+    ** Actual size of column entry
+    *)
+    mutable ed_bbox : bounding_box;
+
+    (*
+    ** Cursor text position
+    *)
+    mutable ed_cursor: int;
+    mutable ed_cursor_display: bool;
+    
+    mutable ed_lastpad : int;
+
+    (*
+    ** Current status of entry (modified ?)
+    *)
+    mutable ed_status: status;
+    
+    (*
+    ** Bounding box of optional action button
+    *)
+    mutable ed_but_bbox: bounding_box;
+    mutable ed_but_active: bool;
+}
+
+let def_but_size = 18
+
+(*
+** The table widget.
+*)
+
+class orig parent (table : table_desc) attributes =
+    object (self)
+
+    inherit VX_object.t parent attributes as super
+    method name = "text_table"
+
+    (*
+    ** Cursor and user interaction utilities
+    *)
+    val mutable display_cursor = false
+    val cursor = String.create 1
+    val mutable last_active = None
+
+    (*
+    ** Internal table info array with informations about the
+    ** column windows, the text and the cursor position.
+    *)
+    val mutable table_info = [||]
+
+
+    val but_size = def_but_size
+
+    (*
+    ** Initialize this widget. The column entry widths are static and
+    ** must be already calculated. The row height can be adjusted auto-
+    ** matically.
+    *)
+
+    initializer
+        (*
+        ** Create table_info array. Needed for editable column entries.
+        *)
+        let rows = table.tb_rows in
+        let nrows = Array.length rows in
+        table_info <- Array.create nrows [||];
+        for row_i = 0 to nrows-1
+        do
+            let cols = rows.(row_i).row_cols in
+            let ncols = Array.length cols in
+            table_info.(row_i) <- Array.init ncols (fun _ ->
+                                    {
+                                        ed_bbox=bbox_of_xywh 0 0 0 0;
+                                        ed_cursor=0;
+                                        ed_cursor_display=false;
+                                        ed_lastpad = 0;
+                                        ed_status = St_Submitted;
+                                        ed_but_bbox=bbox_of_xywh 0 0 0 0;
+                                        ed_but_active=false;
+                                    });
+        done;
+        (*
+        ** User interaction: mouse & keyboard
+        *)
+        __(self#configure [Bindings [
+          PointerMotion,(fun _ ->
+                let x,y= !mouse_x_event,
+                         !mouse_y_event in
+                self#update_cursor x y 0;
+            );
+          EnterWindow,(fun _ ->
+                display_cursor <- true;
+                self#update_cursor (-1) (-1) 0;
+            );
+          LeaveWindow,(fun _ ->
+                display_cursor <- false;
+                self#update_cursor (-1) (-1) 0;
+            );
+          ButtonPress,(fun _ ->
+                let x,y= !mouse_x_event,
+                         !mouse_y_event in
+
+                match last_active with
+                | Some (row_i,col_j) ->
+                begin
+                    let ti = self#get_ti row_i col_j in
+                    let col = self#get_col row_i col_j in
+                    if col.col_but <> [] then
+                    begin
+                        let get_fun = match col.col_fun with
+                                  | Some f -> f;
+                                  | None -> (fun _ a -> a)
+                            in 
+                        let within = within_bbox ti.ed_but_bbox x y in
+                        if within && not ti.ed_but_active then
+                        begin
+                            ti.ed_but_active <- true;
+                            self#update_but row_i col_j;
+                            ti.ed_status <- get_fun col.col_str ti.ed_status;
+                            self#update_but row_i col_j;
+                        end;
+                    end;
+                end;
+                | None -> ();                
+            );
+          ButtonReleased,(fun _ ->
+                let x,y= !mouse_x_event,
+                         !mouse_y_event in
+
+                match last_active with
+                | Some (row_i,col_j) ->
+                begin
+                    let ti = self#get_ti row_i col_j in
+                    let col = self#get_col row_i col_j in
+                    
+                    if col.col_but <> [] then
+                    begin
+                        let within = within_bbox ti.ed_but_bbox x y in
+                        if within then
+                        begin
+                            ti.ed_but_active <- false;
+                            self#update_but row_i col_j;
+                        end;
+                    end;
+                end;
+                | None -> ();                
+            );
+          Key (XK.xk_Left, 0), (fun _ ->
+                let x,y= !mouse_x_event,
+                         !mouse_y_event in
+                self#update_cursor x y (-1);  
+            );
+          Key (XK.xk_Right, 0), (fun _ ->
+                let x,y= !mouse_x_event,
+                         !mouse_y_event in
+                self#update_cursor x y 1;   
+            );
+          Key (XK.xk_BackSpace, 0), (fun _ ->
+                let x,y= !mouse_x_event,
+                         !mouse_y_event in
+
+                match last_active with
+                | Some (row_i,col_j) ->
+                begin
+                    let ti = self#get_ti row_i col_j in
+                    let col = self#get_col row_i col_j in
+
+                    let text_font = col.col_font in
+                    let cursor_x = ti.ed_cursor in
+                    let text_lastpad = ti.ed_lastpad in
+                    if cursor_x > 0 then
+                    begin
+                        (*
+                        ** First restore text under cursor
+                        *)
+                        display_cursor <- false;
+                        self#update_cursor x y 0;
+                        (*
+                        ** Delete character before current cursor
+                        ** position.
+                        *)
+                        col.col_str <-  (
+                            let s = col.col_str in
+                            let len = String.length s in
+                            (String.sub s 0 (cursor_x-1)) ^ 
+                            (String.sub s (cursor_x) (len - cursor_x))
+                            );
+                        ti.ed_cursor <- ti.ed_cursor - 1;
+                        ti.ed_status <- St_Modified;
+                        ti.ed_lastpad <- (self#text_width row_i col_j)-
+                                         (string_width col.col_font 
+                                                       (col.col_str^" "));
+                        (*
+                        ** The content of this column entry was changed.
+                        ** Redraw the column entry.
+                        *)
+                        self#update_col row_i col_j;
+                        (*
+                        ** Redraw cursor at new position
+                        *)
+                        display_cursor <- true;
+                        self#update_cursor x y 0;
+                            
+                        (*
+                        ** User call back function but no button?
+                        *)
+                        if col.col_but = [] && col.col_fun <> None then
+                        begin
+                            let get_fun = match col.col_fun with
+                                  | Some f -> f;
+                                  | None -> (fun _ a -> a)
+                                in 
+                            ti.ed_status <- get_fun col.col_str ti.ed_status;
+                        end;
+                    end;
+                end;
+                | None -> ();
+            );
+
+          Key (XK.xk_Delete, 0), (fun _ ->
+                let x,y= !mouse_x_event,
+                         !mouse_y_event in
+                match last_active with
+                | Some (row_i,col_j) ->
+                begin
+                    let ti = self#get_ti row_i col_j in
+                    let col = self#get_col row_i col_j in
+            
+                    let text_font = col.col_font in
+                    let cursor_x = ti.ed_cursor in
+                    let text_lastpad = ti.ed_lastpad in
+                    if cursor_x < (String.length col.col_str) then
+                    begin
+                        (*
+                        ** First restore text under cursor
+                        *)
+                        display_cursor <- false;
+                        self#update_cursor x y 0;
+                        (*
+                        ** Delete character under current cursor
+                        ** position.
+                        *)
+                        col.col_str <-  (
+                            let s = col.col_str in
+                            let len = String.length s in
+                            (String.sub s 0 cursor_x) ^ 
+                            (String.sub s (cursor_x+1) (len - 1 - cursor_x))
+                            );
+                        ti.ed_lastpad <- (self#text_width row_i col_j)-
+                                         (string_width col.col_font 
+                                                       (col.col_str^" "));
+                        ti.ed_status <- St_Modified;
+                        (*
+                        ** The content of this column entry was changed.
+                        ** Redraw the column entry.
+                        *)
+                        self#update_col row_i col_j;
+                        (*
+                        ** Redraw cursor at new position
+                        *)
+                        display_cursor <- true;
+                        self#update_cursor x y 0;
+                        (*
+                        ** User call back function but no button?
+                        *)
+                        if col.col_but = [] && col.col_fun <> None then
+                        begin
+                            let get_fun = match col.col_fun with
+                                  | Some f -> f;
+                                  | None -> (fun _ a -> a)
+                                in 
+                            ti.ed_status <- get_fun col.col_str ti.ed_status;
+                        end;
+                    end;
+                end;
+                | None -> ();
+            );
+
+          Key (anyKey, anyModifier), (fun _ ->
+                let x,y= !mouse_x_event,
+                         !mouse_y_event in
+                (*
+                ** Enough space for a new character?
+                *)
+                if !key_string <> "" then
+                match last_active with
+                | Some (row_i,col_j) ->
+                begin
+                    let ti = self#get_ti row_i col_j in
+                    let col = self#get_col row_i col_j in
+                    
+                    let text_font = col.col_font in
+                    let cursor_x = ti.ed_cursor in
+                    let text_lastpad = ti.ed_lastpad in
+                    if text_lastpad > text_font.font_width then
+                    begin
+                        (*
+                        ** First restore text under cursor
+                        *)    
+                        display_cursor <- false;
+                        self#update_cursor x y 0;
+                        (*
+                        ** Insert new text
+                        *)
+                        col.col_str <- (
+                            let s = col.col_str in
+                            let len = String.length s in
+                            (String.sub s 0 cursor_x) ^ !key_string ^ 
+                            (String.sub s cursor_x (len - cursor_x))
+                            );
+                        ti.ed_cursor <- ti.ed_cursor + 
+                                      (String.length !key_string);
+                        ti.ed_status <- St_Modified;
+                        ti.ed_lastpad <- (self#text_width row_i col_j)-
+                                         (string_width col.col_font 
+                                                       (col.col_str^" "));
+                        (*
+                        ** The content of this column entry was changed.
+                        ** Redraw the column entry.
+                        *)
+                        self#update_col row_i col_j;
+                        (*
+                        ** Redraw cursor at new position
+                        *)
+                        display_cursor <- true;
+                        self#update_cursor x y 0;
+
+                        (*
+                        ** User call back function but no button?
+                        *)
+                        if col.col_but = [] && col.col_fun <> None then
+                        begin
+                            let get_fun = match col.col_fun with
+                                  | Some f -> f;
+                                  | None -> (fun _ a -> a)
+                                in 
+                            ti.ed_status <- get_fun col.col_str ti.ed_status;
+                        end;
+                    end;
+                end;
+                | None -> warn "no active";    
+            );
+
+          ]]);
+
+
+    val table = table
+    method col_iter f = 
+        let rows = table.tb_rows in
+        let r = ref 0 in
+        Array.iter (fun row ->
+                let c = ref 0 in
+                Array.iter (fun col -> f !r !c row col; incr c) row.row_cols;
+                incr r;
+            ) rows
+
+    (*
+    ** Get an entry from the table_info and table matrix respectively.
+    *)
+    method get_ti row_i col_j =
+        table_info.(row_i).(col_j)
+
+    method get_col row_i col_j =
+        table.tb_rows.(row_i).row_cols.(col_j)
+
+
+    (*
+    ** The width actually available for the text content of a column entry.
+    *)
+    method text_width row_i col_j =
+        let col = self#get_col row_i col_j in
+        let frame_off = frame_offset col.col_border in
+        let status = if col.col_but <> [] then
+                        (table.tb_colpad_x + but_size)
+                     else   
+                        0 in
+        col.col_width - table.tb_colpad_x - frame_off - status
+        
+    (*
+    ** Set the text content of one specific column entry.
+    *)
+    method set_text row_i col_j str =
+        let col = self#get_col row_i col_j in
+        let ti = self#get_ti row_i col_j in
+        col.col_str <- str;
+        if col.col_edit then
+            ti.ed_lastpad <- (self#text_width row_i col_j) - 
+                             (string_width col.col_font 
+                                           (str^" "));
+        self#update_col row_i col_j;
+
+    (*
+    ** Get the actual content of the specified column entry.
+    *)
+    method get_text row_i col_j  =
+        let col = self#get_col row_i col_j in
+        col.col_str
+
+    (*
+    ** Calculate the size of this text widget. Expandable and unsized
+    ** columns entries are recalculated. If the height of a row is not 
+    ** specified, calculate it from the entries of the row, too.
+    *)
+    method size_request =
+        let sz = szhints in
+        (*
+        ** This border is externally handled!
+        *)
+        let frame = frame_size w.w_frame in
+        if not w.w_size_modified || 
+           sz.comp_timestamp = s.s_timestamp then sz
+        else 
+        begin
+            (*
+            *)
+            let rows = table.tb_rows in
+            let nrows = Array.length rows in
+            let ncols = Array.length rows.(0).row_cols in
+            let col_widths = Array.create ncols 0 in
+            for row_i = 0 to nrows-1
+            do
+                let row = rows.(row_i) in
+                for col_j = 0 to ncols-1
+                do
+                    let col = row.row_cols.(col_j) in
+                    let ti = table_info.(row_i).(col_j) in
+                    let text_str = col.col_str in
+                    let text_font = col.col_font in
+                    let text_font_symbol = col.col_symbol_font in
+
+
+                    if col.col_expand = true then
+                        (*
+                        ** Recalculate width!
+                        *)
+                        col.col_width <- 0
+                    else if not col.col_fixed then
+                        col.col_width <- (string_width_S text_font 
+                                           text_font_symbol
+                                           text_str) + 
+                                         2 * table.tb_colpad_x +
+                                         (if col.col_edit then
+                                            (but_size + table.tb_colpad_x)
+                                          else
+                                            0);
+
+                   col_widths.(col_j) <- max col_widths.(col_j) 
+                                             col.col_width;
+                done;
+            done;
+            (*
+            ** how many columns must be expanded or sized ->
+            ** all columns with current width 0
+            *)
+            let ncols_exp = ref 0 in
+            (*
+            ** total width already consumed
+            *)
+            let roww_used = ref 0 in
+            Array.iter (fun cw -> 
+                        if cw = 0 then 
+                            incr ncols_exp      
+                        else
+                            roww_used := !roww_used + cw;
+                    ) col_widths;
+
+            (*
+            ** What remains for column expansion
+            *)
+            let roww_exp = max 0 
+                                ((max sz.min_width w.w_geometry.width) - 
+                                 (frame + 2 * w.w_ipad_x) -
+                                 !roww_used) in
+
+            for row_i = 0 to nrows-1
+            do
+                let row = rows.(row_i) in
+                for col_j = 0 to ncols-1
+                do
+                    let col = row.row_cols.(col_j) in
+                    if !ncols_exp > 0 && col.col_expand then
+                        col.col_width <- roww_exp / !ncols_exp
+                    else if not col.col_fixed then
+                        col.col_width <- col_widths.(col_j);
+                done;
+            done;
+            
+            let width = ref 0 in
+            let height = ref 0 in
+            (*
+            ** Reduced height due to overlapping bottom and top 
+            ** borders if any
+            *)
+            let red_height = ref 0 in
+            let nrows = Array.length table.tb_rows in
+            for row_i = 0 to nrows-1
+            do
+                let row = table.tb_rows.(row_i) in
+                let cols = row.row_cols in
+                let ncols = Array.length cols in
+                let row_width = ref 0 in
+                for col_j = 0 to ncols - 1
+                do
+                    let col = cols.(col_j) in
+                    let frame' = frame_size col.col_border in
+                    let frame_off' = frame_offset col.col_border in
+                    let base_line = match col.col_baseline with
+                                     | Some tb -> tb.tb_width + 2;
+                                     | None -> 0; in
+                    row_width := !row_width + col.col_width;
+
+                    let text_font = col.col_font in
+                    let h = text_font.font_height +
+                            table.tb_colpad_y * 2 + 
+                            frame'  +       
+                            base_line in
+                    row.row_height <- max row.row_height h;
+                    red_height := max !red_height frame_off';
+                done;
+                width := max !width !row_width;
+                height := !height + row.row_height -
+                          !red_height + row.row_pad;
+            done;
+            height := !height + !red_height;
+            sz.requested_width <- min sz.max_width
+                                      (max (!width + frame + 
+                                            2 * w.w_ipad_x)
+                                           (sz.min_width + frame +
+                                            2 * w.w_ipad_x));
+            sz.requested_height <- min sz.max_height
+                                      (max (!height + frame +
+                                            2 * w.w_ipad_y)
+                                            (sz.min_height + frame +
+                                            2 * w.w_ipad_y));
+            sz
+        end
+
+    (*
+    **
+    ** (Re)Size this object and (re)size the X window associated
+    ** with this object widget.
+    **     
+    **  Args:
+    **      x y dx dy -> Maximal available area!
+    **
+    *)
+
+    method size_allocate x y dx dy =
+        super#size_allocate x y dx dy;
+
+        w.w_size_modified <- true;    
+        let wg = w.w_geometry in
+        let s = self#screen in
+        let sz = szhints in
+
+        if sz.expand_x && dx <> sz.requested_width then
+        begin
+            (*
+            ** expand to desired width - update column widths just
+            ** by calling size_request with initial requested_width
+            ** value set to the new window width
+            *)
+            sz.requested_width <- dx;
+            __(self#size_request);
+        end;
+
+        
+
+    (*
+    ** A column entry can have an optional action button.
+    ** Set the state of the button (and redraw content).
+    *)
+    method update_but row_i col_j = 
+        let col = self#get_col row_i col_j in
+        let ti = self#get_ti row_i col_j in
+
+        (*
+        ** Draw status button box if any
+        *)
+        if col.col_but <> [] then
+        begin
+            let active = ti.ed_but_active in
+            let sz = szhints in
+            let dpy = s.s_display in
+            let gcs = s.s_gcs in
+            (*
+            ** Default fore- and background color. Can be overwritten.
+            *)
+            let fg = w.w_foreground.c_pixel in
+            let bg =  w.w_background.c_pixel in
+            let frame = frame_size col.col_border in
+            let frame_off = frame_offset col.col_border in            
+
+            let x0 = ti.ed_bbox.x1 in
+            let y0 = ti.ed_bbox.y1 in
+            let w' = col.col_width in
+            let h' = ti.ed_bbox.y2 - ti.ed_bbox.y1 + 1 in
+
+            let yoff = h'/2 - (but_size/2) in
+            let x0' = x0 + w' - frame_off - but_size - table.tb_colpad_x in
+            let x1' = x0' + but_size in
+            let y0' = y0 + yoff in    
+            let y1' = y0' + but_size in
+            let bbox = {x1=x0';y1=y0';x2=x1';y2=y1'} in
+            ti.ed_but_bbox <- bbox;
+            let bw = 1 in
+            let shadow_box = {(default_frame bw) with
+                              f_fillground=w.w_background;
+                              f_background=w.w_background;
+                              f_bbox=bbox;
+                              f_shape=S_Rect;
+                              f_type=if active
+                                        then ShadowSunken
+                                        else ShadowRaised;} in
+    
+            let frame,frame_off = 
+                frame_size shadow_box,
+                frame_offset shadow_box in
+            let sym = match ti.ed_status with
+                    | St_Failed -> S_ERR;
+                    | St_Unknown -> S_QUEST;
+                    | St_No_status -> S_QUEST;
+                    | St_Modified -> S_ENTER;
+                    | St_Submitted -> S_OK;
+                    | St_Locked -> S_OK;
+                    | St_Busy -> S_BUSY;
+                    in
+
+            X.clearArea s.s_display w.w_window 
+                        x0' y0' (x1'-x0') (y1'-y0') false;
+            drawFrame s.s_display w s.s_gcs shadow_box true;
+
+            (*
+            ** Show symbol status only if specified in col_but list.
+            *)
+            if (List.mem sym col.col_but) then
+            begin
+                let symbol = {
+                    sym_type = if sym = S_WARN then S_ERR else sym;
+                    sym_bbox = {x1=x0'+frame_off;
+                                y1=y0'+frame_off;
+                                x2=x1'-frame+frame_off;
+                                y2=y1'-frame+frame_off};
+                    sym_col = if sym <> S_ERR then noColor
+                                              else (parent#color_make "red"
+                                                           true);
+                    sym_width = 1;
+                    } in
+                drawSymbol s.s_display w gcs symbol; 
+            end;
+        end;
+
+    (*
+    **  The cursor got a new position or the display state
+    **  changed. In the first case, restore old position, draw new position.
+    ** The third argument specifies an optional cursor position change.
+    *)
+    method update_cursor x y change =
+        let sz = szhints in
+        let dpy = s.s_display in                      
+        let gcs = s.s_gcs in
+        last_active <- None;
+        self#col_iter (fun row_i col_j row col ->
+                if col.col_edit then
+                begin
+                    let ti = self#get_ti row_i col_j in
+                    let within = within_bbox ti.ed_bbox x y in
+                    let all = x = (-1) && y = (-1) in
+
+                    (*
+                    ** Change cursor state: state=true -> on , else off.
+                    *)
+                    let cursor_set state =
+                        let x0 = ti.ed_bbox.x1 in
+                        let y0 = ti.ed_bbox.y1 in
+                        let w' = col.col_width in
+                        let h' = ti.ed_bbox.y2 - ti.ed_bbox.y1 + 1 in
+
+                        let text_font = col.col_font in
+                        let text_str = col.col_str in
+                        let text_align = col.col_align in
+                        let frame = frame_size col.col_border in
+                        let frame_off = frame_offset col.col_border in
+
+                        let fg = if col.col_fg <> noColor then
+                                    col.col_fg.c_pixel
+                                 else
+                                    w.w_foreground.c_pixel in
+                        let bg = if col.col_bg <> noColor then
+                                    col.col_bg.c_pixel
+                                 else
+                                    w.w_background.c_pixel in
+                        
+                        let gc = if state then
+                                    GCCache.get_fg_bg_font gcs bg fg 
+                                                           text_font.font_id 
+                                 else
+                                    GCCache.get_fg_bg_font gcs fg bg 
+                                                           text_font.font_id 
+                            in
+
+                        let h'' =  text_font.font_height in
+                        let offset = max 0 (h' - h'' - 
+                                        2 * table.tb_colpad_y - 
+                                        frame)/2
+                            in
+                        let ty = y0 + table.tb_colpad_y + 
+                                 frame_off + text_font.font_ascent + 
+                                 offset in
+
+                        let len = String.length text_str in
+                        let width = string_width text_font text_str in
+    
+                        let tx = 
+                            match text_align with
+                            | Left -> x0 + frame_off + 
+                                      table.tb_colpad_x 
+                            | Center -> x0 + 
+                                        (w' - frame - width)/2
+                            | Right -> x0 + w' - width - 
+                                       2 - frame_off - 
+                                       table.tb_colpad_x -
+                                       (string_width text_font " ");
+                            | _ -> warn_attr "VX_texttable" (Align text_align);
+                                   x0 + frame_off +
+                                   table.tb_colpad_x 
+                            in
+                        let cursor_x = ti.ed_cursor in
+                        cursor.[0] <- if cursor_x > 
+                                         (String.length text_str) - 1 
+                                    then ' ' 
+                                    else text_str.[cursor_x];
+                        let xc,yc = (tx+(string_width text_font 
+                                        (String.sub text_str 0 cursor_x))),
+                                    ty in
+                        Xlib.imageSubString s.s_display w.w_window gc  
+                                            xc yc cursor 0 1;
+
+                        ti.ed_cursor_display <- state;
+                        in
+
+                    (*
+                    ** Cursor state machine
+                    *)
+                    if within && 
+                       display_cursor &&
+                       not ti.ed_cursor_display then
+                    begin
+                        ti.ed_cursor <- max 0 (ti.ed_cursor + change);
+                        ti.ed_cursor <- min ti.ed_cursor
+                                            (String.length col.col_str);
+                        cursor_set true;
+                    end
+                    else if within &&
+                            not display_cursor &&
+                            ti.ed_cursor_display then
+                    begin
+                        cursor_set false;
+                    end
+                    else if not within &&
+                            not display_cursor && 
+                            ti.ed_cursor_display then
+                    begin
+                        cursor_set false;
+                    end 
+                    else if not within && 
+                            ti.ed_cursor_display then
+                    begin
+                        cursor_set false;
+                    end
+                    else if within &&
+                            display_cursor &&
+                            ti.ed_cursor_display &&
+                            change <> 0 then
+                    begin
+                        cursor_set false;
+                        ti.ed_cursor <- max 0 (ti.ed_cursor + change);
+                        ti.ed_cursor <- min ti.ed_cursor
+                                            (String.length col.col_str);
+                        cursor_set true;                        
+                    end;
+                    if ti.ed_cursor_display then
+                        last_active <- Some (row_i,col_j);
+
+                    
+                end;
+            )
+    
+
+    (*
+    ** Update and redraw one specific column entry.
+    *)
+    method update_col row_i col_j =
+            (*
+            ** get the table info entry
+            *)
+            let col = self#get_col row_i col_j in
+            let ti = self#get_ti row_i col_j in
+
+            let sz = szhints in
+            let dpy = s.s_display in
+            let gcs = s.s_gcs in
+            (*
+            ** Default fore- and background color. Can be overwritten.
+            *)
+            let fg = w.w_foreground.c_pixel in
+            let bg =  w.w_background.c_pixel in
+
+            let max_text = self#text_width row_i col_j in
+
+            let x0 = ti.ed_bbox.x1 in
+            let y0 = ti.ed_bbox.y1 in
+            let w' = col.col_width in
+            let h' = ti.ed_bbox.y2 - ti.ed_bbox.y1 + 1 in
+            (*
+            ** Draw text
+            *)
+            let text_font = col.col_font in
+            let text_font_symbol = col.col_symbol_font in
+            let text_str = col.col_str in  
+            let text_align = col.col_align in
+
+            let frame = frame_size col.col_border in
+            let frame_off = frame_offset col.col_border in
+
+            let fg = if col.col_fg <> noColor then
+                                col.col_fg.c_pixel
+                             else
+                                fg in
+            let bg = if col.col_bg <> noColor then
+                                col.col_bg.c_pixel
+                             else
+                                bg in
+                        
+            let gc = GCCache.get_fg_bg_font gcs fg bg
+                                            text_font.font_id in
+      
+            let h'' =  text_font.font_height in
+            let offset = max 0 (h' - h'' - 
+                                2 * table.tb_colpad_y - 
+                                frame)/2
+                            in
+            let ty = y0 + table.tb_colpad_y + frame_off +
+                          text_font.font_ascent + offset in
+
+            let len = String.length text_str in
+            let width = string_width_S text_font 
+                                       text_font_symbol
+                                       text_str in
+    
+            let tx = 
+                match text_align with
+                | Left -> x0 + frame_off + table.tb_colpad_x 
+                | Center -> x0 + (w' - frame - width) / 2
+                | Right -> x0 + w' - width - 2 - frame_off - 
+                           table.tb_colpad_x -
+                           (if col.col_edit then
+                                (string_width text_font " ")
+                            else
+                                0);
+                | _ -> warn_attr "VX_texttable" (Align text_align);
+                       x0 + frame_off + table.tb_colpad_x
+                in
+            (*
+            ** Only clear content!!! Keep borders...
+            *)
+
+
+            X.clearArea s.s_display w.w_window
+                        (x0+frame_off) (y0+frame_off)
+                        (w' - frame - (if col.col_but <> [] 
+                                            then but_size 
+                                            else 0)) 
+                        (ty + (text_font.font_height -
+                               text_font.font_ascent) - y0) false;
+            (*
+            ** Update border bbox and draw border lines
+            *)
+            col.col_border.f_bbox <- bbox_of_xywh x0 y0 w' h';
+
+            drawFrame dpy w gcs col.col_border false;
+
+            if col.col_edit then
+                Xlib.drawSubString s.s_display w.w_window gc  
+                                   tx ty text_str 0 len
+            else
+                (*
+                ** String may contain embedded symbols!
+                ** The draw_string function resolves the embedded symbols.
+                *)
+                draw_string_S s.s_display w.w_window gcs 
+                                       tx ty fg bg 
+                                       text_font
+                                       text_font_symbol
+                                       text_str;
+
+            (*
+            ** Draw baseline if any.    
+            *)
+            (
+                match col.col_baseline with
+                | Some tb ->
+                begin
+                    let blw = tb.tb_width in
+                    let fg = if tb.tb_color <> noColor then
+                                    tb.tb_color.c_pixel
+                                 else
+                                    fg in
+                            
+                    let gc' = 
+                        match tb.tb_linetype with
+                        | L_Dotted ->
+                                get_gc s.s_gcs 
+                                       (Fg_bg_ls 
+                                          (fg,bg,blw,
+                                           LineOnOffDash,
+                                           blw))   
+                        | L_Dashed ->
+                                get_gc s.s_gcs 
+                                       (Fg_bg_ls 
+                                           (fg,bg,blw,
+                                            LineOnOffDash,
+                                            4*blw))   
+                        | L_Solid ->
+                                GCCache.get_fg_bg_lw s.s_gcs fg bg blw
+                            in
+
+                    let x0' = x0 + table.tb_colpad_x + frame_off in
+                    let x1' = x0 + max_text in
+                    let y'  = ty + (text_font.font_height -
+                                    text_font.font_ascent) + 
+                                    (blw/2) + 1 in
+
+                    X.polyLine s.s_display w.w_window gc' Origin
+                               [x0',y';x1',y'];
+
+                end;
+                | None -> ()
+            );
+
+            (*
+            ** Draw button in column entry if there is a 
+            ** button action specified.
+            *)
+            if col.col_but <> [] then self#update_but row_i col_j;
+
+
+            if col.col_edit then
+                ti.ed_lastpad <- max_text - 
+                                 (string_width text_font text_str) -
+                                 (if col.col_edit then 
+                                    string_width text_font " "        
+                                  else    
+                                    0);
+
+    (*
+    ** Draw the graphics content of the full table widget: 
+    **  text, border, cursor...
+    *)
+    method refresh =
+        if s.s_timestamp > w.w_refresh_timestamp && 
+           not (w.w_window == noWindow) then
+        begin
+            super#refresh;
+            let sz = szhints in
+            let dpy = s.s_display in
+            let gcs = s.s_gcs in
+            (*
+            ** Default fore- and background color. Can be overwritten.
+            *)
+            let fg = w.w_foreground.c_pixel in
+            let bg =  w.w_background.c_pixel in
+            let frame = frame_size w.w_frame in
+            let frame_off = frame_offset w.w_frame in 
+
+            let x0 = (frame_off + w.w_ipad_x) in
+            let y0 = ref (frame_off + w.w_ipad_y) in
+
+            let nrows = Array.length table.tb_rows in
+
+            for row_i = 0 to nrows-1
+            do
+                let row = table.tb_rows.(row_i) in
+                let ncols = Array.length row.row_cols in
+                let x = ref x0 in
+                let h' = row.row_height in
+
+                let row_border = ref 0 in
+
+                for col_j = 0 to ncols -1 
+                do
+                    let col = row.row_cols.(col_j) in
+                    let ti = table_info.(row_i).(col_j) in
+                    let w' = col.col_width in
+                    let text_font = col.col_font in
+                    let text_str = col.col_str in
+                    let frame = frame_size col.col_border in
+                    let frame_off = frame_offset col.col_border in
+
+                    row_border := max !row_border frame_off;
+                    (*
+                    ** Save sub window geometry of this column entry.
+                    *)
+                    ti.ed_bbox <- bbox_of_xywh !x !y0 w' h';
+
+
+                    self#update_col row_i col_j;
+                    if col.col_edit then
+                        ti.ed_lastpad <- (self#text_width row_i col_j)- 
+                                         (string_width text_font text_str);
+                    x := !x + w';
+                done;
+                (*
+                ** Note: we want to have overlap of bottom
+                **       and top border lines of succeeding rows:
+                **       - row_border!
+                *)
+                y0 := !y0 + h' - !row_border + row.row_pad;
+            done;
+        end
+
+    (*
+    ** Print button
+    *)
+
+    method print_but ps wx0 wy0 row_i col_j = 
+        let col = self#get_col row_i col_j in
+        let ti = self#get_ti row_i col_j in
+
+        (*
+        ** Draw status button box if any
+        *)
+        if col.col_but <> [] then
+        begin
+            let active = ti.ed_but_active in
+            let sz = szhints in
+            (*
+            ** Default fore- and background color. Can be overwritten.
+            *)
+            let fc = w.w_foreground in
+            let bc =  w.w_background in
+            let frame = frame_size col.col_border in
+            let frame_off = frame_offset col.col_border in            
+
+            let x0 = ti.ed_bbox.x1 in
+            let y0 = ti.ed_bbox.y1 in
+            let w' = col.col_width in
+            let h' = ti.ed_bbox.y2 - ti.ed_bbox.y1 + 1 in
+
+            let yoff = h'/2 - (but_size/2) in
+            let x0' = x0 + w' - frame_off - but_size - table.tb_colpad_x in
+            let x1' = x0' + but_size in
+            let y0' = y0 + yoff in    
+            let y1' = y0' + but_size in
+            let bbox = {x1=x0';y1=y0';x2=x1';y2=y1'} in
+            ti.ed_but_bbox <- bbox;
+            let bw = 1 in
+            let shadow_box = {(default_frame bw) with
+                              f_fillground = bc;
+                              f_background = bc;
+                              f_bbox=bbox;
+                              f_shape=S_Rect;
+                              f_type=if active
+                                        then ShadowSunken
+                                        else ShadowRaised;} in
+    
+            let frame,frame_off = 
+                frame_size shadow_box,
+                frame_offset shadow_box in
+            let sym = match ti.ed_status with
+                    | St_Failed -> S_ERR;
+                    | St_Unknown -> S_QUEST;
+                    | St_No_status -> S_QUEST;
+                    | St_Modified -> S_ENTER;
+                    | St_Submitted -> S_OK;
+                    | St_Locked -> S_OK;
+                    | St_Busy -> S_BUSY;
+                    in
+
+
+            printFrame ps w wx0 wy0 shadow_box true;
+
+            (*
+            ** Show symbol status only if specified in col_but list.
+            *)
+            if (List.mem sym col.col_but) then
+            begin
+                let off = if ti.ed_but_active then frame else 0 in
+                let symbol = {
+                    sym_type = if sym = S_WARN then S_ERR else sym;
+                    sym_bbox = {x1=x0'+frame_off+off;
+                                y1=y0'+frame_off+off;
+                                x2=x1'+off-frame-frame_off;
+                                y2=y1'+off-frame-frame_off};
+                    sym_col = if sym <> S_ERR then noColor
+                                              else (parent#color_make "red"
+                                                           true);
+                    sym_width = 1;
+                    } in
+                (*
+                drawSymbol s.s_display w gcs symbol; 
+                *) ()
+            end;
+        end;
+
+    (*
+    ** Print one column entry
+    *)
+    method print_col ps wx0 wy0 row_i col_j  =
+            (*
+            ** get the table info entry
+            *)
+            let col = self#get_col row_i col_j in
+            let ti = self#get_ti row_i col_j in
+
+            let sz = szhints in
+            (*
+            ** Default fore- and background color. Can be overwritten.
+            *)
+            let fc = w.w_foreground in
+            let bc =  w.w_background in
+
+            let max_text = self#text_width row_i col_j in
+
+            let x0 = ti.ed_bbox.x1 in
+            let y0 = ti.ed_bbox.y1 in
+            let w' = col.col_width in
+            let h' = (ti.ed_bbox.y2 - ti.ed_bbox.y1 + 1) in
+            (*
+            ** Draw text
+            *)
+            let text_font = col.col_font in
+            let text_font_symbol = col.col_symbol_font in
+            let text_str = col.col_str in  
+            let text_align = col.col_align in
+
+            let frame = frame_size col.col_border in
+            let frame_off = frame_size col.col_border in
+
+            let fc = if col.col_fg <> noColor then
+                                col.col_fg
+                             else
+                                fc in
+            let bc = if col.col_bg <> noColor then
+                                col.col_bg
+                             else
+                                bc in
+                        
+      
+            let h'' =  text_font.font_height in
+            let offset = max 0 (h' - h'' - 
+                                2 * table.tb_colpad_y - 
+                                frame)/2
+                            in
+            let ty = y0 + table.tb_colpad_y + frame_off +
+                          text_font.font_ascent + offset in
+
+            let len = String.length text_str in
+            let width = string_width_S text_font 
+                                       text_font_symbol
+                                       text_str in
+    
+            let tx = 
+                match text_align with
+                | Left -> x0 + frame_off + table.tb_colpad_x 
+                | Center -> x0 + (w' - frame - width) / 2
+                | Right -> x0 + w' - width - 2 - frame_off - 
+                           table.tb_colpad_x -
+                           (if col.col_edit then
+                                (string_width text_font " ")
+                            else
+                                0);
+                | _ -> warn_attr "VX_texttable" (Align text_align);
+                       x0 + frame_off + table.tb_colpad_x
+                in
+
+
+            (*
+            ** Update border bbox and draw border lines
+            *)
+            col.col_border.f_bbox <- bbox_of_xywh x0 y0 w' h';
+            printFrame ps w wx0 wy0 col.col_border false;
+
+            print_string_S ps wx0 wy0 
+                           (i2f tx) (i2f ty) fc bc 
+                           text_font
+                           text_font_symbol
+                           text_str;
+
+            (*
+            ** Draw baseline if any.    
+            *)
+            (
+                match col.col_baseline with
+                | Some tb ->
+                begin
+                    let blw = tb.tb_width in
+                    let fc = if tb.tb_color <> noColor then
+                                    tb.tb_color
+                                 else
+                                    fc in
+                            
+                    (*
+                    ** TODO: linetype...
+                    *)
+
+                    let x0' = x0 + table.tb_colpad_x + frame_off in
+                    let x1' = x0 + max_text in
+                    let y'  = ty + (text_font.font_height -
+                                    text_font.font_ascent) + 
+                                    (blw/2) + 1 in
+
+                    VX_ps.polyLine ps wx0 wy0 (i2f blw) fc
+                               [i2f x0', i2f y';
+                                i2f x1', i2f y'];
+
+                end;
+                | None -> ()
+            );
+
+            (*
+            ** Draw button in column entry if there is a 
+            ** button action specified.
+            *)
+            if col.col_but <> [] then 
+                self#print_but ps wx0 wy0 row_i col_j;
+
+
+
+
+    method print (ps : ps) (x0 : int) (y0 : int) =
+        super#print ps x0 y0;
+        self#col_iter (fun row_i col_j row col ->
+                self#print_col ps x0 y0 row_i col_j;
+                    );
+
+end
+
+
+
+(*
+** Generates a table descriptor. Not specified parameters are filled
+** with default values. Sizes are computed in size_request if necessary.
+*)
+let table_gen parent table_cont attributes =
+    let table_attr = ref [] in
+    let row_attr = ref [||] in
+    let col_attr = ref [||] in
+
+    let tb = {
+                tb_rows = [||];
+                tb_colpad_x = 0;
+                tb_colpad_y = 0;
+             } in
+
+
+    let nrows = Array.length table_cont in
+    let rows = Array.init nrows (fun _ -> {row_cols=[||];
+                                           row_height=0;
+                                           row_pad=0;}) in
+
+    let default_font = parent#font_make Helvetica Roman 12 true in
+
+    let font = font_desc default_font in
+    let font_changed = ref false in
+    List.iter (fun ta ->
+        match ta with
+        | IpadX x -> tb.tb_colpad_x <- x;
+        | IpadY y -> tb.tb_colpad_y <- y;
+        | Rows r -> row_attr := r;
+        | Cols c -> col_attr := c;
+        | Text_font  kind  -> font_changed := true;
+                                  font.text_font <- kind;
+        | Text_style style -> font_changed := true;
+                                  font.text_style <- style;
+        | Text_size  size  -> font_changed := true;
+                                  font.text_size <- size;
+        | _ -> ();
+        ) attributes;
+
+    let default_font = 
+        if !font_changed then
+            parent#font_make font.text_font
+                             font.text_style 
+                             font.text_size true
+
+        else
+            default_font in            
+
+    let default_symbol_font = parent#font_make Symbol
+                                               default_font.font_style 
+                                               default_font.font_size true in
+
+    (*
+    ** Some sanity checks
+    *)
+    if !row_attr <> [||] && (Array.length !row_attr <> nrows) then
+        vx_error "VX_texttable: invalid length of Rows array";
+    if !col_attr <> [||] && (Array.length !col_attr <> nrows) then
+        vx_error "VX_texttable: invalid length of Cols array";
+
+    let max_cols = ref 0 in
+
+    for row_i = 0 to nrows - 1
+    do
+        let row = rows.(row_i) in
+        let row_str = table_cont.(row_i) in
+        let ncols = Array.length row_str in
+        if !max_cols > 0 && ncols <> !max_cols then
+            vx_error (sprintf 
+            "VX_texttable: invalid number of column entries (got %d, expected %d)" 
+            ncols !max_cols);
+
+        max_cols := max !max_cols ncols;
+        let cols = Array.init ncols (fun _ -> 
+                        {
+                            col_str = "";
+                            col_font = default_font;
+                            col_symbol_font = default_symbol_font;
+                            col_align = Left;
+                            col_fg = noColor;
+                            col_bg = noColor;
+                            col_border = empty_frame;
+                            col_width = 0;
+                            col_baseline = None;
+                            col_fun = None;
+                            col_edit = false;
+                            col_but = [];
+                            col_expand = false;
+                            col_fixed = false;
+                        }) in
+        row.row_cols <- cols;
+        for col_j = 0 to ncols-1
+        do
+            let col = cols.(col_j) in
+            col.col_str <- table_cont.(row_i).(col_j);
+
+            let font_changed = ref false in
+            let font = font_desc col.col_font in
+
+            if !col_attr <> [||] then
+            begin
+                if (Array.length !col_attr.(row_i) <> ncols) then
+                    vx_error "VX_texttable: invalid length of Cols array";
+                List.iter (fun ca ->
+                    match ca with
+                    | Width  w -> col.col_width <- w;
+                                  col.col_fixed <- true;
+                    | Border attr -> 
+                        col.col_border <- 
+                            create_frame parent#win 
+                                         (fun c->parent#color_make c true)
+                                         attr;
+                    | Text_baseline attr -> 
+                        col.col_baseline <- Some ( 
+                            create_baseline parent#win 
+                                         (fun c->parent#color_make c true)
+                                         attr);
+                                            
+                    | Foreground c -> col.col_fg <- parent#color_make c true;
+                    | Background c -> col.col_bg <- parent#color_make c true;
+                    | Mutable m -> col.col_edit <- m;
+                    | Align al -> col.col_align <- al;
+                    | Sym s -> col.col_but <- col.col_but @ [s];
+                    | Text_font  kind  -> font_changed := true;
+                                  font.text_font <- kind;
+                    | Text_style style -> font_changed := true;
+                                  font.text_style <- style;
+                    | Text_size  size  -> font_changed := true;
+                                  font.text_size <- size;
+                    | ActionS f -> col.col_fun <- Some f;
+                    | ExpandX b -> col.col_expand <- b;
+                                   if col.col_expand then
+                                   begin
+                                        col.col_fixed <- false;
+                                        col.col_width <- 0;
+                                   end;
+                    | _ -> warn_attr "VX_texttable" ca;
+                ) !col_attr.(row_i).(col_j);
+            end;
+
+            if !font_changed then 
+            begin
+                col.col_font <- parent#font_make font.text_font
+                                          font.text_style 
+                                          font.text_size true;
+                col.col_symbol_font <- parent#font_make Symbol
+                                          font.text_style 
+                                          font.text_size true;
+            end;
+
+        done;
+        if !row_attr <> [||] then
+        List.iter (fun ra ->
+                match ra with
+                | IpadY p -> row.row_pad <- p;
+                | _ -> ();
+            ) !row_attr.(row_i);
+    done;
+
+    tb.tb_rows <- rows;
+
+    (*
+    ** Some sanity checks of column widths. Expandable or currently unsized 
+    ** column netries will be sized in size_request.
+    *)
+
+    let col_widths = Array.create !max_cols (max_int,0) in
+    (*
+    ** First calculate column width...
+    *)
+    for row_i = 0 to nrows-1
+    do
+        let row = rows.(row_i) in
+        let ncols = Array.length row.row_cols in
+        for col_j = 0 to ncols-1
+        do
+            let col = row.row_cols.(col_j) in
+            let last_min,last_max = col_widths.(col_j) in
+            col_widths.(col_j) <-   min last_min col.col_width,
+                                    max last_max col.col_width;
+        done;
+    done;
+
+    (*
+    ** Check columns widths
+    *)
+
+    let irregular = ref false in
+    Array.iter ( fun (min_w,max_w) ->
+            (*
+            ** we tolerate different widths of entries from
+            ** one column -> irregular table! -> but all widths must
+            ** be specified!!!
+            *)
+            if min_w <> max_w then
+                irregular := true;
+
+            if min_w = 0 && min_w <> max_w then 
+                vx_error (sprintf
+                    "VX_texttable: different widths of column entries (min=%d max=%d)"
+                    min_w max_w);
+            if !irregular && min_w = 0 && max_w = 0 then
+                vx_error "VX_texttable: irregular table, but not all widths specified!";
+        ) col_widths; 
+
+    tb
+
+class t parent table_cont attributes =
+    object 
+    inherit orig parent (table_gen parent table_cont 
+                                   attributes) attributes
+end
