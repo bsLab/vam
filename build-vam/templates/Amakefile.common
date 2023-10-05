@@ -1,0 +1,231 @@
+##
+##      ==================================
+##      OOOO   OOOO OOOO  O      O   OOOO
+##      O   O  O    O     O     O O  O   O
+##      O   O  O    O     O     O O  O   O
+##      OOOO   OOOO OOOO  O     OOO  OOOO
+##      O   O     O    O  O    O   O O   O
+##      O   O     O    O  O    O   O O   O
+##      OOOO   OOOO OOOO  OOOO O   O OOOO
+##      ================================== 
+##      BSSLAB, Dr. Stefan Bosse sci@bsslab.de
+##
+##    PROTECTED BY AND DISTRIBUTED UNDER THE TERMS OF: 
+##    Free Software Foundation-Europe, GNU GPL License, Version 2
+##
+##    $MODIFIEDBY:  BSSLAB
+##    $AUTHORS:     Stefan Bosse
+##    $INITIAL:     (C) BSSLAB 2003
+##    $CREATED:     
+##    $VERSION:     1.00
+##
+##    $INFO:
+##
+## Path and system independent settings to build the VAM
+## stuff
+##      Prebuild version
+## 
+##
+##    $ENDOFINFO
+##
+
+
+
+
+
+###########################################################################
+#      OCaML compiler system definitions to build the OCaML               #
+#      Most variables prefixed with BOOT.                                 #
+###########################################################################
+
+#
+# Paths and programs
+#
+
+
+
+OCAML_BINDIR     = $INSTALLDIR/ocamlsys/bin;
+OCAML_LIBDIR     = $INSTALLDIR/ocamlsys/lib/ocaml;
+OCAML_RUNTIME    = $OCAML_BINDIR/ocamlrun;
+
+#
+# OCAML standard include paths
+#
+
+OCAML_STD_INC   = {
+    -I, ./interface,
+    -I, $INSTALLDIR/ocamlsys/lib/ocaml
+};
+
+#
+# OCAML compiler standard options
+#
+
+%if ($OCAML_DEBUG == yes,{
+    OCAML_DEBUG_FLAG = {-g};
+},{
+    OCAML_DEBUG_FLAG = {};
+}
+);
+%if ($OCAML_CC_DEBUG == yes,{
+    OCAML_CC_DEBUG_FLAG = {-g};
+},{
+    OCAML_CC_DEBUG_FLAG = {};
+}
+);
+
+
+OCAML_STD_FLAGS   = {
+    $OCAML_DEBUG_FLAG
+}; 
+
+#
+# And archiver flags
+#
+
+OCAML_AR_FLAGS  = {}; 
+
+#
+# OCaML yacc
+#
+
+OCAML_YACC_FLAGS = {};
+
+
+#
+# VM building flags
+#
+
+OCAML_VM_FLAGS = {
+    $OCAML_DEBUG_FLAG
+};
+
+OCAML_CC_STDFLAGS = {
+    $OCAML_CC_STDFLAGS,
+    $OCAML_CC_DEBUG_FLAG
+};
+
+#
+# Dependency filters
+#
+
+MKDEP = $INSTALLDIR/toolset/mkdep.sh;
+
+
+#
+# OCaML Preprocessor
+#
+
+VAM_PP = $INSTALLDIR/toolset/cpp.sh;
+VAM_OPT = '-pp';
+
+
+
+##########################################################################
+#               Build the VAM                                            #
+#               With some different defintions.                          #
+##########################################################################  
+
+%if ($VAM_DEBUG == yes,{
+    VAM_DEBUG_FLAG = {-g};
+},{
+    VAM_DEBUG_FLAG = {};
+}
+);
+%if ($VAM_CC_DEBUG == yes,{
+    VAM_CC_DEBUG_FLAG = {-g};
+},{
+    VAM_CC_DEBUG_FLAG = {}
+}
+);
+
+#
+# OCAML compiler flags for VAM
+#
+VAM_STD_FLAGS   = { 
+    $VAM_DEBUG_FLAG, 
+    -thread
+};
+
+#
+# and archiver options
+#
+VAM_AR_FLAGS  = {$VAM_DEBUG_FLAG};
+
+
+#
+# OCaML compiler system definitions to build the VAM
+#
+
+
+OCAMLRUN      = $INSTALLDIR/ocamlsys/bin/ocamlrun; 
+OCAMLCOMPILE  = $INSTALLDIR/ocamlsys/bin/ocamlc;
+OCAMLDEP      = $INSTALLDIR/ocamlsys/bin/ocamldep;
+OCAMLMVCMI    = $INSTALLDIR/toolset/ocamlmvcmi.sh;
+OCAMLYACC     = $INSTALLDIR/ocamlsys/bin/ocamlyacc;
+OCAMLLEX      = $INSTALLDIR/ocamlsys/bin/ocamllex;
+
+#
+# OCaML standard include paths for VAM
+#  
+
+VAM_STD_INC   = {
+    -I, ./interface,
+    -I, ./../../interface
+};
+
+
+#
+# C compiler and archiver for VAM; same as in OCAML
+#
+
+VAM_CC_AR = $OCAML_CC_AR;
+VAM_CC_AR_FLAGS = $OCAML_CC_AR_FLAGS;
+
+VAM_CC_RANLIB = $OCAML_CC_RANLIB;
+
+VAM_CC = $OCAML_CC;
+
+VAM_CC_STDFLAGS = {
+    $VAM_CC_STDFLAGS,
+    $VAM_CC_DEBUG_FLAG
+};
+
+#
+# OCaML yacc
+#
+
+VAM_YACC_FLAGS = {};
+
+
+#
+# VM building flags
+#
+
+VAM_VM_FLAGS = {
+    $VAM_DEBUG_FLAG,
+    -thread
+};
+
+
+#
+# Create a config.h file from defintions in Amakefile.XX
+#
+
+VAM_BUILD_CONFIG_H = $INSTALLDIR/toolset/config-h.sh;
+VAM_CONFIG_H_TEMPL = $INSTALLDIR/Amakefile.sys;
+
+#
+# Export some environment variables
+#
+
+TOOLSET=$INSTALLDIR/toolset;
+%export TOOLSET;
+
+PP=$VAM_CPP;
+PP_FLAGS=$VAM_CPP_FLAGS;
+
+%export PP;
+%export PP_FLAGS;
+
+
