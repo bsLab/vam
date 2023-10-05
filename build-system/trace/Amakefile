@@ -1,0 +1,48 @@
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include $VAMDIR/src/system/trace/Amake.srclist;
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/system/trace,
+    -I,
+    $INSTALLDIR/interface,
+    -I,
+    $INSTALLDIR/lib,
+};
+
+
+DEFINES = {
+    -g,
+};
+
+SRC = {
+    $SRC_TRACE
+};
+
+LIB = trace.cma;
+
+%include $VAMDIR/toolset/ocaml.lib;
+%include $VAMDIR/toolset/ocaml.sys;
+
+%instance libcluster($LIB,$SRC);
+
+
+PNAME = trace;
+PLIBS = {
+    debug.cma,
+    buffer.cma,
+    unix.cma,
+    str.cma,
+    threads.cma,
+    os.cma,
+    $INSTALLDIR/lib/amoeba.cma,
+    server.cma,
+    trace.cma,
+};
+
+VM = $INSTALLDIR/bin/vamrun;
+%instance bytecode-exe($PNAME,$PLIBS,$VM,$SRC_TRACE_MAIN);
+
