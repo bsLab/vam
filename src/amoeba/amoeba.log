@@ -1,0 +1,6 @@
+** Changes:
+**
+**  -- Amoeba.Error exception introduced
+**  -- port_of_str added
+**  -- rights_req added
+**  -- bytebuf introduced  
