@@ -1,0 +1,62 @@
+#
+# Manual  Module Amakefile
+#
+
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include $VAMDIR/src/mandoc/Amake.srclist;
+
+
+#
+# Special include paths
+#
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/mandoc,
+    -I,
+    $VAMDIR/build-vam/debug/interface,
+    -I,
+    $INSTALLDIR/ocamlsys/lib/ocaml/sys,
+};
+
+#
+# All the sources together
+#
+
+CAMLSRC = {
+    $MODULE_MANDOC_MLI,
+    $MODULE_MANDOC_ML[flags = {'-g'}], 
+};
+
+
+#
+# Target libraries
+#
+
+#
+# CaML library
+#
+
+CAMLLIB     = mandoc.cma;
+
+
+
+%include $VAMDIR/toolset/ocaml.lib;
+%include $VAMDIR/toolset/ocaml.sys;
+
+%instance libcluster($CAMLLIB,$CAMLSRC);
+%instance libcluster($CAMLLIB,$CAMLSRC);
+
+VM = $INSTALLDIR/bin/vamrun;
+PLIBS = {
+    unix.cma,
+    str.cma,
+    $VAMDIR/build-vam/debug/debug.cma,
+    $VAMDIR/build-vam/mandoc/mandoc.cma
+};    
+                                    
+%instance bytecode-exe(mld,$PLIBS,$VM,$MLD_ML);
+ 
