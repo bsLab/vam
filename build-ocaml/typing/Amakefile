@@ -1,0 +1,31 @@
+
+# version 1.01
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include common.amk;
+%include $VAMDIR/toolset/ocaml.types;
+%include $VAMDIR/src/ocaml/toolset/ocaml-tools.common;
+%include $VAMDIR/src/ocaml/toolset/ocaml.sys;
+%include $VAMDIR/src/ocaml/typing/Amake.srclist;
+
+INCLUDES = {
+    -I, ./,
+    -I, $VAMDIR/src/ocaml/typing,
+    -I, $VAMDIR/build-ocaml/parsing/interface,
+    -I, $VAMDIR/build-ocaml/utils/interface,
+};
+
+CAMLSRC = {
+    $OCAML_TYPING_SRC,
+};
+
+
+CAMLLIB = typing.cma;
+
+
+
+%include $VAMDIR/src/ocaml/toolset/ocaml.lib;
+%instance libcluster ($CAMLLIB,$CAMLSRC);
+
