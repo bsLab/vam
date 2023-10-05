@@ -1,0 +1,5 @@
+2004.12.24:
+    Removed obsolete UnixLabels module, and bring back labels for
+    the Unix module. Not conforming with any previous Caml Unix
+    module!
+
