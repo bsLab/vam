@@ -1,0 +1,22 @@
+#!/bin/bash
+
+#
+# Compile ocaml source or interface files
+#
+
+if [ "X$VAMDIR" = "X" ] 
+then
+	VAMDIR=@VAMDIR@
+fi
+
+
+$VAMDIR/bin/vamrun -b $VAMDIR/ocamlsys/bin/ocamlc 	\
+	-pp 'cpp -traditional'			\
+	-I $VAMDIR/interface			\
+	-I $VAMDIR/lib				\
+	-I $VAMDIR/ocamlsys/lib/ocaml		\
+	-I $VAMDIR/ocamlsys/lib/ocaml/threads	\
+	-I $VAMDIR/ocamlsys/lib/ocaml/sys	\
+	-thread -c				\
+	$@
+
