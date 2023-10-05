@@ -1,0 +1,13 @@
+SRC_VAX = {
+    $PWD/dummy.mli,
+    $PWD/vax_common.ml,
+    $PWD/vax_io.ml,
+    $PWD/vax_tty.ml,
+#    $PWD/vax_file.ml,
+    $PWD/vax_exec.ml,
+    $PWD/vax.ml,
+};
+
+SRC_VAX_MAIN = {
+    $PWD/main.ml
+};
