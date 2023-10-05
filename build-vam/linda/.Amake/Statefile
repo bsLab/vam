@@ -1,0 +1,152 @@
+_opt0={-fno-defer-pop, -Wall, -Wno-unused, -MD, -DAMOEBA, -g};
+_opt1={'-I/amoeba/Vam-2.0/ocamlsys/lib/ocaml/caml', '-I/amoeba/src/h', '-I/amoeba/src/h/server', '-I/amoeba/src/amunix/h', '-I/amoeba/src/h/class', '-I/amoeba/src/h/toolset/gnu-2-linux.amunix', '-I/amoeba/Amunix/include', '-include /amoeba/src/amunix/h/amuthr.h', '-include /amoeba/src/amunix/h/amuthr_unix.h'};
+_opt2={-g};
+_opt3={-g, -thread};
+_opt4={-I, interface, -I, '../../interface'};
+_opt5={-g, -thread};
+_opt6={-I, interface, -I, '../../interface'};
+_opt7={-g};
+_opt8={-fno-defer-pop, -Wall, -Wno-unused, -MD, -DAMOEBA, -g};
+_opt9={'-I/amoeba/Vam-2.0/ocamlsys/lib/ocaml/caml', '-I/amoeba/src/h', '-I/amoeba/src/h/server', '-I/amoeba/src/amunix/h', '-I/amoeba/src/h/class', '-I/amoeba/src/h/toolset/gnu-2-linux.amunix', '-I/amoeba/Amunix/include', '-include /amoeba/src/amunix/h/amuthr.h', '-include /amoeba/src/amunix/h/amuthr_unix.h'};
+_74=/amoeba/vam-2.0/src/linda;
+_76=$_74/dummy.mli[cid=1120457006];
+_96=.Amake/version00;
+_58=/amoeba/Vam-2.0/ocamlsys/bin;
+_59=$_58/ocamlrun[cid=1119334617];
+_=ocaml-c-intf(
+	$_76,
+	$_96/dummy.cmi[cid=1120473871],
+	$_opt3,
+	{},
+	$_opt4,
+	$_59,
+	$_96/dummy.mli.d[cid=1120473871],
+	{},
+	{}
+)==%true;
+_77=$_74/linda_common.ml[cid=1120470456];
+_53=/amoeba/vam-2.0/toolset;
+_54=$_53/ocamlmvcmi.sh[cid=1019717890];
+_80=/amoeba/vam-2.0/src/amoeba;
+_172=$_80/amoeba.mli[cid=1068283263];
+_173=$_80/cmdreg.mli[cid=1120456383];
+_=ocaml-c-impl(
+	$_77,
+	$_96/linda_common.cmo[cid=1120473871],
+	$_opt3,
+	{-g},
+	$_opt4,
+	$_59,
+	$_54,
+	$_96/linda_common.ml.d[cid=1120473871],
+	{$_172,$_173},
+	{}
+)==%true;
+_78=$_74/linda_client.ml[cid=1120473619];
+_=ocaml-c-impl(
+	$_78[cid=1120478430],
+	$_96/linda_client.cmo[cid=1120478432],
+	$_opt3,
+	{-g},
+	$_opt4,
+	$_59,
+	$_54,
+	$_96/linda_client.ml.d[cid=1120478432],
+	{$_172,$_173,$_77},
+	{}
+)==%true;
+_=ocaml-ar(
+	{linda_common.cmo[cid=1120473871],linda_client.cmo[cid=1120478432]},
+	{dummy.cmi[cid=1120473871]},
+	$_96/linda.cma[cid=1120478432],
+	{-custom,-cclib,-llinda_ext},
+	$_opt2,
+	$_59
+)==%true;
+_79=$_74/linda_ext.c[cid=1120473751];
+_101=gcc[cid=0];
+_61=$_53/mkdep.sh[cid=1077447107];
+_30=/amoeba/src/amunix/h;
+_102=$_30/amuthr.h[cid=1082994999];
+_28=/amoeba/src/h;
+_103=$_28/amoeba.h[cid=1075028563];
+_41=/amoeba/src/h/toolset/gnu-2-linux.amunix;
+_104=$_41/am_types.h[cid=988132981];
+_105=/amoeba/src/h/toolset/generic;
+_106=$_105/am_types4.h[cid=986031350];
+_107=$_28/_ARGS.h[cid=986031353];
+_108=$_30/amuthr_unix.h[cid=1116775900];
+_38=/amoeba/Vam-2.0/ocamlsys/lib/ocaml/caml;
+_109=$_38/mlvalues.h[cid=1115873574];
+_110=$_38/config.h[cid=1115873573];
+_111=$_38/misc.h[cid=1115873574];
+_116=/usr/lib/gcc-lib/i386-slackware-linux/'3.2.2'/include;
+_117=$_116/stddef.h[cid=1047628129];
+_118=/usr/include;
+_119=$_118/stdlib.h[cid=1046843470];
+_120=$_118/features.h[cid=1046843448];
+_121=/usr/include/sys;
+_122=$_121/cdefs.h[cid=1046843476];
+_123=/usr/include/gnu;
+_124=$_123/stubs.h[cid=1046843491];
+_125=$_121/types.h[cid=1046843475];
+_126=/usr/include/bits;
+_127=$_126/types.h[cid=1046843475];
+_128=$_126/pthreadtypes.h[cid=1046843475];
+_129=$_126/sched.h[cid=1046843475];
+_130=$_118/time.h[cid=1046843475];
+_131=$_118/endian.h[cid=1046843471];
+_132=$_126/endian.h[cid=1046843471];
+_133=$_121/select.h[cid=1046843476];
+_134=$_126/select.h[cid=1046843476];
+_135=$_126/sigset.h[cid=1046843470];
+_136=$_126/time.h[cid=1046843475];
+_137=$_121/sysmacros.h[cid=1046843475];
+_138=$_118/alloca.h[cid=1046843470];
+_139=$_38/alloc.h[cid=1115873573];
+_140=$_38/custom.h[cid=1115873573];
+_141=$_38/callback.h[cid=1115873573];
+_142=$_38/memory.h[cid=1115873574];
+_143=$_38/gc.h[cid=1115873574];
+_144=$_38/major_gc.h[cid=1115873574];
+_145=$_38/freelist.h[cid=1115873574];
+_146=$_38/minor_gc.h[cid=1115873574];
+_147=$_38/signals.h[cid=1115873574];
+_148=$_38/fail.h[cid=1115873574];
+_149=$_118/setjmp.h[cid=1046843470];
+_150=$_126/setjmp.h[cid=1046843470];
+_151=$_116/stdio.h[cid=1047628120];
+_152=$_118/libio.h[cid=1046843471];
+_153=$_118/_G_config.h[cid=1046843471];
+_154=$_118/wchar.h[cid=1046843472];
+_155=$_126/wchar.h[cid=1046843470];
+_156=$_118/gconv.h[cid=1046843449];
+_157=$_116/stdarg.h[cid=1047628129];
+_158=$_126/stdio_lim.h[cid=1046843470];
+_159=$_126/sys_errlist.h[cid=1046843471];
+_160=/amoeba/src/h/module;
+_161=$_160/linda.h[cid=988223718];
+_162=$_28/stderr.h[cid=1071829076];
+_163=$_28/cmdreg.h[cid=1076249457];
+_164=$_160/linda_svr.h[cid=988223718];
+_165=$_160/mutex.h[cid=1072518936];
+_=comp-cc(
+	$_79[cid=1120478384],
+	$_96/linda_ext.o[cid=1120478432],
+	$_opt0,
+	{},
+	$_opt1,
+	$_101,
+	$_61,
+	$_96/linda_ext.c.d[cid=1120478432],
+	{$_102,$_103,$_104,$_106,$_107,$_108,$_109,$_110,$_111,$_117,$_119,$_120,$_122,$_124,$_125,$_127,$_128,$_129,$_130,$_131,$_132,$_133,$_134,$_135,$_136,$_137,$_138,$_139,$_140,$_141,$_142,$_143,$_144,$_145,$_146,$_147,$_148,$_149,$_150,$_151,$_152,$_153,$_154,$_155,$_156,$_157,$_158,$_159,$_161,$_162,$_163,$_164,$_165}
+)==%true;
+_97=ar[cid=0];
+_98=ranlib[cid=0];
+_=ar-cc(
+	{linda_ext.o[cid=1120478432]},
+	$_96/liblinda_ext.a[cid=1120478432],
+	{rc},
+	$_97,
+	$_98
+)==%true;
