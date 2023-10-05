@@ -1,0 +1,10 @@
+
+
+MODULE_OS_MLI = {
+    $PWD/os.mli,
+};
+
+MODULE_OS_ML = {
+    $PWD/os.ml,
+};
+
