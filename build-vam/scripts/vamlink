@@ -1,0 +1,26 @@
+#!/bin/bash
+
+#
+# Link all ocaml object files with the needed libraries.
+#
+
+if [ "X$VAMDIR" = "X" ] 
+then
+	VAMDIR=/amoeba/Vam-1.5
+fi
+
+
+$VAMDIR/bin/vamrun -b $VAMDIR/ocamlsys/bin/ocamlc 	\
+	-I $VAMDIR/interface			\
+	-I $VAMDIR/lib				\
+	-I $VAMDIR/ocamlsys/lib/ocaml		\
+	-I $VAMDIR/ocamlsys/lib/ocaml/threads	\
+	-thread -use-runtime $VAMDIR/bin/vamrun	\
+	os.cma					\
+	unix.cma str.cma 			\
+	threads.cma 				\
+	amoeba.cma				\
+	xlib.cma 				\
+	wxlib.cma 				\
+	$@
+
