@@ -1,0 +1,377 @@
+
+ 
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+  <title>MANDoc manual document</title>
+  <meta name="GENERATOR" content="HelpSys">
+  <meta name="KEYWORDS" content="MANDoc, manual, document, MANdoc">
+</head>
+<body style="text-align: justify; background-color: #FFFFFF">
+
+<A NAME="S1Section1"><P></P></A>
+<br>
+<br><TABLE BORDER="0" ALIGN="center" WIDTH="100%">
+<TBODY>
+<TR STYLE="background-color: #FFFF00">
+<TD ALIGN="center"><B>S1 Section </B></TD>
+</TR>
+</TBODY>
+</TABLE>
+<br>
+
+<P>
+The first Section in the document. <br>
+Some more paragraphs... </P>
+
+<A NAME="S2Subsection2"><P></P></A>
+<br>
+<br><TABLE BORDER="0" ALIGN="center" WIDTH="100%">
+<TBODY>
+<TR >
+<TD WIDTH="50%" ALIGN="left" STYLE="background-color: #FFA000"><B>S2 Subsection </B></TD>
+<TD WIDTH="50%" ALIGN="right" STYLE="background-color: #FFFF00"><B><I> S1 Section</I></B></TD>
+</TR>
+</TBODY>
+</TABLE>
+<br>
+
+<P>
+The first subsection inside the section. </P>
+
+<A NAME="S2Subsection23"><P></P></A>
+<br>
+<br><TABLE BORDER="0" ALIGN="center" WIDTH="100%">
+<TBODY>
+<TR >
+<TD WIDTH="50%" ALIGN="left" STYLE="background-color: #FFA000"><B>S2 Subsection 2 </B></TD>
+<TD WIDTH="50%" ALIGN="right" STYLE="background-color: #FFFF00"><B><I> S1 Section</I></B></TD>
+</TR>
+</TBODY>
+</TABLE>
+<br>
+
+<P>
+The next subsection. </P>
+
+<A NAME="S3Unit4"><P></P></A>
+<br>
+<br><TABLE BORDER="0" ALIGN="center" WIDTH="100%">
+<TBODY>
+<TR >
+<TD WIDTH="50%" ALIGN="left" STYLE="background-color: #B0FF00"><B>S3 Unit </B></TD>
+<TD WIDTH="50%" ALIGN="right" STYLE="background-color: #FFA000"><B><I> S2 Subsection 2</I></B></TD>
+</TR>
+</TBODY>
+</TABLE>
+<br>
+
+<P>
+This kind of unit is often used. </P>
+
+<DL>
+<DT><B>S4 Named Paragraph </B></DT>
+<DD><br>
+<P>
+More words... </P>
+
+</DD><br>
+
+<P>
+A data format table: </P>
+<br><br><TABLE BORDER="1" ALIGN="center" >
+<TBODY>
+<TR>
+<TD STYLE="background-color: #C1FFFF" ALIGN="center"COLSPAN=8><B>FLIP protocol header format </B>
+</TD>
+</TR>
+<TR>
+<TD><B>7 </B></TD>
+<TD><B>6 </B></TD>
+<TD><B>5 </B></TD>
+<TD><B>4 </B></TD>
+<TD><B>3 </B></TD>
+<TD><B>2 </B></TD>
+<TD><B>1 </B></TD>
+<TD><B>0 </B></TD>
+</TR>
+<TR>
+<TD colspan=2>Max HopCnt </TD>
+<TD colspan=2>Actual HopCnt </TD>
+<TD>Res. </TD>
+<TD>Res. </TD>
+<TD>Type </TD>
+<TD>Vers. </TD>
+</TR>
+</TBODY>
+</TABLE><br>
+
+<P>
+The following programming interface gives an impression of the MANDoc system. </P>
+<br><br>
+<TABLE BORDER="1" ALIGN="center" >
+<TBODY>
+<TR>
+<TD ALIGN="center" STYLE="background-color: #C1FFFF">Programming Interface: <I> ML </I> </TD>
+</TR>
+<TR>
+<TD ALIGN="left" >
+<TABLE BORDER="0" ALIGN="left" CELLSPACING="-5" >
+<TBODY>
+<TR>
+<TD>[&nbsp;</TD>
+<TD><I> ret1 </I>: int  * </TD><TD></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+
+</TR>
+<TR>
+<TD></TD>
+<TD><I> ret2 </I>: bool </TD><TD>&nbsp;]</TD>
+<TD>&nbsp;=&nbsp;</TD>
+<TD><B>ml_fun </B></TD>
+<TD>&nbsp;  ~arg : float  -&gt;</TD><TD></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+<TD>&nbsp;  ~kind : bool </TD><TD></TD>
+</TR>
+
+</TBODY>
+
+</TABLE>
+</TD>
+</TR>
+<TR>
+<TD ALIGN="left" >
+<TABLE BORDER="0" ALIGN="left" CELLSPACING="-5" >
+<TBODY>
+<TR>
+<TD style="color: #FF0000">external&nbsp;</TD>
+<TD><B>buf_physical </B>&nbsp;</TD>
+<TD>:&nbsp;</TD>
+<TD>size :  int  -&gt;</TD><TD></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+<TD> buffer </TD><TD></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+<TD>=&nbsp;"<B>= &quot;ext_buf_physical&quot; </B>"</TD>
+<TD></TD>
+
+</TR>
+
+</TBODY>
+
+</TABLE>
+</TD>
+</TR>
+</TBODY>
+</TABLE>
+<br>
+
+<P>
+Not only ML, C interfaces are supported, too. </P>
+<br><br>
+<TABLE BORDER="1" ALIGN="center" >
+<TBODY>
+<TR>
+<TD ALIGN="center" STYLE="background-color: #C1FFFF">Programming Interface: <I> ML </I> </TD>
+</TR>
+<TR>
+<TD ALIGN="left" >
+<TABLE BORDER="0" ALIGN="left" CELLSPACING="-5" >
+<TBODY>
+<TR>
+<TD>struct module_s </TD>
+<TD>&nbsp;</TD>
+<TD><B>mycfun </B>&nbsp;(</TD>
+<TD>int a , </TD>
+<TD></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+<TD>float b , </TD>
+<TD></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+<TD>struct module_s *p &nbsp;);</TD>
+<TD></TD>
+</TR>
+
+</TBODY>
+
+</TABLE>
+</TD>
+</TR>
+<TR>
+<TD ALIGN="left" >
+<TABLE BORDER="0" ALIGN="left" CELLSPACING="-5" >
+<TBODY>
+<TR>
+<TD>struct model &nbsp;</TD>
+<TD><B>myvar </B>;</TD>
+</TR>
+
+</TBODY>
+
+</TABLE>
+</TD>
+</TR>
+<TR>
+<TD ALIGN="left" >
+<TABLE BORDER="0" ALIGN="left" CELLSPACING="-5" >
+<TBODY>
+<TR>
+<TR>
+<TD style="color: #FF0000">struct &nbsp;</TD>
+<TD><B>c_struc &nbsp;</B>&nbsp;</TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+
+</TR>
+<TR>
+<TD> { &nbsp; </TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+
+</TR>
+<TR>
+<TD></TD>
+<TD>char name[20] ;</TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+
+</TR>
+<TR>
+<TD></TD>
+<TD>int len ;</TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+
+</TR>
+<TR>
+<TD></TD>
+<TD>float zahl ;</TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+
+</TR>
+<TR>
+<TD> }; </TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+<TD></TD>
+
+</TR>
+
+</TBODY>
+
+</TABLE>
+</TD>
+</TR>
+</TBODY>
+</TABLE>
+<br>
+
+<P>
+Now we have an image: </P>
+<DL>
+<DT></DT>
+<DD>
+<IMG ALT="Image" SRC="logo.png">
+
+<P>
+(Fig. 1) All the components of the VAMNET system together in an example configuration. <br>
+</P>
+
+</DD>
+</DL>
+<P><BR></P>
+<A NAME="S2single6"><P></P></A>
+<br>
+<br><TABLE BORDER="0" ALIGN="center" WIDTH="100%">
+<TBODY>
+<TR >
+<TD WIDTH="50%" ALIGN="left" STYLE="background-color: #FFA000"><B>S2 single </B></TD>
+
+</TR>
+</TBODY>
+</TABLE>
+<br>
+
+<P>
+One more isolated S2 section. A table: </P>
+
+<br><br><TABLE BORDER="1" ALIGN="center" >
+<TBODY>
+<TR>
+<TD STYLE="background-color: #C1FFFF" ALIGN="center"COLSPAN=2>Table </TD>
+</TR>
+<TR>
+<TD>The special interfaces are used to show ML or C functions, types, submodules and values. Only 
+the content must be given by the user, not the alignment. Commonly, they are collected in an 
+interface subunit. </TD>
+<TD>1+1=2 </TD>
+</TR>
+</TBODY>
+</TABLE><br>
+<br><br><TABLE BORDER="1" ALIGN="center" >
+<TBODY>
+<TR>
+<TD STYLE="background-color: #C1FFFF" ALIGN="center"COLSPAN=2>Table </TD>
+</TR>
+<TR>
+<TD>Operation </TD>
+<TD>1+1=2 </TD>
+</TR>
+</TBODY>
+</TABLE><br>
+<A NAME="NextSection17"><P></P></A>
+<br>
+<br><TABLE BORDER="0" ALIGN="center" WIDTH="100%">
+<TBODY>
+<TR STYLE="background-color: #FFFF00">
+<TD ALIGN="center"><B>Next Section 1 </B></TD>
+</TR>
+</TBODY>
+</TABLE>
+<br>
+
+<P>
+Here comes another section following the above main section. </P>
+
+<P><BR>
+<BR><P>
+<HR><P>
+<I>Generated by MANDoc (C) 2005 BSSLAB Dr. Stefan Bosse<BR>
+ Revision   1110724845 <BR>
+</I></P>
+
+</body>
