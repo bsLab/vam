@@ -1,0 +1,26 @@
+2003.11.23:
+    dns_touch now centralized called only by request_dir
+
+2004.01.03:
+    dns_req_rename added
+
+2004.01.11:
+    dns_time in server struct added
+    dr_time now initialized with dns_time
+
+2004.5.6:
+    release_dir bug in dns_req_lookup fixed
+    
+2004.5.9:
+    dns_req_age modified
+    dns_lock bug fixed
+    dns_delete_inode in server struct added
+
+2004.12.30:
+    sanity check for dns_req_append: name must be <> "" !!!
+
+2005.5.5:
+    added ncols check in create request
+
+2005.5.6:
+    changed from print to sys_log
