@@ -1,0 +1,5 @@
+2004.01.03:
+    dns_req_rename added
+
+2005.5.6:
+    changed from print to sys_log
