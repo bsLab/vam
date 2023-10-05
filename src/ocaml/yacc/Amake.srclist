@@ -1,0 +1,15 @@
+
+OCAML_YACC_SRC = {
+    $PWD/closure.c,
+    $PWD/error.c,
+    $PWD/lalr.c,
+    $PWD/lr0.c,
+    $PWD/main.c,
+    $PWD/mkpar.c,
+    $PWD/output.c,
+    $PWD/reader.c,
+    $PWD/skeleton.c,
+    $PWD/symtab.c,
+    $PWD/verbose.c,
+    $PWD/warshall.c,
+};
