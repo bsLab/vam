@@ -1,0 +1,7 @@
+2004.11.15:
+    added 32bpp mode
+    fixed 
+        depth 16, bits_per_pixel 16, scanline_pad 32
+        depth 24, bits_per_pixel 32, scanline_pad 32
+    bug
+
