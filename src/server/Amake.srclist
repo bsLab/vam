@@ -1,0 +1,35 @@
+#
+# Enable debug support:
+# xxx.ml[flags={-po,-DDEBUG}],
+#
+
+MODULE_SERVER_MLI = {
+    $PWD/dns_server.mli,
+    $PWD/afs_server.mli,
+    $PWD/afs_cache.mli,
+    $PWD/afu_server.mli,
+    $PWD/vamboot.mli,
+    $PWD/om.mli,
+    $PWD/disk_server.mli,
+};
+
+MODULE_SERVER_ML = {
+    $PWD/stdsrvparams.ml,
+    $PWD/dns_server.ml,
+    $PWD/dns_server_rpc.ml,
+    $PWD/afs_server.ml,
+    $PWD/afs_server_rpc.ml,
+    $PWD/afs_cache.ml,
+    $PWD/afu_server.ml,
+    $PWD/vtty_server.ml,
+    $PWD/vamboot.ml,
+    $PWD/om.ml,
+    $PWD/disk_pc86.ml,
+    $PWD/disk_server.ml,
+    $PWD/disk_server_rpc.ml,
+    $PWD/bootdisk_common.ml,
+    $PWD/bootdisk_server.ml,
+    $PWD/bootdisk_server_rpc.ml,
+    $PWD/debugger.ml,
+};
+
