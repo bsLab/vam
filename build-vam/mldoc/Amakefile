@@ -1,0 +1,59 @@
+#
+# Help Module Amakefile
+#
+
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include $VAMDIR/src/mldoc/Amake.srclist;
+
+
+#
+# Special include paths
+#
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/mldoc,
+    -I,
+    $INSTALLDIR/ocamlsys/lib/ocaml/sys,
+};
+
+#
+# All the sources together
+#
+
+CAMLSRC = {
+    $MODULE_MLDOC_MLI,
+    $MODULE_MLDOC_ML[flags = {'-g'}], 
+};
+
+
+#
+# Target libraries
+#
+
+#
+# CaML library
+#
+
+CAMLLIB     = mldoc.cma;
+
+
+
+%include $VAMDIR/toolset/ocaml.lib;
+%include $VAMDIR/toolset/ocaml.sys;
+
+%instance libcluster($CAMLLIB,$CAMLSRC);
+VM = $INSTALLDIR/bin/vamrun;
+PLIBS = {
+    unix.cma,
+    str.cma,
+    mldoc.cma,
+};    
+                                    
+%instance bytecode-exe(mld,$PLIBS,$VM,$MLD_ML);
+
+
+ 
