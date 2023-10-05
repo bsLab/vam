@@ -1,0 +1,20 @@
+2003.11.24:
+    server statistics added
+
+2004.1.11:
+    dns_time added (10s units!)
+
+2004.5.9:
+    dns_delete_dir changed and dns_delete_inode added
+
+2005.1.2:
+    added some block conversion routines
+    changed to default blocksize for inodes
+
+2005.5.6:
+    added ncols check in buf_get_row
+
+2005.5.8:
+    changed from print to sys_log
+
+    
