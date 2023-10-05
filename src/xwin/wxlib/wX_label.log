@@ -1,0 +1,6 @@
+2002:
+    font_width changed to (string_width font str) 
+
+2003.12.01:
+    X.clearArea added to refresh
+
