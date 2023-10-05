@@ -1,0 +1,47 @@
+#
+#  THIS SOFTWARE IS OWNED AND COPYRIGHTED BY
+#
+#    ###     ####   ####               #         ##         #####
+#    #  #    #      #                 #         # #        #     #
+#    #   #   #      #                #         #  #       #      #
+#    #   #   #      #               #         #   #      #      #   
+#    ####    ####   ####  ####     #         ######     ########
+#    #   #      #      #          #         #     #    #      #
+#    #   #      #      #         #         #      #   #       #
+#    #  #       #      #        #         #       #  #       #
+#    ###     ####   ####       ######### #        # #########
+#
+#    Stefan Bosse (c) 2003
+#   
+#  THIS SOFTWARE MAY NOT BE COPIED, EXTRACTED, MODIFIED, OR 
+#  OTHERWISE USED IN A CONTEXT OUTSIDE OF THE VAM SYSTEM.
+# 
+#
+#
+# Build CaML libraries (opt assem versions)
+#
+#
+# Version 1.01
+#
+
+%include common.amk;
+
+%include $PWD/ocaml.types;
+%include $PWD/ocaml-tools.common;
+
+
+#
+# Build a CaML libraray from the sources.
+#
+
+%generic libcluster(camllib,camlsrc)
+{
+    %default $camllib;
+    %cluster 
+    {
+        %targets    $camllib;
+        %sources    $camlsrc;
+    };
+};
+
+
