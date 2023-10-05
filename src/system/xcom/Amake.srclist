@@ -1,0 +1,8 @@
+XCOM_SRC = {
+    $PWD/xcom.mli,
+    $PWD/xcom.ml
+};
+
+XCOM_MAIN_SRC = {
+    $PWD/main.ml,
+};
