@@ -1,0 +1,13 @@
+
+
+MODULE_DDI_MLI = {
+    $PWD/ddi.mli,
+};
+
+MODULE_DDI_ML = {
+    $PWD/ddi.ml,
+};
+
+MODULE_DDI_C = {
+    $PWD/ddi_ext.c,
+};
