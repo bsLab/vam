@@ -1,0 +1,77 @@
+#!/bin/bash
+
+source ../../toolset/build.env
+
+
+if [ $# = 0 ]
+then
+    echo "Usage: build <targets>"
+    echo "Targets: all clean install"
+    exit 1
+fi
+
+check ()
+{
+    if [ $? != 0 ]
+    then
+        echo "Abort due to errors building target."
+        exit 1
+    fi
+}
+
+
+for TARGET in $@
+do
+    echo "Building target [$TARGET] ..."
+    case $TARGET in
+        all)    $AMAKE config.h
+                check
+                $AMAKE jumptbl.h
+                check
+                $AMAKE prims.c
+                check
+                $AMAKE libcamlrun.a
+                check
+                $AMAKE ocamlrun
+                check
+                ;;
+        clean)  $AMAKE -C
+                $RM interface/*
+                $RM primitives
+                ;;
+        install)    
+                $INSTALL -d $INSTALLDIR/ocamlsys
+                $INSTALL -d $INSTALLDIR/ocamlsys/bin
+                $INSTALL -d $INSTALLDIR/ocamlsys/lib
+                $INSTALL -d $INSTALLDIR/ocamlsys/lib/ocaml
+                $INSTALL -d $INSTALLDIR/ocamlsys/lib/ocaml/caml
+                $INSTALL -C libcamlrun.a $INSTALLDIR/ocamlsys/lib/ocaml
+                $INSTALL -C ocamlrun $INSTALLDIR/ocamlsys/bin
+                $INSTALL -C config.h $INSTALLDIR/ocamlsys/lib/ocaml/caml
+                $INSTALL -C $VAMDIR/src/ocaml/byterun/alloc.h $INSTALLDIR/ocamlsys/lib/ocaml/caml
+                $INSTALL -C $VAMDIR/src/ocaml/byterun/callback.h $INSTALLDIR/ocamlsys/lib/ocaml/caml
+                $INSTALL -C $VAMDIR/src/ocaml/byterun/custom.h $INSTALLDIR/ocamlsys/lib/ocaml/caml
+                $INSTALL -C $VAMDIR/src/ocaml/byterun/fail.h $INSTALLDIR/ocamlsys/lib/ocaml/caml
+                $INSTALL -C $VAMDIR/src/ocaml/byterun/io.h $INSTALLDIR/ocamlsys/lib/ocaml/caml
+                $INSTALL -C $VAMDIR/src/ocaml/byterun/memory.h $INSTALLDIR/ocamlsys/lib/ocaml/caml
+                $INSTALL -C $VAMDIR/src/ocaml/byterun/misc.h $INSTALLDIR/ocamlsys/lib/ocaml/caml
+                $INSTALL -C $VAMDIR/src/ocaml/byterun/mlvalues.h $INSTALLDIR/ocamlsys/lib/ocaml/caml
+                $INSTALL -C $VAMDIR/src/ocaml/byterun/roots.h $INSTALLDIR/ocamlsys/lib/ocaml/caml
+                $INSTALL -C $VAMDIR/src/ocaml/byterun/signals.h $INSTALLDIR/ocamlsys/lib/ocaml/caml
+                $INSTALL -C $VAMDIR/src/ocaml/byterun/stacks.h $INSTALLDIR/ocamlsys/lib/ocaml/caml
+                $INSTALL -C $VAMDIR/src/ocaml/byterun/sys.h $INSTALLDIR/ocamlsys/lib/ocaml/caml
+
+                $INSTALL -C $VAMDIR/src/ocaml/byterun/gc.h $INSTALLDIR/ocamlsys/lib/ocaml/caml
+                $INSTALL -C $VAMDIR/src/ocaml/byterun/minor_gc.h $INSTALLDIR/ocamlsys/lib/ocaml/caml
+                $INSTALL -C $VAMDIR/src/ocaml/byterun/major_gc.h $INSTALLDIR/ocamlsys/lib/ocaml/caml
+                $INSTALL -C $VAMDIR/src/ocaml/byterun/freelist.h $INSTALLDIR/ocamlsys/lib/ocaml/caml
+                $INSTALL -C $VAMDIR/src/ocaml/byterun/prims.h $INSTALLDIR/ocamlsys/lib/ocaml/caml
+                $INSTALL -C $VAMDIR/src/ocaml/byterun/backtrace.h $INSTALLDIR/ocamlsys/lib/ocaml/caml
+                $INSTALL -C $VAMDIR/src/ocaml/byterun/interp.h $INSTALLDIR/ocamlsys/lib/ocaml/caml
+
+                ;;
+        
+    esac
+done
+
+echo "Done."
