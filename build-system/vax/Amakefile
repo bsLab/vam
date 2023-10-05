@@ -1,0 +1,49 @@
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include $VAMDIR/src/system/vax/Amake.srclist;
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/system/vax,
+    -I,
+    $INSTALLDIR/interface,
+    -I,
+    $INSTALLDIR/lib,
+};
+
+
+DEFINES = {
+    -g,
+    -DDEBUG,
+};
+
+SRC = {
+    $SRC_VAX
+};
+
+LIB = vax.cma;
+
+%include $VAMDIR/toolset/ocaml.lib;
+%include $VAMDIR/toolset/ocaml.sys;
+
+%instance libcluster($LIB,$SRC);
+
+
+PNAME = vax;
+PLIBS = {
+    debug.cma,
+    buffer.cma,
+    unix.cma,
+    str.cma,
+    threads.cma,
+    os.cma,
+    $VAMDIR/lib/amoeba.cma,
+    server.cma,
+    vax.cma,
+};
+
+VM = $INSTALLDIR/bin/vamrun;
+%instance bytecode-exe($PNAME,$PLIBS,$VM,$SRC_VAX_MAIN);
+
