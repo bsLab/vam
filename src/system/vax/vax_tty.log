@@ -1,0 +1,4 @@
+2005.1.2:
+    increased tty_in/out circular buffer size to 30000 bytes
+    to hold at least one max sized request!
+    also, the tty_REQBUFSZ size was increased to 30000 bytes!
