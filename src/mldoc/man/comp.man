@@ -1,0 +1,31 @@
+.S2
+  .NA Compilation and usage of the MlDoC package .AN
+  First you must compile the package, consisting of the core module,
+  the backend and the frontend modules.
+  Here the steps needed for the case you use the generic OCaML system,
+  version 3.XX:
+  
+  .{
+    ocamlc -c doc_core.ml
+    ocamlc -c doc_html.ml
+    ocamlc -c doc_latex.ml
+    ocamlc -c doc_text.ml
+    ocamlc -c doc_help.ml
+    ocamlc -a *.cmo -o mldoc.cma
+  .}
+  
+  You need the .NA Terminfo .AN interface file .T terminfo.cmi .R to
+  be able to compile the .NA Doc_text .AN module. .NL
+  
+  For .NA VamSyS .AN users:
+  
+  .{
+    vamcomp doc_core.ml
+    vamcomp doc_html.ml
+    vamcomp doc_latex.ml
+    vamcomp doc_text.ml
+    vamcomp doc_help.ml
+    vamar *.cmo -o mldoc.cma
+  .}
+
+.2S
