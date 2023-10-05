@@ -1,0 +1,10 @@
+2002:
+    standard setting attributes for orig_with_label class changed
+    standard button font changed
+
+2003.12.1:
+    with_label class restructured (set label method bug fixed)
+    set_external_switch method introduced
+    Button handling changed to new external control
+
+    
