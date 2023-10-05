@@ -1,0 +1,72 @@
+(* $Id *)
+
+ (*:wX_types*)
+
+ (*:wX_adjust*)
+
+ (*:wX_display*)
+
+ (*:wX_screen*)
+
+ (*:wX_base*)
+
+ (*:wX_object*)
+
+ (*:wX_root*)
+
+ (*:wX_top*)
+
+ (*:wX_dummy*)
+
+ (*:wX_bar*)
+
+ (*:wX_table*)
+
+ (*:wX_scrollbar*)
+
+ (*:wX_label*)
+
+ (*:wX_pixmap*)
+
+ (*:wX_viewport*)
+
+ (*:wX_text*)
+
+ (*:wX_button*)
+
+ (*:wX_popup*)
+
+ (*:wX_selector*)
+
+ (*:wX_deleg*)
+
+ (*:wX_port*)
+
+ (*:wX_wmtop*)
+
+  (*:wX_appli*)
+
+ (*:wX_dialog*)
+
+ (*:wX_dummy*)
+
+ (*:wX_panel*)
+
+ (*:wX_scale*)
+
+ (*:wX_ledit*)
+
+ (*:wX_radiobutton*)
+
+ (*:wX_Graphics*)
+
+ (*:wX_xterm*)
+
+ (*:wX_tree*)
+
+ (*:wX_swap*)
+
+ (*:wX_notebook*)
+
+
+
