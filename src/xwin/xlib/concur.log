@@ -1,0 +1,10 @@
+2002.0.0:
+    more comments (in english)
+    pthreads support
+    listener thread now close the Unix socket connection
+    Thread support changed
+    moved all OS dependent functions to Xos
+    X connection shutdown now sync'ed
+
+2003.12.03:
+    Caught Unix.error EAGAIN -> sleep short time and try again
