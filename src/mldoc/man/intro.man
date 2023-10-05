@@ -1,0 +1,132 @@
+.IO
+  The .NA MlDoC .AN system is a powerfull but 'simple as needed' 
+  documentation tool for
+  ML programming projects. With .NA MlDoC .AN , a document is divided in
+  the document head, sections, subsections, units and subunits. Subunits
+  can be used in all parts up, and the lowest structure elements are generic
+  paragraph elements like lists or text attributes. .B This document you
+  are currently reading is of course written and printed with the
+  .NA MlDoC .AN System. .R .NL
+  The table below shows an overview about .NA MlDoC .AN and it's 
+  capabilities.
+  
+  .TB
+    .TH Document structure .HT
+    .TR 
+      .TC .B Document head .R .CT
+      .TC .B Sections .R .CT
+      .TC .B Subsections .R .CT
+      .TC .B Units .R .CT
+      .TC .B Subunits .R .CT
+      .TC .B Paragraph elements .R .CT
+    .RT
+    .TR
+      .TC Title .CT
+      .TC Package .CT
+      .TC Module .CT
+      .TC ML-Function .CT
+      .TC Named Paragraph .CT
+      .TC Text Attributes .CT  
+    .RT
+    .TR
+      .TC TOC .CT
+      .TC Program .CT
+      .TC C-Lib .CT
+      .TC ML-Type .CT
+      .TC Interface .CT
+      .TC Ordered List .CT
+    .RT
+    .TR
+      .TC .CT
+      .TC .CT
+      .TC .CT
+      .TC ML-Value .CT
+      .TC Example .CT
+      .TC Unordered List .CT
+    .RT
+    .TR
+      .TC .CT
+      .TC .CT
+      .TC .CT
+      .TC ML-Class .CT
+      .TC .CT
+      .TC Table .CT
+    .RT
+    .TR
+      .TC .CT
+      .TC .CT
+      .TC .CT
+      .TC ML-Module .CT
+      .TC .CT
+      .TC Name .CT
+    .RT
+    .TR
+      .TC .CT
+      .TC .CT
+      .TC .CT
+      .TC C-Interface .CT
+      .TC .CT
+      .TC Link .CT
+    .RT
+    .TR
+      .TC .CT
+      .TC Generic S1 .CT
+      .TC Generic S2 .CT
+      .TC Generic S3 .CT
+      .TC Generic S4 .CT
+      .TC Special Interfaces .CT
+    .RT
+    .TR
+      .TC Intro .CT
+      .TC Intro .CT
+      .TC Intro .CT
+      .TC Intro .CT
+      .TC Intro .CT
+      .TC .CT
+    .RT
+  .BT  
+
+  It's not necessary to use all structure depths starting
+  with the document head. For example you
+  can start with the .NA ML-Function .AN unit in a small standalone
+  document. The units are compareable with common manual pages. .NL 
+
+  Units are sub document headers, and subunits and introductions
+  can be placed everywhere in the document. .NL
+
+  The document structure is organized in the way .NA OCaML .AN structures 
+  libraries, modules and values, classes and sub modules. But .NA MlDoC .AN
+  can also be used to provide documentation for programs, C libraries or other
+  nice things you want to write about. For these purposes, generic
+  sections, units and subunits can be used. .NL 
+
+  The .NA Special interface .AN element is used to show ML-function, value, 
+  type and sub module interfaces with an unique look, mostly embedded 
+  in the .NA Interface .AN subunit. .NL 
+ 
+  All document commands are preceeded with a dot and followed by one or
+  two uppercase characters. This is a formatting language which is similar 
+  to .NA TROFF .AN macros. Each dot command must have an antidot command to
+  close a partial environment. For example, an ordered list like
+
+   
+  .OL
+    .LI Line 1 .IL
+    .LI Line 2 .IL
+    .LI ... .IL
+  .LO 
+
+  is coded with the following commands:
+
+  .{
+  .[ .OL .]
+    .# .[ .LI Line 1 .IL .]
+    .# .[ .LI Line 2 .IL .]
+    .# .[ .LI ... .IL .]
+  .[ .LO .]
+  .}
+
+  The antidot command is build with the reversed order of the two characters
+  from the dot command. There is one excpetion: text attributes and some
+  special commands. They all have only one uppercase character. 
+.OI
