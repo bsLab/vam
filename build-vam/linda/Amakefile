@@ -1,0 +1,61 @@
+#
+# Manual  Module Amakefile
+#
+
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include $VAMDIR/src/linda/Amake.srclist;
+
+
+#
+# Special include paths
+#
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/linda,
+    -I,
+    $VAMDIR/src/amoeba,
+    -I,
+    $VAMDIR/build-vam/amoeba/interface,
+    -I,
+    $VAMDIR/build-vam/threads/interface,
+    -I,
+    $VAMDIR/build-vam/buffer/interface,
+};
+
+#
+# All the sources together
+#
+
+CAMLSRC = {
+    $MODULE_LINDA_MLI,
+    $MODULE_LINDA_ML[flags = {'-g'}], 
+    $MODULE_LINDA_C,
+};
+
+
+#
+# Target libraries
+#
+
+#
+# CaML library
+#
+
+CAMLLIB     = linda.cma;
+
+#
+# C library (for Custom link mode), if any.
+#
+
+CUSTOMLIB   = liblinda_ext.a;
+
+
+%include $VAMDIR/toolset/ocaml.lib;
+%include $VAMDIR/toolset/ocaml.sys;
+
+%instance customlibcluster($CAMLLIB,$CUSTOMLIB,$CAMLSRC);
+
