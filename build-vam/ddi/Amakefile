@@ -1,0 +1,64 @@
+#
+# Amoeba Module Amakefile
+#
+
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include $VAMDIR/src/ddi/Amake.srclist;
+
+
+#
+# Special include paths
+#
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/ddi,
+    -I,
+    $VAMDIR/src/buffer,
+    -I,
+    $VAMDIR/build-vam/amoeba/interface,
+    -I,
+    $VAMDIR/build-vam/buffer/interface,
+};
+
+CINCLUDES = {
+    $CINCLUDES,
+    -I$VAMDIR/src/buffer,
+    -I$VAMDIR/src/amoeba,
+};
+
+#
+# All the sources together
+#
+
+CAMLSRC = {
+    $MODULE_DDI_MLI,
+    $MODULE_DDI_ML, 
+    $MODULE_DDI_C
+};
+
+#
+# Target libraries
+#
+
+#
+# CaML library
+#
+
+CAMLLIB     = ddi.cma;
+
+#
+# C library (for Custom link mode), if any.
+#
+
+CUSTOMLIB   = libddi_ext.a;
+
+
+%include $VAMDIR/toolset/ocaml.lib;
+
+%instance customlibcluster($CAMLLIB,$CUSTOMLIB,$CAMLSRC);
+
+ 
