@@ -1,0 +1,49 @@
+(* $Id *)
+
+(*2 Types module *)
+
+(*:xtypes*)
+
+(*2 Main modules *)
+
+(*:xlib*)
+(*:x*)
+(*:keyBind*)
+(*:xGraphics*)
+
+(*2 Modules for Extensions *)
+
+(*:xpm*)
+(*:xmu*)
+(*:icccm*)
+(*:shape*)
+(*:zpixmap*)
+(*:selection*)
+(*:xrm*)
+
+(*2 Modules for Constants *)
+
+(*:xA*) (* Atoms *)
+(*:xC*) (* Cursors *)
+(*:xK*) (* Key Symbols *)
+
+(*2 Modules for Synchronous/Asynchronous requests *)
+
+(*:xsync*)
+(*:xasync*)
+
+(*2 Internal modules *)
+
+(*:display*)
+(*:eloop*)
+(*:equeue*)
+(*:jeton*)
+(*:ll_trans*)
+(*:wintbl*)
+(*:xauth*)
+(*:xbuffer*)
+(*:xdebug*)
+(*:xfifo*)
+(*:xproto*)
+(*:xterm*)
+(*:xtext*)
