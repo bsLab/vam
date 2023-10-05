@@ -1,0 +1,21 @@
+
+  (************************************************************
+  
+  The compatibility with threads is expensive. A special version may
+  be useful when there is no threads.
+  
+  *)
+
+open Xbuffer
+  
+let newBuffer len = String.create (len*4)
+
+let bufSize buf = String.length buf lsr 2
+
+let readBuffer () = String.create 32
+let addBuffer buf len =
+  if len > 0 then
+    let b2 = newString (len+8) in
+    string_blit buf 0 b2 0 32;
+    b2
+  else buf
