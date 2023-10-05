@@ -1,0 +1,2 @@
+2006.2.22:
+    matrix_ext.c: fixed dimension=1 case !!!
