@@ -1,0 +1,135 @@
+	branch L5
+L1:	const 1
+	push
+	const 20
+	push
+	branch L10
+L9:	check_signals
+	const 100
+	push
+	acc 2
+	mulint
+	push
+	acc 0
+	push
+	acc 3
+	push
+	envacc 2
+	apply 2
+	acc 0
+	push
+	acc 3
+	push
+	envacc 1
+	apply 2
+	const 0a
+	pop 1
+	acc 1
+	offsetint 1
+	assign 1
+L10:	acc 0
+	push
+	acc 2
+	leint
+	branchif L9
+	const 0a
+	pop 2
+	const 1
+	return 1
+	restart
+L2:	grab 1
+	const 0
+	push
+	const 0
+	push
+	const 100
+	push
+	branch L8
+L7:	check_signals
+	acc 4
+	push
+	acc 4
+	addint
+	push
+	acc 5
+	push
+	acc 5
+	subint
+	push
+	acc 0
+	push
+	acc 2
+	push
+	envacc 1
+	apply 2
+	assign 4
+	pop 2
+	acc 1
+	offsetint 1
+	assign 1
+L8:	acc 0
+	push
+	acc 2
+	leint
+	branchif L7
+	const 0a
+	pop 2
+	acc 0
+	return 3
+	restart
+L3:	grab 1
+	const 0
+	push
+	const 1
+	ccall make_vect, 2
+	push
+	acc 2
+	push
+	acc 2
+	addint
+	push
+	const 2
+	push
+	const 2
+	push
+	acc 3
+	ccall array_set_addr, 3
+	acc 0
+	push
+	const 0
+	ltint
+	strictbranchifnot L6
+	const "Backtrace test"
+	push
+	getglobal Pervasives!
+	getfield 2
+	apply 1
+L6:	acc 0
+	return 4
+L4:	const 0a
+	ccall extraise, 1
+	return 1
+L5:	const "Backtrace.Bt_test"
+	makeblock 1, 0
+	push
+	closure L4, 0
+	push
+	closure L3, 0
+	push
+	acc 0
+	closure L2, 1
+	push
+	acc 0
+	push
+	acc 2
+	closure L1, 2
+	push
+	acc 0
+	push
+	acc 2
+	push
+	acc 6
+	makeblock 3, 0
+	pop 5
+	setglobal Backtrace!
+
