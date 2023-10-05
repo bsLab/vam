@@ -1,0 +1,8 @@
+2004.01.03:
+    dns_rename added
+    dns_lookup/setlookup renamed
+
+2005.5.3:
+    dns_append added
+    dns_delete added
+
