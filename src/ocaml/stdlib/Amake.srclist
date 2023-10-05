@@ -1,0 +1,100 @@
+
+OCAML_STDLIB_ML = {
+    $PWD/pervasives.ml[flags={-nopervasives}],
+    $PWD/array.ml,
+    $PWD/list.ml,
+    $PWD/char.ml,
+    $PWD/string.ml,
+    $PWD/sys.ml,
+    $PWD/hashtbl.ml,
+    $PWD/sort.ml,
+    $PWD/marshal.ml,
+    $PWD/obj.ml,
+    $PWD/lexing.ml,
+    $PWD/parsing.ml,
+    $PWD/set.ml,
+    $PWD/map.ml,
+    $PWD/stack.ml,
+    $PWD/queue.ml,
+    $PWD/stream.ml,
+    $PWD/buffer.ml,
+    $PWD/printf.ml,
+    $PWD/format.ml,
+    $PWD/arg.ml,
+    $PWD/printexc.ml,
+    $PWD/gc.ml,
+    $PWD/digest.ml,
+    $PWD/random.ml,
+    $PWD/oo.ml,
+    $PWD/genlex.ml,
+    $PWD/callback.ml,
+    $PWD/weak.ml,
+    $PWD/lazy.ml,
+    $PWD/filename.ml,
+    $PWD/int32.ml,
+    $PWD/int64.ml,
+    $PWD/nativeint.ml,
+
+
+    $PWD/arrayLabels.ml[flags={-nolabels}],
+    $PWD/moreLabels.ml[flags={-nolabels}],
+    $PWD/listLabels.ml[flags={-nolabels}],
+    $PWD/stringLabels.ml[flags={-nolabels}],
+    $PWD/stdLabels.ml[flags={-nolabels}],
+
+    
+};
+
+OCAML_STDLIB_MLI = {
+    $PWD/pervasives.mli[flags={-nopervasives}],
+    $PWD/array.mli,
+    $PWD/list.mli,
+    $PWD/char.mli,
+    $PWD/string.mli,
+    $PWD/sys.mli,
+    $PWD/hashtbl.mli,
+    $PWD/sort.mli,
+    $PWD/marshal.mli,
+    $PWD/obj.mli,
+    $PWD/lexing.mli,
+    $PWD/parsing.mli,
+    $PWD/set.mli,
+    $PWD/map.mli,
+    $PWD/stack.mli,
+    $PWD/queue.mli,
+    $PWD/stream.mli,
+    $PWD/buffer.mli,
+    $PWD/printf.mli,
+    $PWD/format.mli,
+    $PWD/arg.mli,
+    $PWD/printexc.mli,
+    $PWD/gc.mli,
+    $PWD/digest.mli,
+    $PWD/random.mli,
+    $PWD/oo.mli[flags={-nopervasives}],
+    $PWD/genlex.mli,
+    $PWD/callback.mli,
+    $PWD/weak.mli,
+    $PWD/lazy.mli,
+    $PWD/filename.mli,
+    $PWD/int32.mli,
+    $PWD/int64.mli,
+    $PWD/nativeint.mli,
+
+    $PWD/arrayLabels.mli[flags={-nolabels}],
+    $PWD/listLabels.mli[flags={-nolabels}],
+    $PWD/stringLabels.mli[flags={-nolabels}],
+    $PWD/moreLabels.mli[flags={-nolabels}],
+    $PWD/stdLabels.mli[flags={-nolabels}],
+
+    
+};
+
+OCAML_STDLIB_SRC = {
+    $OCAML_STDLIB_ML,
+    $OCAML_STDLIB_MLI, 
+};
+
+OCAML_STDLIB_STDEXIT = {
+    $PWD/std_exit.ml
+};
