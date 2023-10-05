@@ -1,0 +1,48 @@
+#!/bin/bash
+
+source ../../toolset/build.env
+
+if [ $# = 0 ]
+then
+    echo "Usage: build <targets>"
+    echo "Targets: all clean install"
+    exit 1
+fi
+
+check ()
+{
+    if [ $? != 0 ]
+    then
+        echo "Abort due to errors building target."
+        exit 1
+    fi
+}
+
+
+for TARGET in $@
+do
+    echo "Building target [$TARGET] ..."
+    case $TARGET in
+        all)    $AMAKE threads.cma
+                check
+                ;;
+        clean)  $AMAKE -C
+                $RM interface/*
+                ;;
+        install)    
+                $INSTALL -d $INSTALLDIR/lib
+                $INSTALL -d $INSTALLDIR/interface
+                $INSTALL -d $INSTALLDIR/ocamlsys/lib/ocaml
+                $INSTALL -d $INSTALLDIR/ocamlsys/lib/ocaml/threads
+
+
+                $INSTALL -C interface/sema.cmi $INSTALLDIR/interface   
+
+                $INSTALL -C $VAMDIR/src/threads/thread.mli $INSTALLDIR/ocamlsys/lib/ocaml
+
+                $INSTALL -C threads.cma $INSTALLDIR/ocamlsys/lib/ocaml/threads
+                $INSTALL -C libthreads.a $INSTALLDIR/ocamlsys/lib/ocaml/threads
+                $INSTALL -C interface/thread.cmi $INSTALLDIR/ocamlsys/lib/ocaml/threads
+                $INSTALL -C interface/mutex.cmi $INSTALLDIR/ocamlsys/lib/ocaml/threads
+    esac
+done
