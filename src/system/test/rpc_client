@@ -1,0 +1,114 @@
+(*
+**      ==================================
+**      OOOO   OOOO OOOO  O      O   OOOO
+**      O   O  O    O     O     O O  O   O
+**      O   O  O    O     O     O O  O   O
+**      OOOO   OOOO OOOO  O     OOO  OOOO
+**      O   O     O    O  O    O   O O   O
+**      O   O     O    O  O    O   O O   O
+**      OOOO   OOOO OOOO  OOOO O   O OOOO
+**      ================================== 
+**      BSSLAB, Dr. Stefan Bosse sci@bsslab.de
+**
+**    PROTECTED BY AND DISTRIBUTED UNDER THE TERMS OF: 
+**    Free Software Foundation-Europe, GNU GPL License, Version 2
+**
+**    $MODIFIEDBY:  BSSLAB
+**    $AUTHORS:     
+**    $INITIAL:     (C)
+**    $CREATED:     
+**    $MODIFIED:    
+**    $VERSION:     1.01
+**
+**    $INFO:
+**
+** RPC test program
+**
+**
+**    $ENDOFINFO
+**
+*)
+
+open Amoeba ;;
+open Stderr ;;
+open Stdcom ;;
+open Rpc ;;
+open Bytebuf ;;
+
+let bufsize = 1000000 ;;
+let n1 = 1000 ;;
+let n2 = 5000 ;;
+let port str = Port (let p = String.create port_SIZE in 
+                        let n = min port_SIZE (String.length str) in
+                        for i = 0 to n-1
+                        do
+                            p.[i] <- str.[i];
+                        done; p) 
+;;
+
+
+let t1 down =
+    let getport = port "Test" in
+    let putport = priv2pub getport in
+    let buf = buf_create bufsize in
+    let hdr = header_new () in
+
+    hdr.h_size <- 1;      
+    hdr.h_port <- putport;
+    ignore(trans (hdr,nilbuf,0,nilbuf,0));
+
+    let s1 = Unix.time () in
+    for i = 0 to n1-1
+    do
+        hdr.h_size <- bufsize;
+        hdr.h_port <- putport;
+        let err,repsize,hdr = trans (hdr,buf,bufsize,nilbuf,0) in
+        ();
+    done;
+    let s2 = Unix.time () in
+    let tot = (bufsize*n1) in
+    let st = (s2-.s1) in
+    Printf.printf "RPC: %d MB oneway transferred (framesize=%d kB) with rate: %4.1f MB/s\n"
+                  (tot/(1024*1024)) (bufsize/1024) 
+                  ((float_of_int tot)/.st/.(1024.0*.1024.0));  
+
+    print_newline ();
+    if (down) then
+    begin
+        hdr.h_size <- 0;      
+        hdr.h_port <- putport;
+        ignore(trans (hdr,nilbuf,0,nilbuf,0));
+    end;
+;;
+let t2 down =
+    let getport = port "Test" in
+    let putport = priv2pub getport in
+    let buf = buf_create bufsize in
+    let hdr = header_new () in
+
+    hdr.h_size <- 1;      
+    hdr.h_port <- putport;
+    ignore(trans (hdr,nilbuf,0,nilbuf,0));
+
+    let s1 = Unix.time () in
+    for i = 0 to n2-1
+    do
+        hdr.h_size <- 1;
+        hdr.h_port <- putport;
+        let err,repsize,hdr = trans (hdr,nilbuf,0,nilbuf,0) in
+        ();
+    done;
+    let s2 = Unix.time () in
+    let st = (s2-.s1) in
+    Printf.printf "RPC: NULL rpc latency: %4.1f usec\n"
+                    (st/.(float_of_int n2)*.1000000.0);  
+
+    if (down) then
+    begin
+        hdr.h_size <- 0;      
+        hdr.h_port <- putport;
+        ignore(trans (hdr,nilbuf,0,nilbuf,0));
+    end;
+;;    
+
+let _ = t2 true ;;
