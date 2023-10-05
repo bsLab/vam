@@ -1,0 +1,33 @@
+  .S2
+    .NA Subsection headers .AN
+
+    Subsections are used to group for example functions, values or
+    other ML things. Commonly, a subsection is a part of a section.
+    .TB
+      .TH Available subsections .HT
+      .TR
+        .TC .B Name .R .CT
+        .TC .B begin .R .CT
+        .TC .B end .R .CT
+        .TC .B Comment .R .CT 
+      .RT
+      .TR
+        .TC ML-Module .CT
+        .TC .[ .MD .] .CT 
+        .TC .[ .DM .] .CT
+        .TC Name argument required .CT
+      .RT
+      .TR
+        .TC C-Library .CT
+        .TC .[ .CY .] .CT 
+        .TC .[ .YC .] .CT
+        .TC Name argument required .CT
+      .RT
+      .TR
+        .TC Generic Subsection S2 .CT
+        .TC .[ .S2 .] .CT 
+        .TC .[ .2S .] .CT 
+        .TC Name argument required .CT
+      .RT
+    .BT
+  .2S
