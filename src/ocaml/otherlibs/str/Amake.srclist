@@ -1,0 +1,12 @@
+
+OCAML_STRLIB_CSRC = {
+    $PWD/strstubs.c,
+    $PWD/regex-0.12/regex.c
+};
+
+OCAML_STRLIB_CAMLSRC = {
+    $PWD/str.mli,
+    $PWD/str.ml,
+    $PWD/strLabels.mli,
+    $PWD/strLabels.ml[flags={-nolabels}],
+};
