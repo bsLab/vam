@@ -1,0 +1,67 @@
+#/bin/bash
+
+source ../../toolset/build.env
+
+
+
+if [ $# = 0 ]
+then
+    echo "Usage: build <targets>"
+    echo "Targets: all clean install"
+    exit 1
+fi
+
+
+check ()
+{
+    if [ $? != 0 ]
+    then
+        echo "[Abort due to errors building target.]"
+        exit 1
+    fi
+}
+
+for TARGET in $@
+do
+    echo "Building target [$TARGET] ..."
+    case $TARGET in
+        all)    
+            ;;
+
+        clean)
+            ;;
+
+        install)
+            $INSTALL -d $INSTALLDIR
+
+            cd ../../toolset
+            $INSTALL -d $INSTALLDIR/toolset
+            $INSTALL -C * $INSTALLDIR/toolset
+            check
+            cd -
+
+            $INSTALL -C Amakefile.common    $INSTALLDIR
+            $INSTALL -C Amakefile           $INSTALLDIR/toolset
+            $INSTALL -C Amakefile.prog.templ  $INSTALLDIR/toolset
+            $INSTALL -C Amakefile.lib.templ  $INSTALLDIR/toolset
+
+            $INSTALL -C revision            $INSTALLDIR
+            case $HOST in
+                Linux)
+                    $INSTALL -C Amakefile.sys.linux  -T $INSTALLDIR/Amakefile.sys
+                    $INSTALL -C revision.conf.linux  -T $INSTALLDIR/revision.conf
+                    ;;
+                FreeBSD)
+                    $INSTALL -C Amakefile.sys.freebsd -T $INSTALLDIR/Amakefile.sys
+                    $INSTALL -C revision.conf.freebsd -T $INSTALLDIR/revision.conf
+                    ;;
+            esac
+            cd $INSTALLDIR/toolset
+            $AMAKE -C 
+            check
+            $AMAKE
+            check
+            cd -
+            ;;
+    esac
+done
