@@ -1,0 +1,20 @@
+SRC_VRPC_TEST = {
+    $PWD/dummy.mli,
+    $PWD/vrpc_test.ml
+};
+
+SRC_VRPC_CLIENT = {
+    $PWD/vrpc_client.ml
+};
+
+SRC_VRPC_SERVER = {
+    $PWD/vrpc_server.ml
+};
+
+SRC_VRPC_SELF = {
+    $PWD/vrpc_self.ml
+};
+
+
+
+
