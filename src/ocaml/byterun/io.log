@@ -1,0 +1,17 @@
+2003.11.08:
+    chan_std_err
+    chan_std_out
+    introduced.
+    Raw Amoeba split started
+
+2003.11.19:
+    fixed chan_std_err output garbage bug
+    TODO: one big circular print buffer
+
+2004.12.14:
+    chan_std_** functions renamed to print_std** 
+    tmp_buf for print_std*** operations changed to static
+    do_write now handles callbacks for stdin and stdout file descriptor
+
+2005.6.21:
+    added caml_file_size
