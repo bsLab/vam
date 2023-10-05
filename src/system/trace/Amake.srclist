@@ -1,0 +1,10 @@
+SRC_TRACE = {
+    $PWD/dummy.mli,
+    $PWD/io.ml,
+    $PWD/trace_fun.ml,
+    $PWD/trace.ml
+};
+
+SRC_TRACE_MAIN = {
+    $PWD/main.ml
+};
