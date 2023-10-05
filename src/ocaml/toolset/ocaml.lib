@@ -1,0 +1,56 @@
+#
+# Build CaML libraries
+#
+
+
+
+
+#
+# Build a CaML libraray from the sources.
+#
+
+%generic libcluster(camllib,camlsrc)
+{
+    %default $camllib;
+    %cluster 
+    {
+        %targets    $camllib;
+        %sources    $camlsrc;
+    };
+};
+
+
+#
+# Build a CaML library from the sources, and additionaly
+# a custom mode C library.
+#
+
+%generic customlibcluster(camllib,clib,camlsrc)
+{
+    %default $camllib;
+    %cluster 
+    {
+        %targets    $camllib,
+                    $clib;
+        %sources    $camlsrc;
+        %use ocaml-ar(custom => {'-custom',
+                                 '-cclib',
+                                 '-l'basename($clib,'lib%.a')});
+    };
+};
+
+#
+# Build a C library from the sources.
+#
+
+%generic clibcluster(clib,csrc)
+{
+    %default $clib;
+    %cluster 
+    {
+        %targets    $clib;
+        %sources    $csrc;
+        %use        ar-cc();
+    };
+};
+
