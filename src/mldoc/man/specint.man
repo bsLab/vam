@@ -1,0 +1,359 @@
+  .S2
+    .NA Special Interfaces .AN
+    The special interfaces are used to show ML or C functions, types,
+    submodules and values. Only the content must be given by the user,
+    not the alignment. Commonly, they are collected in an interface
+    subunit.
+     
+    .TB
+      .TH Available special interfaces .HT
+      .TR
+        .TC .B Name .R .CT
+        .TC .B begin .R .CT
+        .TC .B end .R .CT 
+        .TC .B Subarguments (*=optional, #=multiple) .R .CT
+      .RT
+      .TR
+        .TC ML-Function .CT
+        .TC .[ .IF .] .CT 
+        .TC .[ .FI .] .CT
+        .TC Name, RetVal (#), Arg (#), Val (*#) .CT
+      .RT
+      .TR
+        .TC ML-Value .CT
+        .TC .[ .IV .] .CT 
+        .TC .[ .VI .] .CT
+        .TC Name, Arg (#) .CT
+      .RT
+      .TR
+        .TC ML-Type (type list) .CT
+        .TC .[ .IT .] .CT 
+        .TC .[ .TI .] .CT
+        .TC Name, Arg (#) .CT
+      .RT
+      .TR
+        .TC ML-Structure (type) .CT
+        .TC .[ .IS .] .CT 
+        .TC .[ .SI .] .CT
+        .TC Name, Arg (*#) .CT
+      .RT
+      .TR
+        .TC ML-Module .CT
+        .TC .[ .IM .] .CT 
+        .TC .[ .MI .] .CT
+        .TC Name, other specials .CT
+      .RT
+      .TR
+        .TC ML-Class .CT
+        .TC .[ .CS .] .CT 
+        .TC .[ .SC .] .CT
+        .TC Name, Arg [*#], Obj .CT
+      .RT
+      .TR
+        .TC ML-Class method .CT
+        .TC .[ .MT .] .CT 
+        .TC .[ .TM .] .CT
+        .TC Name, Arg .CT
+      .RT
+      .TR
+        .TC C-Header .CT
+        .TC .[ .CH .] .CT 
+        .TC .[ .HC .] .CT
+        .TC .CT
+      .RT
+      .TR
+        .TC C-Function .CT
+        .TC .[ .CF .] .CT 
+        .TC .[ .FC .] .CT
+        .TC Name, Arg (#) , RetVal  .CT
+      .RT
+      .TR
+        .TC C-Variable .CT
+        .TC .[ .CV .] .CT 
+        .TC .[ .VC .] .CT
+        .TC Name, Arg .CT
+      .RT
+    .BT
+  
+    The followinf subarguments used only in special interfaces, except
+    the .NA Name .AN command and the .NA Comment .AN command: 
+
+    .TB 
+      .TH Available subarguments .HT
+      .TR
+        .TC .B Name .R .CT
+        .TC .B Description .R .CT
+        .TC .B begin .R .CT
+        .TC .B end .R .CT
+      .RT
+      .TR
+        .TC Name .CT
+        .TC Name of function,... .CT
+        .TC .[ .NA .] .CT
+        .TC .[ .AN .] .CT
+      .RT
+      .TR
+        .TC Comment .CT
+        .TC Placed before the special interface .CT
+        .TC .[ .(* .] .CT
+        .TC .[ .*) .] .CT
+      .RT
+      .TR
+        .TC RetVal .CT
+        .TC Return value of a function (uncurried subvalue) .CT
+        .TC .[ .RV .] .CT
+        .TC .[ .VR .] .CT
+      .RT
+      .TR
+        .TC Arg .CT
+        .TC Argument of a function (curried value) .CT
+        .TC .[ .AR .] .CT
+        .TC .[ .RA .] .CT
+      .RT
+      .TR
+        .TC Val .CT
+        .TC Value argument of a function (uncurried subvalue) .CT
+        .TC .[ .AV .] .CT
+        .TC .[ .VA .] .CT
+      .RT
+      .TR
+        .TC Obj .CT
+        .TC Class object .CT
+        .TC .[ .OB .] .CT
+        .TC .[ .BO .] .CT
+      .RT
+    .BT
+
+    
+    Either the curried value form .B or .R the uncurried value form
+    must be used for the function interface. .NL
+    
+    Here is an example for an interface with functions: 
+
+    .IN
+      .NA Function interfaces .AN
+      .IF
+        .NA myfun1 .AN
+        .RV ret1:int          .(* The first return argument .*) .VR
+        .RV ret2:bool         .(* The second one. .*) .VR
+        .AR ~arg1:float       .(* The first fun arg .*) .RA
+        .AR ~arg2:string list .(* The second one. .*) .RA
+      .FI
+      .IF
+        .NA myfun2 .AN
+        .RV ret1:bool  .VR
+        .AV arg1:float .VA
+        .AV arg2:string list .VA
+      .FI
+      .CH
+        sys/io.h
+      .HC
+      .CF
+        .NA cfun .AN
+        .RV int .VR
+        .AR float arg1 .RA
+        .AR char arg2  .RA
+      .FC
+      .IV
+        .(* The first value interface .*)
+        .NA myval .AN
+        .AR ~arg1:string .(* The arg string .*) .RA
+        .AR ~arg2:int .RA
+        .AR retarg:float .RA
+      .VI
+    .NI
+
+    The first and the second interfaces show a ML-Function, and the third
+    one is a C-Function interface. This way to display ML-functions
+    is different from the one commonly used in ML interfaces, but
+    more readable. There is also a generic ML-value interface, shown
+    in the fourth part of the example. In the second ML-function an
+    uncurried value tuple is used for the function argument. Either the
+    curried or the uncurried form must be used.
+    
+   
+    The required programming code to get this beauty ML-interfaces
+    is easy to create: 
+
+    .{
+    .[ .IN .]
+      .# .[ .NA Function interfaces .AN .]
+      .# .[ .IF .]
+        .# .# .[ .NA myfun1 .AN .]
+        .# .# .[ .RV ret1:int .(* The first return argument .*) .VR .]
+        .# .# .[ .RV ret2:bool .(* The second one .*) .VR .]
+        .# .# .[ .AR ~arg1:float .(* The first fun arg .*) .RA .]
+        .# .# .[ .AR ~arg2:string list .(* The second one .*) .RA .]
+      .# .[ .FI .]
+      .# .[ .IF .]
+        .# .# .[ .NA myfun2 .AN  .]
+        .# .# .[ .RV ret1:bool .VR  .]
+        .# .# .[ .AV arg1:float .VA  .]
+        .# .# .[ .AV arg2:string list .VA  .]
+      .# .[ .FI  .]
+      .# .[ .CH .]
+      .# .# sys/io.h
+      .# .[ .HC .]
+      .# .[ .CF .]
+      .# .#  .[ .NA cfun .AN .]
+      .# .#  .[ .RV int .VR .]
+      .# .#  .[ .AR float arg1 .RA .]
+      .# .#  .[ .AR char arg2  .RA .]
+      .# .[ .FC .]
+      .# .[ .IV .]
+      .# .# .[ .(* The first value interface .*) .]
+      .# .# .[ .NA myval .AN .]
+      .# .# .[ .AR ~arg1:string .(* The arg string .*) .RA .]
+      .# .# .[ .AR ~arg2:int .RA .]
+      .# .# .[ .AR retarg:float .RA .]
+      .# .[ .VI .]
+    .[ .NI .]
+    .}
+
+    Always, labels must be marked with a leading tilde character. All other
+    names appearing in value or function names are symbolic names and are
+    displayed in a slatented font. .NL
+
+    And an example for such an interface paragraph with ML-types and
+    a ML-class:
+
+    .IN
+      .IT
+        .NA mytype .AN
+        .AR Type_1 .RA
+        .AR Type_2 .RA
+        .AR Type_3 .RA
+      .TI   
+      .IS
+        .NA mytype .AN
+        .AR .MU a:int .RA
+        .AR b:float .RA
+        .AR c:int list .RA
+      .SI   
+      .IX
+        Failure of string
+      .XI
+      .CS
+        .NA myclass .AN
+        .AR a:int .RA
+        .AR b:int .RA
+        .OB
+          .IV
+            .NA .MU speed .AN
+            .AR dir:int list .RA 
+            .AR vl: int list .RA 
+            .AR ?really: bool .RA 
+          .VI
+          .IV
+            .NA align .AN
+            .AR up:string list .RA 
+            .AR down: int list .RA 
+            .AR ?really: bool .RA 
+          .VI
+          .MT
+            .NA .PV up .AN
+            .AR v:int .RA
+            .AR name:string .RA
+            .AR ~arg3:int int list list .RA
+            .AR () .RA
+          .TM
+        .BO
+      .SC
+      .IM
+        .NA mymod .AN
+          .IT
+            .NA mytype .AN
+            .AR Type_1 .RA
+            .AR Type_2 .RA
+            .AR Type_3 .RA
+          .TI   
+          .IV
+            .NA align .AN
+            .AR up:string list .RA 
+            .AR down: int list .RA 
+            .AR ?really: bool .RA 
+          .VI
+          .IV
+            .NA .MU speed .AN
+            .AR dir:int list .RA 
+            .AR vl: int list .RA 
+            .AR ?really: bool .RA 
+          .VI
+      .MI
+    .NI
+
+    which was produced with this source code:
+
+    .{
+    .[ .IN .]
+      .# .[ .IT .]
+        .# .# .[ .NA mytype .AN .]
+        .# .# .[ .AR Type_1 .RA .]
+        .# .# .[ .AR Type_2 .RA .]
+        .# .# .[ .AR Type_3 .RA .]
+      .# .[ .TI .]  
+      .# .[ .IS .]
+        .# .# .[ .NA mytype .AN .]
+        .# .# .[ .AR .MU a:int .RA .]
+        .# .# .[ .AR b:float .RA .]
+        .# .# .[ .AR c:int list .RA .]
+      .# .[ .SI .]
+      .# .[ .CS .]
+      .# .# .[  .NA myclass .AN .]
+      .# .# .[  .AR a:int .RA .]
+      .# .# .[  .AR b:int .RA .]
+      .# .# .[  .OB .]
+      .# .# .# .[    .IV .]
+      .# .# .# .# .[      .NA .MU speed .AN .]
+      .# .# .# .# .[      .AR dir:int list .RA .]
+      .# .# .# .# .[      .AR vl: int list .RA .]
+      .# .# .# .# .[      .AR ?really: bool .RA .]
+      .# .# .# .[    .VI .]
+      .# .# .# .[    .IV .]
+      .# .# .# .# .[      .NA align .AN .]
+      .# .# .# .# .[      .AR up:string list .RA .]
+      .# .# .# .# .[      .AR down: int list .RA .]
+      .# .# .# .# .[      .AR ?really: bool .RA .]
+      .# .# .# .[    .VI .]
+      .# .# .# .[    .MT .]
+      .# .# .# .# .[      .NA .PV up .AN .]
+      .# .# .# .# .[      .AR v:int .RA .]
+      .# .# .# .# .[      .AR name:string .RA .]
+      .# .# .# .# .[      .AR ~arg3:int int list list .RA .]
+      .# .# .# .# .[      .AR () .RA .]
+      .# .# .# .[    .TM .]
+      .# .# .[  .BO .]
+      .# .[ .SC .]
+      .# .[ .IM .]
+      .# .# .[  .NA mymod .AN .]
+      .# .# .[     .IT .]
+      .# .# .# .[      .NA mytype .AN .]
+      .# .# .# .[      .AR Type_1 .RA .]
+      .# .# .# .[      .AR Type_2 .RA .]
+      .# .# .# .[      .AR Type_3 .RA .]
+      .# .# .[     .TI .] 
+      .# .# .[     .IV .]
+      .# .# .# .[      .NA align .AN .]
+      .# .# .# .[      .AR up:string list .RA .]
+      .# .# .# .[      .AR down: int list .RA .]
+      .# .# .# .[      .AR ?really: bool .RA .] 
+      .# .# .[     .VI .]
+      .# .# .[     .IV .]
+      .# .# .# .[      .NA .MU speed .AN .]
+      .# .# .# .[      .AR dir:int list .RA .]
+      .# .# .# .[      .AR vl: int list .RA .]
+      .# .# .# .[       .AR ?really: bool .RA .] 
+      .# .# .[     .VI .]
+      .# .[   .MI .]
+    .[ .NI .]
+    .}
+     
+    The class interface needs the class name, optional arguments, and
+    the object block with values and methods.
+    Of course, all possible special interfaces can be mixed, and the 
+    interface subunit is not required, but strongly recommended. 
+    
+    Currently, only simple module signatures without functors are 
+    supported.
+
+  .2S 
