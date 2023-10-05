@@ -1,0 +1,17 @@
+SRC_VASH = {
+    $PWD/dummy.mli,
+    $PWD/vash_io.ml,
+    $PWD/vash_env.ml,
+    $PWD/vash_std.ml,
+    $PWD/vash_ksys.ml,
+    $PWD/vash_dir.ml,
+    $PWD/vash_file.ml,
+    $PWD/vash_exec.ml,
+    $PWD/vash_tty.ml,
+    $PWD/vash_stream.ml,
+    $PWD/vash.ml
+};
+
+SRC_VASH_MAIN = {
+    $PWD/main.ml
+};
