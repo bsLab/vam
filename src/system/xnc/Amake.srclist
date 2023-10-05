@@ -1,0 +1,12 @@
+
+XNC_SRC = {
+    $PWD/xnc_widget.ml,
+    $PWD/xnc_prog.ml,
+    $PWD/xnc_exec.ml,
+    $PWD/xnc_file.ml,
+    $PWD/dummy.mli,
+};
+
+XNC_MAIN_SRC = {
+    $PWD/xnc.ml,
+};
