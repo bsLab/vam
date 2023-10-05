@@ -1,0 +1,51 @@
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include $VAMDIR/src/system/xnc/Amake.srclist;
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/system/xnc,
+    -I,
+    $INSTALLDIR/interface,
+    -I,
+    $INSTALLDIR/lib,
+};
+
+
+DEFINES = {
+    -g,
+};
+
+SRC = {
+    $XNC_SRC
+};
+
+LIB = xnc.cma;
+
+%include $VAMDIR/toolset/ocaml.lib;
+%include $VAMDIR/toolset/ocaml.sys;
+
+%instance libcluster($LIB,$SRC);
+
+
+PNAME = xnc;
+PLIBS = {
+    debug.cma,
+    buffer.cma,
+    unix.cma,
+    str.cma,
+    threads.cma,
+    os.cma,
+    test.cma,
+    amoeba.cma,
+    xlib.cma,
+    xcom.cma,
+    wxlib.cma,
+    xnc.cma,
+};
+PSRC = $XNC_MAIN_SRC;
+VM = $INSTALLDIR/bin/vamrun;
+%instance bytecode-exe($PNAME,$PLIBS,$VM,$PSRC);
+
