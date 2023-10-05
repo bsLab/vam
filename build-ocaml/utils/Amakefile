@@ -1,0 +1,78 @@
+
+# version 1.02
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include common.amk;
+%include $VAMDIR/toolset/ocaml.types;
+
+#
+# Caml config files
+#
+
+%tool camlconfig-tool   
+(
+    src:        %in     [type = caml-config-templ];
+    dest:       %out    [type = ML-src-impl] => {config.ml};
+    intf:       %out    [ type = ML-src-intf ]   
+                                             => {config.mli};
+
+    prog:       %in     [type = command]    => $VAMDIR/src/ocaml/toolset/make-configml.sh;
+
+    objintf:   %string %list                =>
+                if (get($src, flags) <> %unknown, {get($src, flags)}, {});
+
+)
+{
+    exec($prog,
+         args   => 
+                   'SED'               + vpath($SED,$BINPATHS)'/'$SED +
+                   'CHMOD'             + vpath($CHMOD,$BINPATHS)'/'$CHMOD + 
+                   'OCAML_LIBDIR'       + $OCAML_LIBDIR +      
+                   'OCAML_BINDIR'       + $OCAML_BINDIR +
+                   'BOOT_CC'            + $OCAML_CC +
+                   'BOOT_CCSTD_FLAGS:'    + $OCAML_CC_STDFLAGS + ':BOOT_CCSTD_FLAGS' +
+                   'BOOT_LD_FLAGS:'      + $OCAML_LD_START_GROUP + $OCAML_CC_LD_FLAGS + ':BOOT_LD_FLAGS' +
+                   'BOOT_CC_LIBS:'       + $OCAML_CC_LIBS + $OCAML_LD_END_GROUP + ':BOOT_CC_LIBS' +
+                   'RANLIB'             + $OCAML_CC_RANLIB +
+                   'ARCH'               + $ARCH +
+                   'MODEL'              + $MODEL +
+                   'SYSTEM'             + $SYSTEM +
+                   'SYSTEM_ID'             + $SYSTEM_ID +
+                   'SRC'                + $src
+         );
+
+    exec(cp, args =>
+            $objintf + './');        
+
+};
+
+
+%include $VAMDIR/src/ocaml/toolset/ocaml-tools.common;
+%include $VAMDIR/src/ocaml/toolset/ocaml.sys;
+%include $VAMDIR/src/ocaml/utils/Amake.srclist;
+
+INCLUDES = {
+    -I, ./,
+    -I, ./../../interface,
+    -I, $VAMDIR/src/ocaml/utils,
+};
+
+CAMLSRC = {
+    $OCAML_UTILS_SRC,
+};
+
+
+CAMLLIB = utils.cma;
+
+
+%include $VAMDIR/toolset/ocaml.types;
+
+
+#
+# Create the library
+#
+
+%include $VAMDIR/src/ocaml/toolset/ocaml.lib;
+%instance libcluster ($CAMLLIB,$CAMLSRC);
