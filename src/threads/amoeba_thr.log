@@ -1,0 +1,30 @@
+2003.0.0:
+    CaML thread stacksize increased (4k -> 32k !!!)
+
+2004.5.2:
+    stopthreads() added (called on process exit)
+
+2004.5.5:
+    added detection of mutex programming errors
+
+2004.5.9:
+    caml_mutex_lock bug fixed (mu check)
+    caml_thread_new fixed (thread_create arg -> th)
+
+2004.12.24:
+    AMOEBA_RAW changed added
+
+2005.1.5:
+    added thread debugging
+    added pc entry to caml_thread_struct feeded with extern_pc value
+    for enhanced debugging
+
+2005.1.17:
+    bug fix in caml_thread_start/new fixed: value of th (address
+    of thread structure) is argument in thread_create call!!!!
+
+
+2005.11.13:
+    caml_thread_new: changed value descr to CAMLparam0();  CAMLlocal1(descr);
+                                            CAMLreturn(descr);  
+    caml_thread_start: callback with protected value th->descr
