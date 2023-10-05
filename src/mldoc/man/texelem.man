@@ -1,0 +1,86 @@
+  .S2
+    .NA Text elements .AN
+    .TB
+      .TR
+        .TC .B Name .R .CT
+        .TC .B begin .R .CT
+        .TC .B end .R .CT
+        .TC .B Description .R .CT
+      .RT
+      .TR
+        .TC Newline .CT
+        .TC .[ .NL .] .CT
+        .TC .CT
+        .TC Flush the current text paragraph and force a newline. .CT
+      .RT
+      .TR
+        .TC Indentmark .CT
+        .TC .[ .# .] .CT
+        .TC .CT
+        .TC Increase the current text indention. Only used in 
+            preformatted paragraphs like examples.
+        .CT
+      .RT
+      .TR
+        .TC Preformatted text ('as is') .CT
+        .TC .[ . [ .] .CT
+        .TC .[ . ] .] .CT
+        .TC Print inlined raw text. Ignore all dot commands. .CT
+      .RT
+      .TR
+        .TC Comments .CT
+        .TC .[ .(* .] .CT
+        .TC .[ .*) .] .CT
+        .TC 
+          Comments can be placed in .NA Arguments .AN . 
+        .CT
+      .RT
+      
+    .BT
+    See .LK Special Interfaces .KL for comment examples and the place
+    to use them.
+     
+    Use the .NA Newline .AN command only to finish the current text
+    paragraph, and not to create space between paragraphs or other
+    structure elements. .NL 
+    There are several text attribute commands controlling the appearence
+    of text. 
+
+    .TB
+      .TH Text attributes .HT
+      .TR
+        .TC .B Attribute .R .CT
+        .TC .B command .R .CT
+      .RT
+      .TR
+        .TC .B Boldface style .R .CT
+        .TC .[ .B .] .CT
+      .RT
+      .TR
+        .TC .I Italic style .R .CT
+        .TC .[ .I .] .CT
+      .RT
+      .TR
+        .TC .BI Boldface and italic style .R .CT
+        .TC .[ .BI .] .CT
+      .RT
+      .TR
+        .TC .T Typewriter style .R .CT
+        .TC .[ .T .] .CT
+      .RT
+      .TR
+        .TC Romane style (default) .CT
+        .TC .[ .R .] .CT
+      .RT
+      .TR
+        .TC Superscript .SP textmode .PS .CT
+        .TC .[ .SP .] .[ .PS .] .CT
+      .RT
+      .TR
+        .TC Subscript .SB textmode .BS .CT
+        .TC .[ .SB .] .[ .BS .] .CT
+      .RT
+
+      All font styles must be switched off with the .[ .R .] regular style command.
+    .BT
+  .2S
