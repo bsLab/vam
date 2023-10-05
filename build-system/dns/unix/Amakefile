@@ -1,0 +1,52 @@
+
+%include ../../../Amakefile.sys;
+%include ../../../Amakefile.common;
+
+%include $VAMDIR/src/system/dns/unix/Amake.srclist;
+
+INCLUDES = {
+    -I,
+    $VAMDIR/src/system/dns/unix,
+    -I,
+    $VAMDIR/src/system/afs/unix,
+    -I,
+    $INSTALLDIR/interface,
+    -I,
+    $VAMDIR/build-system/afs/unix/interface,
+    -I,
+    $INSTALLDIR/lib,
+};
+
+
+DEFINES = {
+    -g,
+};
+
+SRC = {
+    $SYS_DNS_SRC
+};
+
+LIB = dns_unix.cma;
+
+%include $VAMDIR/toolset/ocaml.lib;
+%include $VAMDIR/toolset/ocaml.sys;
+
+%instance libcluster($LIB,$SRC);
+
+
+PNAME = dns_unix;
+PLIBS = {
+    debug.cma,
+    buffer.cma,
+    unix.cma,
+    str.cma,
+    threads.cma,
+    os.cma,
+    amoeba.cma,
+    server.cma,
+    dns_unix.cma,
+};
+PSRC = $SYS_DNS_MAIN_SRC;
+VM = $INSTALLDIR/bin/vamrun;
+%instance bytecode-exe($PNAME,$PLIBS,$VM,$PSRC);
+
