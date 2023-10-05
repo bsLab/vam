@@ -1,0 +1,43 @@
+
+# version 1.01
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+%include common.amk;
+%include $VAMDIR/toolset/ocaml.types;
+%include $VAMDIR/src/ocaml/toolset/ocaml-tools.common;
+%include $VAMDIR/src/ocaml/toolset/ocaml.sys;
+
+%include $VAMDIR/src/ocaml/toplevel/Amake.srclist;
+
+INCLUDES = {
+    -I, ./,
+    -I, $VAMDIR/build-ocaml/stdlib,
+    -I, $VAMDIR/build-ocaml/utils/interface,
+    -I, $VAMDIR/build-ocaml/parsing/interface,
+    -I, $VAMDIR/build-ocaml/typing/interface,
+    -I, $VAMDIR/build-ocaml/bytecomp/interface,
+    -I, $VAMDIR/build-ocaml/driver/interface,
+    -I, $VAMDIR/src/ocaml/toplevel
+};
+
+
+CAMLSRC = {
+    $OCAML_TOPLEVEL_SRC,
+};
+
+%cluster main.cmo
+{
+    %targets    topmain.cmo;
+    %sources    $OCAML_TOP_MAIN;
+};
+
+
+CAMLLIB = toplevellib.cma;
+
+
+
+%include $VAMDIR/src/ocaml/toolset/ocaml.lib;
+%instance libcluster ($CAMLLIB,$CAMLSRC);
+
