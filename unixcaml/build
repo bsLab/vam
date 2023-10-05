@@ -1,0 +1,5 @@
+#!/bin/sh
+
+OCAMLMKTOP=/amoeba/Vam-2.0/ocamlsys/bin/ocamlmktop
+LIBDIR="-I /amoeba/Vam-2.0/ocamlsys/lib/ocaml/threads" 
+$OCAMLMKTOP $LIBDIR -verbose -o unixcaml unix.cma str.cma -thread threads.cma
