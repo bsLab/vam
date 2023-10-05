@@ -1,0 +1,8 @@
+TERMINAL_CC = {
+    $PWD/termcap.c
+};
+
+TERMINAL_ML = {
+    $PWD/dummy.mli,
+    $PWD/terminal.ml
+};
