@@ -1,0 +1,13 @@
+
+
+OCAML_DEP_SRC = {
+    $PWD/ocamldep.ml
+};
+
+OCAML_CP_SRC = {
+    $PWD/ocamlcp.ml
+};
+
+OCAML_MKTOP_TEMPL = {
+    $PWD/ocamlmktop.tpl
+};
