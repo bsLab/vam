@@ -1,0 +1,263 @@
+# 
+# This file is part of the FIREBALL AMOEBA System.
+#
+# Written by:
+#               Stefan Bosse
+#               sbosse@physik.uni-bremen.de
+#
+# Last modified:    11/01/02
+#
+#
+# Changes:
+#
+#
+#
+# FIREBALL AMOEBA is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as 
+# published by the Free Software Foundation; version 2.
+#
+# The FIREBALL AMOEBA is distributed in the hope that it will be usefull,
+# but WITHOUT ANY WARRANTY; without even implied warranty of 
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+#
+
+    #################
+    # Native AMOEBA #
+    #################
+
+#
+# Path and system dependent settings to build the OCaML and the VAM
+# system
+#
+
+VAMDIR = /home/vam/vam-1.0;
+
+INSTALLDIR = /home/vam/Vam-1.0;
+
+#%include $VAMDIR/../conf/linux/Amakefile.sys;
+
+    #################
+    # Util programs #
+    #################
+
+AMAKE = amake;
+CP = cp;
+SED = gsed;
+TR = tr;
+ECHO = echo;
+RM= "rm -f";
+MKDIR = "mkdir -p";
+CMP = cmp;
+BASENAME = basename;
+CHMOD = echo;
+AWK = gawk;
+
+#
+# Installation util. Non BSD system need the script in the toolset 
+# directory.
+#
+
+INSTALL = "$VAMDIR/toolset/install.sh -v";
+
+#
+# Paths for util programs
+#
+
+BINPATHS={'/bin','/usr/bin','/usr/local/bin'};
+
+
+
+###########################################################################
+#      OCaML compiler system definitions to build the OCaML               #
+#      Most variables prefixed with OCAML.                                #
+###########################################################################
+
+
+#
+# System/Architecture descriptions
+#
+# ARCH = [i386]
+# SYSTEM = [Unix, Amoeba]
+#
+#
+
+BIGNUM_ARCH = x86;
+ARCH        = i386;
+MODEL       = default;
+SYSTEM      = Amoeba;
+
+
+
+#
+# Note: More source code (OCaML) OS/ARCH dependencies in:
+#
+# amoeba/os.ml
+# amoeba/buf.ml
+# xwin/xlib/<some>
+#
+
+
+#
+# System definitions for the virtual machine
+#
+
+
+OCAML_SYSFLAGS = {
+    '-DOCAML_OS_TYPE="'$SYSTEM'"',
+    -DHAS_STRERROR,
+    -DHAS_TIMES,
+    -DHAS_TERMCAP,
+    -DHAS_UNISTD,
+    -DHAS_DIRENT,
+    -DHAS_REWINDDIR,
+    -DHAS_MKFIFO,
+    -DHAS_GETCWD,
+    -DHAS_GETWD,
+    -DHAS_GETPRIORITY,
+    -DHAS_UTIME,
+    -DHAS_UTIMES,
+    -DHAS_DUP2,
+    -DHAS_SYS_SELECT_H,
+    -DHAS_WAITPID,
+    -DHAS_WAIT4,
+    -DHAS_TERMIOS,
+    -DHAS_GETHOSTNAME,
+    -DHAS_UNAME,
+    -DHAS_GETTIMEOFDAY,
+    -DHAS_MKTIME,
+    -DHAS_SETSID,
+    -DHAS_PUTENV,
+    -DHAS_LOCALE,
+    -DARCH_ALIGN_DOUBLE,
+    -D_POSIX_SOURCE,
+    -DHAS_STRING_H,
+    -DSTDC_HEADERS,
+#    -DHAS_MMAP,
+#    -DPOSIX_SIGNALS,
+#    -DHAS_SOCKETS,
+#    -DHAS_LOCKF,
+#    -DHAS_FCHMOD,
+#    -DHAS_TRUNCATE,
+#    -DHAS_SELECT,
+#    -DHAS_SYMLINK,
+#    -DHAS_GETGROUPS,
+#    -DHAS_ASYNC_IO,
+#    -DHAS_SETITIMER,
+
+};
+
+
+#
+# Machine parameters
+#
+
+OCAML_MACHPARAM = {
+    '-DOCAML_ARCH_TYPE="'$ARCH'"',
+    '-DOCAML_MODEL_TYPE="'$MODEL'"',
+    '-UARCH_SIXTYFOUR',
+    '-DSIZEOF_INT=4',
+    '-DSIZEOF_LONG=4',
+    '-DSIZEOF_SHORT=2',
+    '-DARCH_INT64_TYPE=long long',
+    '-DARCH_UINT64_TYPE=unsigned long long',
+    '-DARCH_INT64_PRINTF_FORMAT="ll"',
+    '-UARCH_BIG_ENDIAN',
+    '-UARCH_ALIGN_DOUBLE',
+    '-UARCH_ALIGN_INT64'
+};
+
+
+#
+# C compiler
+#
+
+OCAML_CC = gcc;
+
+#
+# Dependency generation CC compiler flag
+#
+
+OCAML_CCDEP_FLAGS  = { '-MD' };
+
+#
+# CC standard flags
+#
+
+OCAML_CC_STDFLAGS = {
+    -fno-defer-pop,
+    -Wall,
+    -Wno-unused,
+    -fno-builtin,
+    $OCAML_CCDEP_FLAGS
+};
+
+#
+# Additional standard include paths
+#
+
+OCAML_CC_STDINC = {};
+
+#
+# Special CC linker flags
+#
+
+OCAML_CC_LD_FLAGS = {
+    -Xlinker,
+    -stack, 
+    -Xlinker, 
+    512
+
+};
+
+#
+# Additional system CC libraries needed for the ocamlrun VM and some
+# native util programs like ocamlyacc.
+#
+
+OCAML_CC_LIBS = {
+};
+
+#
+# CC archive tools
+#
+
+OCAML_CC_AR      = ar;
+OCAML_CC_AR_FLAGS = rc;
+
+OCAML_CC_RANLIB  = ranlib;
+
+
+
+##########################################################################
+#               Build the VAM                                            #
+#               With some different defintions.                          #
+##########################################################################  
+
+#
+# C compiler standard options for VAM
+# 
+
+VAM_CC_STDFLAGS = { 
+    $OCAML_CC_STDFLAGS,
+};
+
+#
+# Additional include paths
+#
+
+VAM_CC_STDINC = {
+    -I$INSTALLDIR/ocamlsys/lib/ocaml/caml,
+};
+
+#
+# Additional libraries to build the VAM vm.
+#
+
+VAM_CC_LIBS = {
+
+};
+
+
+
