@@ -1,0 +1,37 @@
+#/bin/bash
+
+AMAKE=amake
+
+if [ $# = 0 ]
+then
+    echo "Usage: build <targets>"
+    echo "Targets: [all clean] "
+    exit 1
+fi
+
+
+check ()
+{
+    if [ $? != 0 ]
+    then
+        echo "[Abort due to errors building target.]"
+        exit 1
+    fi
+}
+
+for TARGET in $@
+do
+    echo "Building target [$TARGET] ..."
+    case $TARGET in
+        all)    
+            $AMAKE 
+            check
+            ;;
+
+        clean)
+            $AMAKE -C
+            check
+            ;;
+
+    esac
+done
