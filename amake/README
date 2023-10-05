@@ -1,0 +1,44 @@
+****************************************************************************
+          Amoeba Make utility - AMUNIX bootstrap version
+****************************************************************************
+
+Make
+----
+To compile Amake with Make, copy the file Makefile to the configuration
+directory in which the compilations should take place.
+The Makefile contains some configuration flags which have to be set
+according to the local situation, such as paths (e.g., AMAKELIBDIR), OS, etc.
+You will also have to set the variable AMAKE_SRC_DIR to the pathname
+of the directory containing the sources (i.e., this directory).
+
+Calling "make" without parameters should result in the executable "amake".
+Before you install it, it is probably wise to test it first; a nice testcase
+is to compile Amake with Amake (see next item).
+
+Amake
+-----
+If you have made a version of Amake, you should also try to let Amake compile
+itself. To do this, rename amake to, say XXamake in this configuration
+directory and run it.  If all goes well, this will give a binary "Amake"
+(notice the capital A).
+Amake is link()ed to a file in the .Amake/version00 directory, so when you
+install it, be careful to copy (rather than move) it.
+
+
+Please send bug reports (with example and version number), fixes, complaints,
+etc. to amake@cs.vu.nl
+
+Good luck.
+
+
+Unix standalone
+---------------
+
+Edit the 'Makefile' file and change settings for your host OS.
+Compile and install 'amake' with 'build'. That's all.
+Assumption: installation directoty ../../Amunix/bin
+
+
+Stefan Bosse,
+sci@bsslab.de
+
