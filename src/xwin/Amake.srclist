@@ -1,0 +1,4 @@
+
+%include $PWD/common/Amake.srclist;
+%include $PWD/xlib/Amake.srclist;
+%include $PWD/wxlib/Amake.srclist;
