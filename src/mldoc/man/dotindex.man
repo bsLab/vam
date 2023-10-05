@@ -1,0 +1,378 @@
+.S2
+  .NA Summary of dot commands .AN
+
+  .S4 .NA Text styles and special text .AN
+  .TB 
+    .NR
+    .TR
+      .TC .[ .B .] .CT 
+      .TC .[ .R .] .CT
+      .TC Bold text style .CT
+    .RT
+    .TR
+      .TC .[ .BI .] .CT
+      .TC .[ .R .] .CT
+      .TC Bold-Italic text style .CT
+    .RT
+    .TR
+      .TC .[ .I .] .CT
+      .TC .[ .R .] .CT
+      .TC Italic text style .CT
+    .RT
+    .TR
+      .TC .[ .T .] .CT
+      .TC .[ .R .] .CT
+      .TC Typewriter text style .CT
+    .RT
+    .TR
+      .TC .[ .S .] .CT
+      .TC .[ .R .] .CT
+      .TC Symbol text style [NA] .CT
+    .RT
+    .TR
+      .TC .[ .SB .] .CT
+      .TC .[ .BS .] .CT
+      .TC Subscript text mode .CT
+    .RT
+    .TR
+      .TC .[ .SP .] .CT
+      .TC .[ .PS .] .CT
+      .TC Superscript text mode .CT
+    .RT
+    .TR
+      .TC .[ . [ .] .CT
+      .TC .[ . ] .] .CT
+      .TC 'As-Is' text mode .CT
+    .RT
+    .TR
+      .TC .[ .NL .] .CT
+      .TC .CT
+      .TC Newline: End of paragraph .CT
+    .RT
+    .BT
+  .4S
+
+  .S4
+  .NA Special dot commands .AN
+  .TB
+    .NR  
+    .TR
+      .TC .[ .MU .] .CT
+      .TC .CT
+      .TC Special ML-attribute .NA mutable .AN  .CT
+    .RT
+    .TR
+      .TC .[ .PV .] .CT
+      .TC .CT
+      .TC Special ML-attribute .NA private .AN  .CT
+    .RT
+    .TR
+      .TC .[ .VT .] .CT
+      .TC .CT
+      .TC Special ML-attribute .NA virtual .AN  .CT
+    .RT
+    .TR
+      .TC .[ .NR .] .CT
+      .TC .CT
+      .TC No rulers around tables and table cells .CT
+    .RT
+    .TR
+      .TC .[ .# .] .CT
+      .TC .CT
+      .TC White Space in .NA example .AN and .NA As-Is .AN
+          environments 
+      .CT
+    .RT
+    .TR
+      .TC .[ .<< .] .CT
+      .TC .[ .>> .] .CT
+      .TC Include a .NA MlDoc .AN file at the current position .CT
+    .RT
+    .TR
+      .TC .[ .LK .] .CT
+      .TC .[ .KL .] .CT
+      .TC A document link .CT
+    .RT
+  .BT
+  .4S
+
+
+  .S4
+  .NA List commands .AN
+  .TB
+    .NR
+    .TR
+      .TC .[ .OL .] .CT
+      .TC .[ .LO .] .CT
+      .TC Numbered (ordered) list body .CT
+    .RT
+    .TR
+      .TC .[ .UL .] .CT
+      .TC .[ .LU .] .CT
+      .TC Unnumbered (unorderd) list body .CT
+    .RT
+    .TR
+      .TC .[ .PL .] .CT
+      .TC .[ .LP .] .CT
+      .TC Option (definition) list .CT
+    .RT
+    .TR
+      .TC .[ .LI .] .CT
+      .TC .[ .IL .] .CT
+      .TC A list item .CT
+    .RT
+  .BT
+  .4S
+
+
+  .S4
+  .NA Table commands .AN
+  .TB
+    .NR
+    .TR
+      .TC .[ .TB .] .CT
+      .TC .[ .BT .] .CT
+      .TC Table body .CT
+    .RT
+    .TR
+      .TC .[ .TR .] .CT
+      .TC .[ .RT .] .CT
+      .TC Table row .CT
+    .RT
+    .TR
+      .TC .[ .TC .] .CT
+      .TC .[ .CT .] .CT
+      .TC Table column .CT
+    .RT
+    .TR
+      .TC .[ .TH .] .CT
+      .TC .[ .HT .] .CT
+      .TC Optional table head .CT
+    .RT
+  .BT
+  .4S
+
+
+  .S4
+    .NA Special Interfaces commands .AN
+    .TB
+      .NR
+      .TR
+        .TC .[ .IF .] .CT
+        .TC .[ .FI .] .CT
+        .TC ML-Function Interface .CT
+      .RT
+      .TR
+        .TC .[ .IV .] .CT
+        .TC .[ .VI .] .CT
+        .TC ML-Value Interface .CT
+      .RT
+      .TR
+        .TC .[ .IT .] .CT
+        .TC .[ .TI .] .CT
+        .TC ML-Type Interface .CT
+      .RT
+      .TR
+        .TC .[ .IS .] .CT
+        .TC .[ .SI .] .CT
+        .TC ML-Structure Interface .CT
+      .RT
+      .TR
+        .TC .[ .IX .] .CT
+        .TC .[ .XI .] .CT
+        .TC ML-Exception Interface .CT
+      .RT
+      .TR
+        .TC .[ .IM .] .CT
+        .TC .[ .MI .] .CT
+        .TC ML-Module Interface .CT
+      .RT
+      .TR
+        .TC .[ .CH .] .CT
+        .TC .[ .HC .] .CT
+        .TC C-Header Interface .CT
+      .RT
+      .TR
+        .TC .[ .CF .] .CT
+        .TC .[ .FC .] .CT
+        .TC C-Function Interface .CT
+      .RT
+      .TR
+        .TC .[ .CV .] .CT
+        .TC .[ .VC .] .CT
+        .TC C-Variable Interface .CT
+      .RT
+      .TR
+        .TC .[ .CS .] .CT
+        .TC .[ .SC .] .CT
+        .TC ML-Class Interface .CT
+      .RT
+      .TR
+        .TC .[ .OB .] .CT
+        .TC .[ .BO .] .CT
+        .TC ML-Object (Class) Interface .CT
+      .RT
+      .TR
+        .TC .[ .MT .] .CT
+        .TC .[ .TM .] .CT
+        .TC ML-Method (Class)  Interface .CT
+      .RT
+      .TR
+        .TC .[ .] .CT
+        .TC .[ .] .CT
+        .TC .CT
+      .RT
+      .TR
+        .TC .[ .NA .] .CT
+        .TC .[ .AN .] .CT
+        .TC Name argument .CT
+      .RT
+      .TR
+        .TC .[ .AR .] .CT
+        .TC .[ .RA .] .CT
+        .TC Curried value argument .CT
+      .RT
+      .TR
+        .TC .[ .AV .] .CT
+        .TC .[ .VA .] .CT
+        .TC Uncurried (tuple) value argument .CT
+      .RT
+      .TR
+        .TC .[ .RV .] .CT
+        .TC .[ .VR .] .CT
+        .TC Return argument of a function .CT
+      .RT
+    .BT
+  .4S
+
+
+  .S4
+    .NA Section commands .AN
+    .TB
+    .NR  
+    .TR
+      .TC .[ .PR .] .CT
+      .TC .[ .RP .] .CT
+      .TC Program Section .CT
+    .RT
+    .TR
+      .TC .[ .PK .] .CT
+      .TC .[ .KP .] .CT
+      .TC Package Section .CT
+    .RT
+  .BT
+  .4S
+
+
+  .S4
+    .NA Subsection commands .AN
+    .TB
+    .NR
+    .TR
+      .TC .[ .MD .] .CT
+      .TC .[ .DM .] .CT
+      .TC ML-Module .CT
+    .RT
+    .TR
+      .TC .[ .CY .] .CT
+      .TC .[ .YC .] .CT
+      .TC C-Library .CT
+    .RT
+  .BT
+  .4S
+
+
+  .S4
+    .NA Units of a Subsection (Manual Page) commands .AN
+    .TB
+    .NR
+    .TR
+      .TC .[ .FU .] .CT
+      .TC .[ .UF .] .CT
+      .TC ML-Function .CT
+    .RT
+    .TR
+      .TC .[ .MV .] .CT
+      .TC .[ .VM .] .CT
+      .TC ML-Value .CT
+    .RT
+    .TR
+      .TC .[ .TP .] .CT
+      .TC .[ .PT .] .CT
+      .TC ML-Type (generic) .CT
+    .RT
+    .TR
+      .TC .[ .CL .] .CT
+      .TC .[ .LC .] .CT
+      .TC ML-Class .CT
+    .RT
+    .TR
+      .TC .[ .CI .] .CT
+      .TC .[ .IC .] .CT
+      .TC C .CT
+    .RT
+  .BT
+  .4S
+
+
+  .S4
+    .NA Subunit commands  .AN
+    .TB
+    .NR
+    .TR
+      .TC .[ .IN .] .CT
+      .TC .[ .NI .] .CT
+      .TC Generic Interface Paragraph .CT
+    .RT
+    .TR
+      .TC .[ .EX .] .CT
+      .TC .[ .XE .] .CT
+      .TC Example Paragraph .CT
+    .RT
+    .TR
+      .TC .[ .{ .] .CT
+      .TC .[ .} .] .CT
+      .TC Preformatted Paragraph .CT
+    .RT
+    .TR
+      .TC .[ .PA .] .CT
+      .TC .[ .AP .] .CT
+      .TC A named Paragraph .CT
+    .RT
+    .TR
+      .TC .[ .IO .] .CT
+      .TC .[ .OI .] .CT
+      .TC An Introduction Paragraph .CT
+    .RT
+  .BT
+  .4S
+
+  .S4
+    .NA Generic Section, Subsection, Unit, Subunit commands .AN
+    .TB
+    .NR
+    .TR
+      .TC .[ .S1 .] .CT
+      .TC .[ .1S .] .CT
+      .TC Generic Section .CT
+    .RT
+    .TR
+      .TC .[ .S2 .] .CT
+      .TC .[ .2S .] .CT
+      .TC Generic Subsection .CT
+    .RT
+    .TR
+      .TC .[ .S3 .] .CT
+      .TC .[ .3S .] .CT
+      .TC Generic Unit .CT
+    .RT
+    .TR
+      .TC .[ .S4 .] .CT
+      .TC .[ .4S .] .CT
+      .TC Generic Subunit .CT
+    .RT
+  .BT
+  .4S
+
+
+.2S
