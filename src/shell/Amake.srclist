@@ -1,0 +1,16 @@
+MODULE_SHELL_MLI = {
+    $PWD/shell_common.mli,
+    $PWD/shell_dir.mli,
+    $PWD/shell_exec.mli,
+};
+
+MODULE_SHELL_ML = {
+    $PWD/shell_common.ml,
+    $PWD/shell_dir.ml,
+    $PWD/shell_exec.ml,
+    $PWD/shell.ml[deps={'-dep',$PWD/shell_common.ml,
+                        '-dep',$PWD/shell_dir.ml,
+                        '-dep',$PWD/shell_exec.ml}]
+
+};
+
