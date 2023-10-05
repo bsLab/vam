@@ -1,0 +1,21 @@
+
+MODULE_COMMON_MLI = {
+    $PWD/lexers.mli,
+    $PWD/utils.mli
+};
+
+
+MODULE_COMMON_ML = {
+    $PWD/str2.ml,
+    $PWD/time.ml,
+    $PWD/utils.ml
+};
+
+MODULE_COMMON_MLY = {
+    $PWD/parsers.mly,
+};
+
+MODULE_COMMON_MLL = {
+    $PWD/lexers.mll[flags = {$PWD/lexers.mli}],
+};
+
