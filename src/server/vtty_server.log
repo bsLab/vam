@@ -1,0 +1,10 @@
+2005.5.6:
+    changed from print to sys_log
+
+2005.7.27:
+    some cleanup, public output and input functions introduced
+    (override for standard IO channel functions)
+
+2005.5.30:
+    changed: tty_init ~bufsize ~nthr ~input ~output
+    input and output redirect functions added
