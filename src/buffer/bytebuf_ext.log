@@ -1,0 +1,7 @@
+2003.11.19:
+    fixed pos<0 && len<0 failure
+
+2005.1.2:
+    Physical buffers now allocated with (size+1)
+    This leads to a valid malloc call in the case of size=0!!!
+
