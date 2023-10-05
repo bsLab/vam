@@ -1,0 +1,11 @@
+2003.11.30:
+    Added text and button classes
+    Fixed col/row inconsistence in class t
+
+2003.12.01:
+    Equalized text and button classes
+    now all can be configured at creation time or later at runtime
+
+2003.12.02:
+    Added set_bistable method
+    Changed set_action handler
