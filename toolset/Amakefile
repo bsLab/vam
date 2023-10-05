@@ -1,0 +1,51 @@
+#
+# Create a shell environment with all definitions from
+# the Amakefile.sys for other shell scripts needed to compile
+# the VAM and OCaML distribution.
+#
+
+%include ../Amakefile.sys;
+%include ../Amakefile.common;
+
+%tool buildenv-tool   
+(
+    src:        %in     [type = build-env-dep];
+    dest:       %out    [type = build-env]  => build.env;
+    prog:       %in     [type = command]    => $ECHO;
+)
+{
+    exec($prog,
+         args   => 
+                'export CP="'$CP'";'           +
+                'export PP="'$VAM_CPP'";'       +      
+                'export PP_FLAGS="'$VAM_CPP_FLAGS'";'       +      
+                'export CHMOD="'$CHMOD'";'     + 
+                'export SED="'$SED'";'         + 
+                'export AWK="'$AWK'";'         + 
+                'export TR="'$TR'";'           +
+                'export ECHO="'$ECHO'";'       +
+                'export RM="'$RM'";'           +
+                'export AMAKE="'$AMAKE'";'     +
+                'export MKDIR="'$MKDIR'";'     +
+                'export CMP="'$CMP'";'         +
+                'export BASENAME="'$BASENAME'";'   +
+                'export INSTALL="'$INSTALL'";'     +
+                'export VAMDIR="'$VAMDIR'";'       +
+                'export AMUNIX_LIB_DIR="'$AMUNIX_LIB_DIR'";'  +
+                'export AMUNIX_INC_DIR="'$AMUNIX_INC_DIR'";'  +
+                'export AMUNIX_BIN_DIR="'$AMUNIX_BIN_DIR'";'  +
+                'export AMOEBA_SRC_DIR="'$AMOEBA_SRC_DIR'";'  +
+                'export INSTALLDIR="'$INSTALLDIR'";'
+                'export TOOLSET="'$TOOLSET'";'
+                'export HOST="'$HOST'";'                
+                ,
+         stdout => $dest);
+};
+
+%cluster
+{
+    %targets    build.env [type = build-env];
+    %sources    Amakefile.sys [ type = build-env-dep ];
+    %use        buildenv-tool();
+};
+
