@@ -1,0 +1,13 @@
+#
+# Build a generic program executable
+#
+
+%generic progexe(exename,csrc)
+{
+    %default $exename;
+    %cluster
+    {
+        %targets    $exename[type = generic-program];
+        %sources    $csrc;
+    };
+};
