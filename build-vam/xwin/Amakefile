@@ -1,0 +1,96 @@
+#
+# Xwin Module Amakefile
+#
+
+
+%include ../../Amakefile.sys;
+%include ../../Amakefile.common;
+
+VAM_OPT={};
+VAM_PP={};
+
+%include $VAMDIR/src/xwin/Amake.srclist;
+
+
+#
+# Special include paths
+#
+
+INCLUDES = {
+    -I,
+    $VAMDIR/build-vam/os/interface,
+    -I,
+    $VAMDIR/build-vam/unix/interface,
+    -I,
+    $VAMDIR/src/xwin/common,
+    -I,
+    $VAMDIR/src/xwin/xlib,
+    -I,
+    $VAMDIR/src/xwin/wxlib,
+    -I,
+    $VAMDIR/build-vam/pthreads/interface,
+    -I,
+    $VAMDIR/build-vam/amoeba/interface,
+    -I,
+    $VAMDIR/build-vam/mldoc/interface,
+    -I,
+    $VAMDIR/build-vam/debug/interface,
+    -I,
+    $VAMDIR/build-vam/buffer/interface,
+
+};
+
+#
+# All the sources together
+#
+
+
+CAMLSRC_XLIB = {
+    $MODULE_XLIB_MLI,
+    $MODULE_XLIB_ML_XOS,
+};
+
+
+
+CAMLSRC_XCOM = {
+    $MODULE_COMMON_MLL,
+    $MODULE_COMMON_MLI,
+    $MODULE_COMMON_ML, 
+};
+
+CAMLSRC_WXLIB = {
+    $MODULE_WXLIB_MLI,
+    $MODULE_WXLIB_ML,
+};
+
+
+
+%cluster parsers.cmo
+{
+    %targets    parsers.cmi,parsers.cmo;
+    %sources    $MODULE_COMMON_MLY;
+};
+
+#
+# Target libraries
+#
+
+#
+# CaML library
+#
+
+CAMLLIB_XLIB     = xlib.cma;
+CAMLLIB_XCOM     = xcom.cma;
+CAMLLIB_WXLIB    = wxlib.cma;
+
+%include $VAMDIR/toolset/ocaml.lib;
+
+
+%instance libcluster($CAMLLIB_XLIB,$CAMLSRC_XLIB);
+%instance libcluster($CAMLLIB_XCOM,$CAMLSRC_XCOM);
+%instance libcluster($CAMLLIB_WXLIB,$CAMLSRC_WXLIB);
+
+
+
+
+
