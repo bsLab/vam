@@ -1,0 +1,8 @@
+SRC_VDISK = {
+    $PWD/dummy.mli,
+    $PWD/server.ml,
+};
+
+SRC_VDISK_MAIN = {
+    $PWD/main.ml
+};
