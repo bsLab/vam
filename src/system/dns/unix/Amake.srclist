@@ -1,0 +1,14 @@
+#
+# Enable debug support:
+# xxx.ml[flags={-po,-DDEBUG}],
+#
+
+
+SYS_DNS_SRC = {
+    $PWD/dummy.mli,
+    $PWD/dns_unix.ml,
+};
+
+SYS_DNS_MAIN_SRC = {
+    $PWD/main.ml
+};
