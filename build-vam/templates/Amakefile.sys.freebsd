@@ -1,0 +1,355 @@
+##
+##      ==================================
+##      OOOO   OOOO OOOO  O      O   OOOO
+##      O   O  O    O     O     O O  O   O
+##      O   O  O    O     O     O O  O   O
+##      OOOO   OOOO OOOO  O     OOO  OOOO
+##      O   O     O    O  O    O   O O   O
+##      O   O     O    O  O    O   O O   O
+##      OOOO   OOOO OOOO  OOOO O   O OOOO
+##      ================================== 
+##      BSSLAB, Dr. Stefan Bosse sci@bsslab.de
+##
+##    PROTECTED BY AND DISTRIBUTED UNDER THE TERMS OF: 
+##    Free Software Foundation-Europe, GNU GPL License, Version 2
+##
+##    $MODIFIEDBY:  BSSLAB
+##    $AUTHORS:     Stefan Bosse
+##    $INITIAL:     (C) BSSLAB 2003
+##    $CREATED:     
+##    $VERSION:     1.00
+##
+##    $INFO:
+##
+## Path and system dependent settings to build the VAM stuff
+##      Prebuild version
+##
+##
+##    $ENDOFINFO
+##
+
+
+#
+#
+
+
+INSTALLDIR = /amoeba/Vam-1.6;
+VAMDIR = $INSTALLDIR;
+
+#
+# Amoeba sources and the AMUNIX environment (must be already build).
+#
+
+AMUNIX_LIB_DIR = /amoeba/Amunix/lib;
+AMOEBA_SRC_DIR = /amoeba/src;
+AMUNIX_INC_DIR = /amoeba/Amunix/include;
+AMUNIX_BIN_DIR = /amoeba/Amunix/bin;
+
+
+
+
+
+    ###################
+    # FreeBSD AMUNIX  #
+    ###################
+
+
+    #################
+    # Util programs #
+    #################
+
+AMAKE = $AMUNIX_BIN_DIR/amake;
+CP = cp;
+SED = sed;
+AWK = awk;
+TR = tr;
+ECHO = echo;
+RM= "rm -f";
+MKDIR = "mkdir -p";
+CMP = cmp;
+BASENAME = basename;
+CHMOD = chmod;
+AWK = awk;
+
+#
+# Installation util. 
+#
+
+INSTALL = "$VAMDIR/toolset/install.sh -v";
+
+#
+# Paths for util programs
+#
+
+BINPATHS={'/bin','/usr/bin','/usr/local/bin'};
+
+
+
+###########################################################################
+#      OCaML compiler system definitions to build the OCaML               #
+#      Most variables prefixed with OCAML.                                #
+###########################################################################
+
+
+#
+# System/Architecture descriptions
+#
+# ARCH = [i386]
+# SYSTEM = [Unix, Amoeba]
+# SYSTEM_ID = [bsd_elf,linux_elf,amoeba_aout,...]
+# HOST = [Linux,FreeBSD,Amoeba]
+#
+
+BIGNUM_ARCH = x86;
+ARCH        = i386;
+MODEL       = default;
+SYSTEM      = Unix;
+SYSTEM_ID   = bsd_elf;
+HOST        = FreeBSD;
+
+#
+# Note: More source code (OCaML) OS/ARCH dependencies in:
+#
+# amoeba/os.ml
+# amoeba/buf.ml
+# xwin/xlib/<some>
+#
+
+#
+# Enable OCaML debugging code (adds C and CAML debugging code)
+#
+# [yes,no]
+
+OCAML_DEBUG = yes;
+
+#
+# Enable OCaML C-code debugging
+#
+# [yes,no]
+
+OCAML_CC_DEBUG = yes;
+
+
+#
+# System definitions for the virtual machine
+#
+
+
+OCAML_SYSFLAGS = {
+    '-DOCAML_OS_TYPE="'$SYSTEM'"',
+    '-DOCAML_OS_ID="'$SYSTEM_ID'"',
+#   '-DSUPPORT_DYNAMIC_LINKING',    
+    '-DOCAML_STDLIB_DIR="/usr/local/lib/ocaml"',
+    -DHAS_STRERROR,
+    -DHAS_TIMES,
+    -DHAS_TERMCAP,
+    -DHAS_SOCKETS,
+    -DHAS_INET_ATON,
+    -DHAS_UNISTD,
+    -DHAS_DIRENT,
+    -DHAS_REWINDDIR,
+    -DHAS_LOCKF,
+    -DHAS_MKFIFO,
+    -DHAS_GETCWD,
+    -DHAS_GETWD,
+    -DHAS_GETPRIORITY,
+    -DHAS_UTIME,
+    -DHAS_UTIMES,
+    -DHAS_DUP2,
+    -DHAS_FCHMOD,
+    -DHAS_TRUNCATE,
+    -DHAS_SYS_SELECT_H,
+    -DHAS_SELECT,
+    -DHAS_SYMLINK,
+    -DHAS_WAITPID,
+    -DHAS_WAIT4,
+    -DHAS_GETGROUPS,
+    -DHAS_TERMIOS,
+    -DHAS_ASYNC_IO,
+    -DHAS_SETITIMER,
+    -DHAS_GETHOSTNAME,
+    -DHAS_UNAME,
+    -DHAS_GETTIMEOFDAY,
+    -DHAS_MKTIME,
+    -DHAS_SETSID,
+    -DHAS_PUTENV,
+    -DHAS_LOCALE,
+    -DHAS_MMAP,
+    -DHAS_STACK_OVERFLOW_DETECTION,
+
+# some extra definitions (readline.c)
+
+    -DHAVE_POPEN,
+    -DHAVE_STRNCASECMP,
+    -DHAVE_PROTO,
+
+##
+
+
+
+};
+
+
+#
+# Machine parameters
+#
+
+OCAML_MACHPARAM = {
+    '-DOCAML_ARCH_TYPE="'$ARCH'"',
+    '-DOCAML_MODEL_TYPE="'$MODEL'"',
+    '-UARCH_SIXTYFOUR',
+    '-DSIZEOF_INT=4',
+    '-DSIZEOF_LONG=4',
+    '-DSIZEOF_SHORT=2',
+    '-DARCH_INT64_TYPE=long long',
+    '-DARCH_UINT64_TYPE=unsigned long long',
+    '-DARCH_INT64_PRINTF_FORMAT="ll"',
+    '-UARCH_BIG_ENDIAN',
+    '-UARCH_ALIGN_DOUBLE',
+    '-UARCH_ALIGN_INT64',
+    '-UNONSTANDARD_DIV_MOD',
+};
+
+
+#
+# C compiler
+#
+
+OCAML_CC = gcc;
+
+#
+# Dependency generation CC compiler flag
+#
+
+OCAML_CCDEP_FLAGS  = { '-MD' };
+
+#
+# CC standard flags
+#
+
+OCAML_CC_STDFLAGS = {
+    -fno-defer-pop,
+    -Wall,
+    -Wno-unused,
+    $OCAML_CCDEP_FLAGS
+};
+
+#
+# Additional standard include paths
+#
+
+OCAML_CC_STDINC = {
+    -I$AMOEBA_SRC_DIR/h,
+    "-include $AMUNIX_INC_DIR/pthread.h" 
+};
+
+#
+# Special CC linker flags
+#
+
+OCAML_CC_LD_FLAGS = {
+};
+
+#
+# Additional system CC libraries needed for the ocamlrun VM and some
+# native util programs like ocamlyacc.
+#
+
+OCAML_CC_LIBS = {
+      -lm,
+      -lcurses,
+      $AMUNIX_LIB_DIR/libpthread.a,
+      $AMUNIX_LIB_DIR/libpth.a,
+
+};
+
+#
+# CC archive tools
+#
+
+OCAML_CC_AR      = ar;
+OCAML_CC_AR_FLAGS = rc;
+
+OCAML_CC_RANLIB  = ranlib;
+
+
+
+##########################################################################
+#               Build the VAM                                            #
+#               With some different defintions.                          #
+##########################################################################  
+
+#
+# Preprocessor
+#
+
+VAM_CPP = '/usr/bin/cpp';
+VAM_CPP_FLAGS = '-traditional -undef';
+
+#
+# Add VAM debug code (exception backtrace informations)
+# 
+# [yes,no]
+
+VAM_DEBUG = yes;
+
+#
+# Enable C-code debugging
+#
+
+VAM_CC_DEBUG = yes;
+
+#
+# C compiler standard options for VAM
+# 
+
+VAM_CC_STDFLAGS = { 
+    $OCAML_CC_STDFLAGS,
+    -DAMOEBA
+};
+
+#
+# Additional include paths
+#
+
+VAM_CC_STDINC = {
+    -I$INSTALLDIR/ocamlsys/lib/ocaml/caml,
+    -I$AMOEBA_SRC_DIR/h,
+    -I$AMOEBA_SRC_DIR/h/server,
+    -I$AMOEBA_SRC_DIR/amunix/h,
+    -I$AMOEBA_SRC_DIR/h/class,
+#    -I$AMOEBA_SRC_DIR/h/sys/flip,
+#    -I$AMOEBA_SRC_DIR/h/sys,
+#    -I$AMOEBA_SRC_DIR/h/machdep/arch/$ARCH,
+    -I$AMOEBA_SRC_DIR/h/toolset/gnu-2-freebsd.amunix,
+    -I$AMUNIX_INC_DIR,
+    "-include $AMUNIX_INC_DIR/pthread.h" 
+};
+
+#
+# Additional libraries to build the VAM vm.
+#
+
+VAM_CC_LIBS = {
+    -cclib, -lm,
+    -cclib, -lcurses,
+    -cclib, $AMUNIX_LIB_DIR/libamunix.a,
+#    -cclib, -lc_r
+    -cclib, $AMUNIX_LIB_DIR/libpth.a,
+    -cclib, $AMUNIX_LIB_DIR/libpthread.a,
+};
+
+#
+# Termcap library config
+#
+
+VAM_TERMCAP_DEF = {
+    '-DHAVE_STRING_H=1',
+    '-DHAVE_UNISTD_H=1',
+    '-DSTDC_HEADERS=1',
+    '-DTERMCAP_FILE="/etc/termcap"'
+};
+
+# Amake
+AMAKELIB = $AMOEBA_SRC_DIR/Amakelib + $AMOEBA_SRC_DIR/Amakelib/common;
+
