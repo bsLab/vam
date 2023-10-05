@@ -1,0 +1,632 @@
+alloc.o: /amoeba/src//util/amake/alloc.c \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/alloc.h /amoeba/src/util/amake/standlib.h \
+ /amoeba/src/util/amake/error.h
+assignment.o: /amoeba/src//util/amake/assignment.c \
+ /usr/include/assert.h /usr/include/features.h \
+ /usr/include/sys/cdefs.h /usr/include/stdio.h /usr/include/libio.h \
+ /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/standlib.h /amoeba/src/util/amake/alloc.h \
+ /amoeba/src/util/amake/dbug.h /amoeba/src/util/amake/idf.h \
+ /amoeba/src/util/amake/idf_pkg.spec /amoeba/src/util/amake/expr.h \
+ /amoeba/src/util/amake/error.h /amoeba/src/util/amake/eval.h \
+ /amoeba/src/util/amake/lexan.h /amoeba/src/util/amake/f_info.h \
+ /amoeba/src/util/amake/execute.h /usr/include/setjmp.h \
+ /usr/include/jmp_buf.h /usr/include/i386/jmp_buf.h \
+ /usr/include/signal.h /usr/include/sys/types.h \
+ /usr/include/linux/types.h /usr/include/linux/posix_types.h \
+ /usr/include/asm/posix_types.h /usr/include/asm/types.h \
+ /usr/include/sys/bitypes.h /usr/include/linux/signal.h \
+ /usr/include/asm/signal.h /amoeba/src/util/amake/slist.h \
+ /amoeba/src/util/amake/structdef.h /amoeba/src/util/amake/type.h \
+ /amoeba/src/util/amake/builtin.h /amoeba/src/util/amake/buffer.h \
+ /amoeba/src/util/amake/conversion.h /amoeba/src/util/amake/scope.h \
+ /amoeba/src/util/amake/statefile.h /amoeba/src/util/amake/caching.h \
+ /amoeba/src/util/amake/assignment.h /amoeba/src/util/amake/input.h \
+ /amoeba/src/util/amake/inp_pkg.spec
+buffer.o: /amoeba/src//util/amake/buffer.c \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/standlib.h /amoeba/src/util/amake/alloc.h \
+ /amoeba/src/util/amake/buffer.h
+builtin.o: /amoeba/src//util/amake/builtin.c /usr/include/assert.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/include/string.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /usr/include/stdio.h /usr/include/libio.h \
+ /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/stdlib.h \
+ /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/standlib.h /amoeba/src/util/amake/alloc.h \
+ /amoeba/src/util/amake/idf.h /amoeba/src/util/amake/idf_pkg.spec \
+ /amoeba/src/util/amake/expr.h /amoeba/src/util/amake/type.h \
+ /amoeba/src/util/amake/structdef.h /amoeba/src/util/amake/slist.h \
+ /amoeba/src/util/amake/scope.h /amoeba/src/util/amake/Lpars.h \
+ /amoeba/src/util/amake/dbug.h /amoeba/src/util/amake/objects.h \
+ /amoeba/src/util/amake/eval.h /amoeba/src/util/amake/execute.h \
+ /usr/include/setjmp.h /usr/include/jmp_buf.h \
+ /usr/include/i386/jmp_buf.h /usr/include/signal.h \
+ /usr/include/sys/types.h /usr/include/linux/types.h \
+ /usr/include/linux/posix_types.h /usr/include/asm/posix_types.h \
+ /usr/include/asm/types.h /usr/include/sys/bitypes.h \
+ /usr/include/linux/signal.h /usr/include/asm/signal.h \
+ /amoeba/src/util/amake/error.h /amoeba/src/util/amake/conversion.h \
+ /amoeba/src/util/amake/assignment.h /amoeba/src/util/amake/cluster.h \
+ /amoeba/src/util/amake/main.h /amoeba/src/util/amake/buffer.h \
+ /amoeba/src/util/amake/invoke.h /amoeba/src/util/amake/lexan.h \
+ /amoeba/src/util/amake/f_info.h /amoeba/src/util/amake/os.h \
+ /amoeba/src/util/amake/builtin.h
+caching.o: /amoeba/src//util/amake/caching.c /usr/include/assert.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/alloc.h /amoeba/src/util/amake/idf.h \
+ /amoeba/src/util/amake/idf_pkg.spec /amoeba/src/util/amake/main.h \
+ /amoeba/src/util/amake/slist.h /amoeba/src/util/amake/structdef.h \
+ /amoeba/src/util/amake/objects.h /amoeba/src/util/amake/expr.h \
+ /amoeba/src/util/amake/scope.h /amoeba/src/util/amake/type.h \
+ /amoeba/src/util/amake/builtin.h /amoeba/src/util/amake/dbug.h \
+ /amoeba/src/util/amake/Lpars.h /amoeba/src/util/amake/lexan.h \
+ /amoeba/src/util/amake/f_info.h /amoeba/src/util/amake/dump.h \
+ /amoeba/src/util/amake/symbol2str.h /amoeba/src/util/amake/execute.h \
+ /usr/include/setjmp.h /usr/include/jmp_buf.h \
+ /usr/include/i386/jmp_buf.h /usr/include/signal.h \
+ /usr/include/sys/types.h /usr/include/linux/types.h \
+ /usr/include/linux/posix_types.h /usr/include/asm/posix_types.h \
+ /usr/include/asm/types.h /usr/include/sys/bitypes.h \
+ /usr/include/linux/signal.h /usr/include/asm/signal.h \
+ /amoeba/src/util/amake/assignment.h /amoeba/src/util/amake/error.h \
+ /amoeba/src/util/amake/conversion.h /amoeba/src/util/amake/cluster.h \
+ /amoeba/src/util/amake/eval.h /amoeba/src/util/amake/invoke.h \
+ /amoeba/src/util/amake/os.h /amoeba/src/util/amake/tools.h \
+ /amoeba/src/util/amake/statefile.h /amoeba/src/util/amake/caching.h
+check.o: /amoeba/src//util/amake/check.c /usr/include/assert.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/idf.h /amoeba/src/util/amake/idf_pkg.spec \
+ /amoeba/src/util/amake/type.h /amoeba/src/util/amake/structdef.h \
+ /amoeba/src/util/amake/symbol2str.h /amoeba/src/util/amake/Lpars.h \
+ /amoeba/src/util/amake/error.h /amoeba/src/util/amake/expr.h \
+ /amoeba/src/util/amake/scope.h /amoeba/src/util/amake/dbug.h \
+ /amoeba/src/util/amake/slist.h /amoeba/src/util/amake/builtin.h \
+ /amoeba/src/util/amake/objects.h /amoeba/src/util/amake/check.h
+cluster.o: /amoeba/src//util/amake/cluster.c /usr/include/assert.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/include/setjmp.h /usr/include/jmp_buf.h \
+ /usr/include/i386/jmp_buf.h /usr/include/signal.h \
+ /usr/include/sys/types.h /usr/include/linux/types.h \
+ /usr/include/linux/posix_types.h /usr/include/asm/posix_types.h \
+ /usr/include/asm/types.h /usr/include/sys/bitypes.h \
+ /usr/include/linux/signal.h /usr/include/asm/signal.h \
+ /usr/include/stdio.h /usr/include/libio.h \
+ /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/alloc.h /amoeba/src/util/amake/Lpars.h \
+ /amoeba/src/util/amake/idf.h /amoeba/src/util/amake/idf_pkg.spec \
+ /amoeba/src/util/amake/dbug.h /amoeba/src/util/amake/error.h \
+ /amoeba/src/util/amake/slist.h /amoeba/src/util/amake/structdef.h \
+ /amoeba/src/util/amake/eval.h /amoeba/src/util/amake/expr.h \
+ /amoeba/src/util/amake/objects.h /amoeba/src/util/amake/execute.h \
+ /amoeba/src/util/amake/type.h /amoeba/src/util/amake/parser.h \
+ /amoeba/src/util/amake/conversion.h /amoeba/src/util/amake/tools.h \
+ /amoeba/src/util/amake/scope.h /amoeba/src/util/amake/invoke.h \
+ /amoeba/src/util/amake/main.h /amoeba/src/util/amake/caching.h \
+ /amoeba/src/util/amake/declare.h /amoeba/src/util/amake/os.h \
+ /amoeba/src/util/amake/assignment.h /amoeba/src/util/amake/cluster.h \
+ /amoeba/src/util/amake/statefile.h /amoeba/src/util/amake/docmd.h \
+ /amoeba/src/util/amake/classes.h
+conversion.o: /amoeba/src//util/amake/conversion.c \
+ /usr/include/ctype.h /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/include/endian.h /usr/include/bytesex.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/standlib.h /amoeba/src/util/amake/alloc.h \
+ /amoeba/src/util/amake/error.h /amoeba/src/util/amake/type.h \
+ /amoeba/src/util/amake/structdef.h /amoeba/src/util/amake/idf.h \
+ /amoeba/src/util/amake/idf_pkg.spec /amoeba/src/util/amake/expr.h \
+ /amoeba/src/util/amake/objects.h /amoeba/src/util/amake/builtin.h \
+ /amoeba/src/util/amake/Lpars.h /amoeba/src/util/amake/slist.h \
+ /amoeba/src/util/amake/symbol2str.h /amoeba/src/util/amake/dbug.h \
+ /amoeba/src/util/amake/dump.h /amoeba/src/util/amake/statefile.h \
+ /amoeba/src/util/amake/conversion.h
+dbug.o: /amoeba/src//util/amake/dbug.c
+declare.o: /amoeba/src//util/amake/declare.c /usr/include/assert.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /amoeba/src/util/amake/dbug.h /amoeba/src/util/amake/global.h \
+ /amoeba/src/util/amake/typedefs.h /amoeba/src/util/amake/struct.def \
+ /usr/include/string.h /usr/include/stdlib.h /usr/include/errno.h \
+ /usr/include/linux/errno.h /usr/include/asm/errno.h \
+ /usr/include/alloca.h /amoeba/src/util/amake/expr.h \
+ /amoeba/src/util/amake/eval.h /amoeba/src/util/amake/execute.h \
+ /usr/include/setjmp.h /usr/include/jmp_buf.h \
+ /usr/include/i386/jmp_buf.h /usr/include/signal.h \
+ /usr/include/sys/types.h /usr/include/linux/types.h \
+ /usr/include/linux/posix_types.h /usr/include/asm/posix_types.h \
+ /usr/include/asm/types.h /usr/include/sys/bitypes.h \
+ /usr/include/linux/signal.h /usr/include/asm/signal.h \
+ /amoeba/src/util/amake/declare.h /amoeba/src/util/amake/lexan.h \
+ /amoeba/src/util/amake/f_info.h /amoeba/src/util/amake/slist.h \
+ /amoeba/src/util/amake/structdef.h /amoeba/src/util/amake/objects.h \
+ /amoeba/src/util/amake/conversion.h /amoeba/src/util/amake/Lpars.h \
+ /amoeba/src/util/amake/type.h
+dump.o: /amoeba/src//util/amake/dump.c /amoeba/src/util/amake/global.h \
+ /amoeba/src/util/amake/typedefs.h /amoeba/src/util/amake/struct.def \
+ /usr/include/string.h /usr/include/features.h \
+ /usr/include/sys/cdefs.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/idf.h /amoeba/src/util/amake/idf_pkg.spec \
+ /amoeba/src/util/amake/Lpars.h /amoeba/src/util/amake/lexan.h \
+ /amoeba/src/util/amake/f_info.h /amoeba/src/util/amake/dbug.h \
+ /usr/include/stdio.h /usr/include/libio.h \
+ /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /amoeba/src/util/amake/error.h /amoeba/src/util/amake/dump.h
+error.o: /amoeba/src//util/amake/error.c /usr/include/stdio.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/libio.h \
+ /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stdarg.h \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/standlib.h /amoeba/src/util/amake/idf.h \
+ /amoeba/src/util/amake/idf_pkg.spec /amoeba/src/util/amake/type.h \
+ /amoeba/src/util/amake/structdef.h /amoeba/src/util/amake/scope.h \
+ /amoeba/src/util/amake/lexan.h /amoeba/src/util/amake/f_info.h \
+ /amoeba/src/util/amake/main.h /amoeba/src/util/amake/statefile.h \
+ /amoeba/src/util/amake/docmd.h /amoeba/src/util/amake/execute.h \
+ /usr/include/setjmp.h /usr/include/jmp_buf.h \
+ /usr/include/i386/jmp_buf.h /usr/include/signal.h \
+ /usr/include/sys/types.h /usr/include/linux/types.h \
+ /usr/include/linux/posix_types.h /usr/include/asm/posix_types.h \
+ /usr/include/asm/types.h /usr/include/sys/bitypes.h \
+ /usr/include/linux/signal.h /usr/include/asm/signal.h \
+ /amoeba/src/util/amake/expr.h /amoeba/src/util/amake/error.h
+eval.o: /amoeba/src//util/amake/eval.c /usr/include/assert.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/alloc.h /amoeba/src/util/amake/idf.h \
+ /amoeba/src/util/amake/idf_pkg.spec /amoeba/src/util/amake/type.h \
+ /amoeba/src/util/amake/structdef.h /amoeba/src/util/amake/expr.h \
+ /amoeba/src/util/amake/eval.h /amoeba/src/util/amake/error.h \
+ /amoeba/src/util/amake/dbug.h /amoeba/src/util/amake/Lpars.h \
+ /amoeba/src/util/amake/parser.h /amoeba/src/util/amake/scope.h \
+ /amoeba/src/util/amake/slist.h /amoeba/src/util/amake/builtin.h \
+ /amoeba/src/util/amake/execute.h /usr/include/setjmp.h \
+ /usr/include/jmp_buf.h /usr/include/i386/jmp_buf.h \
+ /usr/include/signal.h /usr/include/sys/types.h \
+ /usr/include/linux/types.h /usr/include/linux/posix_types.h \
+ /usr/include/asm/posix_types.h /usr/include/asm/types.h \
+ /usr/include/sys/bitypes.h /usr/include/linux/signal.h \
+ /usr/include/asm/signal.h /amoeba/src/util/amake/conversion.h \
+ /amoeba/src/util/amake/assignment.h /amoeba/src/util/amake/invoke.h \
+ /amoeba/src/util/amake/caching.h /amoeba/src/util/amake/statefile.h \
+ /amoeba/src/util/amake/derive.h /amoeba/src/util/amake/objects.h
+expr.o: /amoeba/src//util/amake/expr.c /usr/include/assert.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/alloc.h /amoeba/src/util/amake/dump.h \
+ /amoeba/src/util/amake/idf.h /amoeba/src/util/amake/idf_pkg.spec \
+ /amoeba/src/util/amake/Lpars.h /amoeba/src/util/amake/symbol2str.h \
+ /amoeba/src/util/amake/error.h /amoeba/src/util/amake/type.h \
+ /amoeba/src/util/amake/structdef.h /amoeba/src/util/amake/dbug.h \
+ /amoeba/src/util/amake/objects.h /amoeba/src/util/amake/slist.h \
+ /amoeba/src/util/amake/scope.h /amoeba/src/util/amake/tools.h \
+ /amoeba/src/util/amake/assignment.h /amoeba/src/util/amake/generic.h \
+ /amoeba/src/util/amake/main.h /amoeba/src/util/amake/expr.h \
+ /amoeba/src/util/amake/builtin.h
+idf.o: /amoeba/src//util/amake/idf.c /amoeba/src/util/amake/global.h \
+ /amoeba/src/util/amake/typedefs.h /amoeba/src/util/amake/struct.def \
+ /usr/include/string.h /usr/include/features.h \
+ /usr/include/sys/cdefs.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/idf.h /amoeba/src/util/amake/idf_pkg.spec \
+ /amoeba/src/util/amake/idf_pkg.body /amoeba/src/util/amake/alloc.h
+input.o: /amoeba/src//util/amake/input.c \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/f_info.h /amoeba/src/util/amake/input.h \
+ /amoeba/src/util/amake/inp_pkg.spec \
+ /amoeba/src/util/amake/inp_pkg.body /amoeba/src/util/amake/standlib.h \
+ /amoeba/src/util/amake/alloc.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/i586-pc-linux-gnulibc1/include/_G_config.h
+invoke.o: /amoeba/src//util/amake/invoke.c /usr/include/assert.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/include/setjmp.h /usr/include/jmp_buf.h \
+ /usr/include/i386/jmp_buf.h /usr/include/signal.h \
+ /usr/include/sys/types.h /usr/include/linux/types.h \
+ /usr/include/linux/posix_types.h /usr/include/asm/posix_types.h \
+ /usr/include/asm/types.h /usr/include/sys/bitypes.h \
+ /usr/include/linux/signal.h /usr/include/asm/signal.h \
+ /usr/include/stdio.h /usr/include/libio.h \
+ /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/alloc.h /amoeba/src/util/amake/Lpars.h \
+ /amoeba/src/util/amake/idf.h /amoeba/src/util/amake/idf_pkg.spec \
+ /amoeba/src/util/amake/dbug.h /amoeba/src/util/amake/error.h \
+ /amoeba/src/util/amake/slist.h /amoeba/src/util/amake/structdef.h \
+ /amoeba/src/util/amake/eval.h /amoeba/src/util/amake/expr.h \
+ /amoeba/src/util/amake/objects.h /amoeba/src/util/amake/execute.h \
+ /amoeba/src/util/amake/type.h /amoeba/src/util/amake/conversion.h \
+ /amoeba/src/util/amake/tools.h /amoeba/src/util/amake/scope.h \
+ /amoeba/src/util/amake/caching.h /amoeba/src/util/amake/builtin.h \
+ /amoeba/src/util/amake/cluster.h /amoeba/src/util/amake/main.h \
+ /amoeba/src/util/amake/os.h /amoeba/src/util/amake/invoke.h
+generic.o: /amoeba/src//util/amake/generic.c /usr/include/assert.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/alloc.h /amoeba/src/util/amake/idf.h \
+ /amoeba/src/util/amake/idf_pkg.spec /amoeba/src/util/amake/scope.h \
+ /amoeba/src/util/amake/structdef.h /amoeba/src/util/amake/error.h \
+ /amoeba/src/util/amake/input.h /amoeba/src/util/amake/inp_pkg.spec \
+ /amoeba/src/util/amake/lexan.h /amoeba/src/util/amake/f_info.h \
+ /amoeba/src/util/amake/expr.h /amoeba/src/util/amake/slist.h \
+ /amoeba/src/util/amake/dbug.h /amoeba/src/util/amake/dump.h \
+ /amoeba/src/util/amake/buffer.h /amoeba/src/util/amake/assignment.h \
+ /amoeba/src/util/amake/execute.h /usr/include/setjmp.h \
+ /usr/include/jmp_buf.h /usr/include/i386/jmp_buf.h \
+ /usr/include/signal.h /usr/include/sys/types.h \
+ /usr/include/linux/types.h /usr/include/linux/posix_types.h \
+ /usr/include/asm/posix_types.h /usr/include/asm/types.h \
+ /usr/include/sys/bitypes.h /usr/include/linux/signal.h \
+ /usr/include/asm/signal.h /amoeba/src/util/amake/generic.h
+getoptx.o: /amoeba/src//util/amake/getoptx.c \
+ /amoeba/src/util/amake/getoptx.h
+lexan.o: /amoeba/src//util/amake/lexan.c /usr/include/assert.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /usr/include/ctype.h /usr/include/endian.h /usr/include/bytesex.h \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/standlib.h /amoeba/src/util/amake/alloc.h \
+ /amoeba/src/util/amake/idf.h /amoeba/src/util/amake/idf_pkg.spec \
+ /amoeba/src/util/amake/scope.h /amoeba/src/util/amake/structdef.h \
+ /amoeba/src/util/amake/Lpars.h /amoeba/src/util/amake/parser.h \
+ /amoeba/src/util/amake/symbol2str.h /amoeba/src/util/amake/error.h \
+ /amoeba/src/util/amake/dbug.h /amoeba/src/util/amake/objects.h \
+ /amoeba/src/util/amake/slist.h /amoeba/src/util/amake/main.h \
+ /amoeba/src/util/amake/input.h /amoeba/src/util/amake/inp_pkg.spec \
+ /amoeba/src/util/amake/expr.h /amoeba/src/util/amake/assignment.h \
+ /amoeba/src/util/amake/tokenname.h /amoeba/src/util/amake/os.h \
+ /amoeba/src/util/amake/lexan.h /amoeba/src/util/amake/f_info.h
+main.o: /amoeba/src//util/amake/main.c /usr/include/ctype.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/include/endian.h /usr/include/bytesex.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/standlib.h /amoeba/src/util/amake/alloc.h \
+ /amoeba/src/util/amake/dbug.h /amoeba/src/util/amake/getoptx.h \
+ /amoeba/src/util/amake/idf.h /amoeba/src/util/amake/idf_pkg.spec \
+ /amoeba/src/util/amake/scope.h /amoeba/src/util/amake/structdef.h \
+ /amoeba/src/util/amake/error.h /amoeba/src/util/amake/lexan.h \
+ /amoeba/src/util/amake/f_info.h /amoeba/src/util/amake/symbol2str.h \
+ /amoeba/src/util/amake/type.h /amoeba/src/util/amake/expr.h \
+ /amoeba/src/util/amake/eval.h /amoeba/src/util/amake/check.h \
+ /amoeba/src/util/amake/objects.h /amoeba/src/util/amake/builtin.h \
+ /amoeba/src/util/amake/execute.h /usr/include/setjmp.h \
+ /usr/include/jmp_buf.h /usr/include/i386/jmp_buf.h \
+ /usr/include/signal.h /usr/include/sys/types.h \
+ /usr/include/linux/types.h /usr/include/linux/posix_types.h \
+ /usr/include/asm/posix_types.h /usr/include/asm/types.h \
+ /usr/include/sys/bitypes.h /usr/include/linux/signal.h \
+ /usr/include/asm/signal.h /amoeba/src/util/amake/docmd.h \
+ /amoeba/src/util/amake/declare.h /amoeba/src/util/amake/assignment.h \
+ /amoeba/src/util/amake/tokenname.h /amoeba/src/util/amake/derive.h \
+ /amoeba/src/util/amake/cluster.h /amoeba/src/util/amake/caching.h \
+ /amoeba/src/util/amake/invoke.h /amoeba/src/util/amake/dump.h \
+ /amoeba/src/util/amake/slist.h /amoeba/src/util/amake/statefile.h \
+ /amoeba/src/util/amake/conversion.h /amoeba/src/util/amake/os.h \
+ /amoeba/src/util/amake/tools.h /amoeba/src/util/amake/generic.h \
+ /amoeba/src/util/amake/main.h /amoeba/src/util/amake/classes.h \
+ /usr/include/sys/param.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/limits.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/syslimits.h \
+ /usr/include/limits.h /usr/include/posix1_lim.h \
+ /usr/include/linux/limits.h /usr/include/posix2_lim.h \
+ /usr/include/linux/param.h /usr/include/asm/param.h
+os.o: /amoeba/src//util/amake/os.c /usr/include/errno.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/include/linux/errno.h /usr/include/asm/errno.h \
+ /usr/include/assert.h /usr/include/stdio.h /usr/include/libio.h \
+ /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /amoeba/src/util/amake/systypes.h /usr/include/sys/types.h \
+ /usr/include/linux/types.h /usr/include/linux/posix_types.h \
+ /usr/include/asm/posix_types.h /usr/include/asm/types.h \
+ /usr/include/sys/bitypes.h /usr/include/sys/stat.h \
+ /usr/include/linux/stat.h /amoeba/src/util/amake/standlib.h \
+ /usr/include/stdlib.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/unistand.h /usr/include/unistd.h \
+ /usr/include/posix_opt.h /usr/include/gnu/types.h \
+ /usr/include/confname.h /amoeba/src/util/amake/global.h \
+ /amoeba/src/util/amake/typedefs.h /amoeba/src/util/amake/struct.def \
+ /usr/include/string.h /amoeba/src/util/amake/alloc.h \
+ /amoeba/src/util/amake/idf.h /amoeba/src/util/amake/idf_pkg.spec \
+ /amoeba/src/util/amake/error.h /amoeba/src/util/amake/expr.h \
+ /amoeba/src/util/amake/scope.h /amoeba/src/util/amake/structdef.h \
+ /amoeba/src/util/amake/objects.h /amoeba/src/util/amake/dbug.h \
+ /amoeba/src/util/amake/statefile.h /amoeba/src/util/amake/buffer.h \
+ /amoeba/src/util/amake/docmd.h /amoeba/src/util/amake/main.h \
+ /amoeba/src/util/amake/caching.h /amoeba/src/util/amake/slist.h \
+ /amoeba/src/util/amake/type.h /amoeba/src/util/amake/conversion.h \
+ /amoeba/src/util/amake/builtin.h /amoeba/src/util/amake/os.h \
+ /usr/include/signal.h /usr/include/linux/signal.h \
+ /usr/include/asm/signal.h /usr/include/sys/wait.h \
+ /usr/include/waitflags.h /usr/include/linux/wait.h \
+ /usr/include/waitstatus.h /usr/include/endian.h \
+ /usr/include/bytesex.h
+scope.o: /amoeba/src//util/amake/scope.c /usr/include/assert.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/alloc.h /amoeba/src/util/amake/dump.h \
+ /amoeba/src/util/amake/idf.h /amoeba/src/util/amake/idf_pkg.spec \
+ /amoeba/src/util/amake/type.h /amoeba/src/util/amake/structdef.h \
+ /amoeba/src/util/amake/Lpars.h /amoeba/src/util/amake/error.h \
+ /amoeba/src/util/amake/main.h /amoeba/src/util/amake/slist.h \
+ /amoeba/src/util/amake/cluster.h /amoeba/src/util/amake/dbug.h \
+ /amoeba/src/util/amake/assignment.h /amoeba/src/util/amake/tools.h \
+ /amoeba/src/util/amake/generic.h /amoeba/src/util/amake/expr.h \
+ /amoeba/src/util/amake/builtin.h /amoeba/src/util/amake/scope.h
+slist.o: /amoeba/src//util/amake/slist.c /usr/include/assert.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/alloc.h /amoeba/src/util/amake/slist.h \
+ /amoeba/src/util/amake/structdef.h
+statefile.o: /amoeba/src//util/amake/statefile.c /usr/include/assert.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/unistand.h /usr/include/sys/types.h \
+ /usr/include/linux/types.h /usr/include/linux/posix_types.h \
+ /usr/include/asm/posix_types.h /usr/include/asm/types.h \
+ /usr/include/sys/bitypes.h /usr/include/unistd.h \
+ /usr/include/posix_opt.h /usr/include/gnu/types.h \
+ /usr/include/confname.h /amoeba/src/util/amake/alloc.h \
+ /amoeba/src/util/amake/idf.h /amoeba/src/util/amake/idf_pkg.spec \
+ /amoeba/src/util/amake/Lpars.h /amoeba/src/util/amake/error.h \
+ /amoeba/src/util/amake/objects.h /amoeba/src/util/amake/structdef.h \
+ /amoeba/src/util/amake/expr.h /amoeba/src/util/amake/type.h \
+ /amoeba/src/util/amake/caching.h /amoeba/src/util/amake/dump.h \
+ /amoeba/src/util/amake/dbug.h /amoeba/src/util/amake/builtin.h \
+ /amoeba/src/util/amake/scope.h /amoeba/src/util/amake/slist.h \
+ /amoeba/src/util/amake/assignment.h /amoeba/src/util/amake/main.h \
+ /amoeba/src/util/amake/cluster.h /amoeba/src/util/amake/lexan.h \
+ /amoeba/src/util/amake/f_info.h /amoeba/src/util/amake/invoke.h \
+ /amoeba/src/util/amake/execute.h /usr/include/setjmp.h \
+ /usr/include/jmp_buf.h /usr/include/i386/jmp_buf.h \
+ /usr/include/signal.h /usr/include/linux/signal.h \
+ /usr/include/asm/signal.h /amoeba/src/util/amake/symbol2str.h \
+ /amoeba/src/util/amake/os.h /amoeba/src/util/amake/conversion.h \
+ /amoeba/src/util/amake/docmd.h /amoeba/src/util/amake/statefile.h
+symbol2str.o: /amoeba/src//util/amake/symbol2str.c \
+ /amoeba/src/util/amake/Lpars.h
+tokenfile.o: /amoeba/src//util/amake/tokenfile.c \
+ /amoeba/src/util/amake/Lpars.h
+tools.o: /amoeba/src//util/amake/tools.c \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/slist.h /amoeba/src/util/amake/structdef.h \
+ /amoeba/src/util/amake/type.h /amoeba/src/util/amake/expr.h \
+ /amoeba/src/util/amake/scope.h /amoeba/src/util/amake/tools.h \
+ /amoeba/src/util/amake/classes.h
+type.o: /amoeba/src//util/amake/type.c /usr/include/assert.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /amoeba/src/util/amake/dbug.h /amoeba/src/util/amake/global.h \
+ /amoeba/src/util/amake/typedefs.h /amoeba/src/util/amake/struct.def \
+ /usr/include/string.h /usr/include/stdlib.h /usr/include/errno.h \
+ /usr/include/linux/errno.h /usr/include/asm/errno.h \
+ /usr/include/alloca.h /amoeba/src/util/amake/alloc.h \
+ /amoeba/src/util/amake/error.h /amoeba/src/util/amake/expr.h \
+ /amoeba/src/util/amake/type.h /amoeba/src/util/amake/structdef.h
+classes.o: /amoeba/src//util/amake/classes.c /usr/include/assert.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/alloc.h /amoeba/src/util/amake/idf.h \
+ /amoeba/src/util/amake/idf_pkg.spec /amoeba/src/util/amake/error.h \
+ /amoeba/src/util/amake/slist.h /amoeba/src/util/amake/structdef.h \
+ /amoeba/src/util/amake/expr.h /amoeba/src/util/amake/dbug.h \
+ /amoeba/src/util/amake/type.h /amoeba/src/util/amake/eval.h \
+ /amoeba/src/util/amake/tools.h /amoeba/src/util/amake/scope.h \
+ /amoeba/src/util/amake/Lpars.h /amoeba/src/util/amake/objects.h \
+ /amoeba/src/util/amake/cluster.h /amoeba/src/util/amake/caching.h \
+ /amoeba/src/util/amake/dump.h /amoeba/src/util/amake/classes.h
+derive.o: /amoeba/src//util/amake/derive.c /usr/include/assert.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/alloc.h /amoeba/src/util/amake/idf.h \
+ /amoeba/src/util/amake/idf_pkg.spec /amoeba/src/util/amake/expr.h \
+ /amoeba/src/util/amake/slist.h /amoeba/src/util/amake/structdef.h \
+ /amoeba/src/util/amake/objects.h /amoeba/src/util/amake/builtin.h \
+ /amoeba/src/util/amake/eval.h /amoeba/src/util/amake/scope.h \
+ /amoeba/src/util/amake/error.h /amoeba/src/util/amake/dbug.h \
+ /amoeba/src/util/amake/type.h /amoeba/src/util/amake/execute.h \
+ /usr/include/setjmp.h /usr/include/jmp_buf.h \
+ /usr/include/i386/jmp_buf.h /usr/include/signal.h \
+ /usr/include/sys/types.h /usr/include/linux/types.h \
+ /usr/include/linux/posix_types.h /usr/include/asm/posix_types.h \
+ /usr/include/asm/types.h /usr/include/sys/bitypes.h \
+ /usr/include/linux/signal.h /usr/include/asm/signal.h \
+ /amoeba/src/util/amake/Lpars.h /amoeba/src/util/amake/main.h \
+ /amoeba/src/util/amake/derive.h
+docmd.o: /amoeba/src//util/amake/docmd.c /usr/include/assert.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/include/string.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /usr/include/stdio.h /usr/include/libio.h \
+ /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /amoeba/src/util/amake/standlib.h /usr/include/stdlib.h \
+ /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /amoeba/src/util/amake/alloc.h \
+ /amoeba/src/util/amake/dbug.h /amoeba/src/util/amake/slist.h \
+ /amoeba/src/util/amake/structdef.h /amoeba/src/util/amake/error.h \
+ /amoeba/src/util/amake/execute.h /usr/include/setjmp.h \
+ /usr/include/jmp_buf.h /usr/include/i386/jmp_buf.h \
+ /usr/include/signal.h /usr/include/sys/types.h \
+ /usr/include/linux/types.h /usr/include/linux/posix_types.h \
+ /usr/include/asm/posix_types.h /usr/include/asm/types.h \
+ /usr/include/sys/bitypes.h /usr/include/linux/signal.h \
+ /usr/include/asm/signal.h /amoeba/src/util/amake/expr.h \
+ /amoeba/src/util/amake/builtin.h /amoeba/src/util/amake/objects.h \
+ /amoeba/src/util/amake/invoke.h /amoeba/src/util/amake/buffer.h \
+ /amoeba/src/util/amake/main.h /amoeba/src/util/amake/os.h \
+ /amoeba/src/util/amake/docmd.h /amoeba/src/util/amake/Lpars.h
+execute.o: /amoeba/src//util/amake/execute.c /usr/include/assert.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /usr/include/setjmp.h /usr/include/jmp_buf.h \
+ /usr/include/i386/jmp_buf.h /usr/include/signal.h \
+ /usr/include/sys/types.h /usr/include/linux/types.h \
+ /usr/include/linux/posix_types.h /usr/include/asm/posix_types.h \
+ /usr/include/asm/types.h /usr/include/sys/bitypes.h \
+ /usr/include/linux/signal.h /usr/include/asm/signal.h \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/alloc.h /amoeba/src/util/amake/slist.h \
+ /amoeba/src/util/amake/structdef.h /amoeba/src/util/amake/docmd.h \
+ /amoeba/src/util/amake/expr.h /amoeba/src/util/amake/builtin.h \
+ /amoeba/src/util/amake/idf.h /amoeba/src/util/amake/idf_pkg.spec \
+ /amoeba/src/util/amake/dbug.h /amoeba/src/util/amake/error.h \
+ /amoeba/src/util/amake/eval.h /amoeba/src/util/amake/type.h \
+ /amoeba/src/util/amake/scope.h /amoeba/src/util/amake/derive.h \
+ /amoeba/src/util/amake/Lpars.h /amoeba/src/util/amake/objects.h \
+ /amoeba/src/util/amake/main.h /amoeba/src/util/amake/os.h \
+ /amoeba/src/util/amake/execute.h
+objects.o: /amoeba/src//util/amake/objects.c /usr/include/assert.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/i586-pc-linux-gnulibc1/include/_G_config.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/standlib.h /amoeba/src/util/amake/alloc.h \
+ /amoeba/src/util/amake/idf.h /amoeba/src/util/amake/idf_pkg.spec \
+ /amoeba/src/util/amake/expr.h /amoeba/src/util/amake/Lpars.h \
+ /amoeba/src/util/amake/scope.h /amoeba/src/util/amake/structdef.h \
+ /amoeba/src/util/amake/derive.h /amoeba/src/util/amake/slist.h \
+ /amoeba/src/util/amake/dump.h /amoeba/src/util/amake/dbug.h \
+ /amoeba/src/util/amake/execute.h /usr/include/setjmp.h \
+ /usr/include/jmp_buf.h /usr/include/i386/jmp_buf.h \
+ /usr/include/signal.h /usr/include/sys/types.h \
+ /usr/include/linux/types.h /usr/include/linux/posix_types.h \
+ /usr/include/asm/posix_types.h /usr/include/asm/types.h \
+ /usr/include/sys/bitypes.h /usr/include/linux/signal.h \
+ /usr/include/asm/signal.h /amoeba/src/util/amake/eval.h \
+ /amoeba/src/util/amake/type.h /amoeba/src/util/amake/error.h \
+ /amoeba/src/util/amake/main.h /amoeba/src/util/amake/conversion.h \
+ /amoeba/src/util/amake/os.h /amoeba/src/util/amake/objects.h
+next.o: /amoeba/src//util/amake/next.c
+tokenname.o: /amoeba/src//util/amake/tokenname.c \
+ /amoeba/src/util/amake/global.h /amoeba/src/util/amake/typedefs.h \
+ /amoeba/src/util/amake/struct.def /usr/include/string.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/lib/gcc-lib/i586-pc-linux-gnulibc1/egcs-2.90.29/include/stddef.h \
+ /usr/include/stdlib.h /usr/include/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/alloca.h \
+ /amoeba/src/util/amake/Lpars.h /amoeba/src/util/amake/idf.h \
+ /amoeba/src/util/amake/idf_pkg.spec /usr/include/ctype.h \
+ /usr/include/endian.h /usr/include/bytesex.h
