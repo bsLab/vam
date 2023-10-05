@@ -1,0 +1,13 @@
+
+OCAML_VAM_TEMPL = {
+    $PWD/vam.tmpl
+};
+OCAML_VAMB_TEMPL = {
+    $PWD/vamb.tmpl
+};
+OCAML_XVAM_TEMPL = {
+    $PWD/xvam.tmpl
+};
+OCAML_VAMC_TEMPL = {
+    $PWD/vamc.tmpl
+};
