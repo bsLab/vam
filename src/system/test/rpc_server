@@ -1,0 +1,33 @@
+(*
+** RPC test program
+*)
+
+open Amoeba ;;
+open Stderr ;;
+open Stdcom ;;
+open Rpc ;;
+open Bytebuf ;;
+
+let bufsize = 1000000 ;;
+let port str = Port (let p = String.create port_SIZE in 
+                        let n = min port_SIZE (String.length str) in
+                        for i = 0 to n-1
+                        do
+                            p.[i] <- str.[i];
+                        done; p) 
+;;
+
+
+let _ =
+    let getport = port "Test" in
+    let buf = buf_create bufsize in
+    let dying = ref false in
+    while(!dying = false)
+    do
+        let err,reqsize,hdr = getreq (getport,buf,bufsize) in
+        if (hdr.h_size = 0) then
+            dying := true;
+        hdr.h_status <- std_OK;
+        ignore(putrep(hdr,nilbuf,0));
+    done;
+;;    
