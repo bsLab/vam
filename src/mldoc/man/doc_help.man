@@ -1,0 +1,81 @@
+  .MD
+    .NA doc_help .AN
+    .S4 .NA Description .AN
+    This is the .NA Help .AN frontend. It can be used to handle
+    .NA MlDoc .AN documents with various backend modules. First,
+    a document must be loaded. Either, you use the .NA atoms_of_file .AN
+    and the .NA tree_of_atoms .AN functions from .NA Doc_core .AN module,
+    finally loaded with .NA help_load .AN function,
+    or you use the .NA help_file .AN function to load a document.
+    .4S    
+    .IN
+      .IS
+        .NA h_sec .AN 
+        .AR .MU h_sec_keywords: string list .RA
+        .AR .MU h_sec_ds: structure_block ref .RA
+        .AR .MU h_sec_env: section_names list .RA
+        .AR .MU h_type: string .RA
+      .SI
+      .IS
+        .NA s_help .AN 
+        .AR .MU h_sections: h_sec list .RA
+        .AR .MU h_subsections: h_sec list .RA
+        .AR .MU h_units: h_sec list .RA
+        .AR .MU h_main: structure_block .RA
+      .SI
+      .IF
+        .NA help_of_doc .AN
+        .RV help: s_help .VR
+        .AR ~ds: structure_block .RA
+      .FI
+      .IF
+        .NA help_load .AN
+        .RV unit .VR
+        .AR ~ds: structure_block .RA
+      .FI
+      .IF
+        .NA help_file .AN
+        .RV unit .VR
+        .AR ~fname: string .RA
+      .FI
+      .IT
+        .NA help_Device .AN
+        .AR Help_TTY .(* Print to stdout .*) .RA
+        .AR Help_ASCII .(* Print to file: ASCII text .*) .RA
+        .AR Help_HTML .(* Print to file: HTML .*) .RA
+        .AR Help_LATEX .(* Print to file: Latex .*) .RA
+      .TI
+      .IF
+        .NA help_dev .AN
+        .RV unit .VR
+        .AR ~dev: help_device .RA
+      .FI
+      .IF
+        .NA help .AN
+        .RV unit .VR
+        .AR ~name: string .RA
+      .FI
+    .NI
+
+    The .NA help_dev .AN function can be used to change the
+    output device. Default is the .NA Help_TTY .AN device.
+    The .NA help .AN function uses  the  keyword or name string  to
+    search the help database. The search results
+    will be shown.
+
+    .EX
+      let at = atoms_of_file "mldoc.man" in
+      let ds = tree_of_atoms at in
+      help_load ds;
+    .XE
+
+    .S4
+      .NA Module dependencies .AN
+      .UL
+      .LI .NA Doc_core .AN .IL
+      .LI .NA Doc_html .AN .IL
+      .LI .NA Doc_latex .AN .IL
+      .LI .NA Doc_text .AN .IL
+      .LU
+    .4S
+  .DM
