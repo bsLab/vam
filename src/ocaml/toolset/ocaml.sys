@@ -1,0 +1,47 @@
+
+#
+# Build the VM and the toplevel system.
+#
+
+%generic vmbuild(vm_name,clibs)
+{
+    %default $vm_name;
+    %cluster
+    {
+        %targets    $vm_name[type = program];
+        %sources    $clibs;
+        %use        vm-build();
+    };
+};
+
+#
+# Cretae a new toplevel system
+#
+
+%generic maketop(top_name,vm_name,caml_libs)
+{
+    %default $top_name;
+    %cluster
+    {
+        %targets    $top_name[type = bytecode-top];
+        %sources    {$caml_libs};
+        %use        top-build(vmname => $vm_name);
+    };
+};
+
+
+
+#
+# Build a bytecode program without explicit C lib references.
+#
+
+%generic bytecode-exe(prog_name,camllibs,main)
+{
+    %default $prog_name;
+    %cluster
+    {
+        %targets    $prog_name[ type = bytecode-exe ];
+        %sources    {$camllibs,$main};
+    };
+};
+
