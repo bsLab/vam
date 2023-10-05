@@ -1,0 +1,266 @@
+#!/bin/bash
+
+##      ==================================
+##      OOOO   OOOO OOOO  O      O   OOOO
+##      O   O  O    O     O     O O  O   O
+##      O   O  O    O     O     O O  O   O
+##      OOOO   OOOO OOOO  O     OOO  OOOO
+##      O   O     O    O  O    O   O O   O
+##      O   O     O    O  O    O   O O   O
+##      OOOO   OOOO OOOO  OOOO O   O OOOO
+##      ================================== 
+##      BSSLAB, Dr. Stefan Bosse sci@bsslab.de
+##
+##    PROTECTED BY AND DISTRIBUTED UNDER THE TERMS OF: 
+##    Free Software Foundation-Europe, GNU GPL License, Version 2
+##
+##    $MODIFIEDBY:  BSSLAB
+##    $AUTHORS:     Stefan Bosse
+##    $INITIAL:     (C) 2003 BSSLAB
+##    $CREATED:     2003.11.25
+##    $VERSION:     1.02
+##
+##    $INFO:
+##
+##  VAM ML and C compiler, linker, archiver,... frontend 
+##
+##    $ENDOFINFO
+##
+
+
+version="1.01"
+
+if [ "X$VAMDIR" = "X" ] 
+then
+        VAMDIR=@VAMDIR@
+fi
+
+
+RM="rm"
+CC="gcc"
+VM="$VAMDIR/bin/vamrun"
+OCAMLC="$VAMDIR/ocamlsys/bin/ocamlc"
+PP="-pp $VAMDIR/toolset/cpp.sh"
+
+CFLAGS=
+MLFLAGS=-thread
+
+CSRC=
+MLSRC=
+MLISRC=
+
+COBJ=
+CLIB=
+MLOBJ=
+MLIOBJ=
+MLLIB=
+
+MLSTDINC="$VAMDIR/interface $VAMDIR/lib"
+MLSTDINC="$MLSTDINC $VAMDIR/ocamlsys/lib/ocaml"
+MLSTDINC="$MLSTDINC $VAMDIR/ocamlsys/lib/ocaml/threads"
+MLSTDINC="$MLSTDINC $VAMDIR/ocamlsys/lib/ocaml/sys"
+
+STDMLLIB="str.cma threads.cma "
+STDMLLIB="$STDMLLIB buffer.cma unix.cma debug.cma mandoc.cma os.cma "
+STDMLLIB="$STDMLLIB amoeba.cma server.cma ddi.cma linda.cma math.cma matrix.cma "
+STDMLLIB="$STDMLLIB math.cma shell.cma xlib.cma xcom.cma vxlib.cma test.cma "
+
+
+STDCLIBPATH=$VAMDIR/lib
+STDCLIB="libamoeba_ext.a libbuffer_ext.a libunix_ext.a libstr.a " 
+STDCLIB="$STDCLIB libddi_ext.a libtest_c.a "
+
+STDOCLIBPATH=$VAMDIR/ocamlsys/lib/ocaml
+STDOCLIB="libstr.a threads/libthreads.a"
+
+CLIBEXTRA="/amoeba/Amunix/lib/libamunix.a "
+CLIBEXTRA="$CLIBEXTRA /amoeba/Amunix/lib/libvm42.a "
+CLIBEXTRA="$CLIBEXTRA /amoeba/Amunix/lib/libpth.a "
+CLIBEXTRA="$CLIBEXTRA /amoeba/Amunix/lib/libpthread.a "
+
+INCPATHS="./ $MLSTDINC"
+LIBPATHS="./"
+
+OPTS=
+OUTPUT=
+USEPP=
+
+DEBUG=no
+CMODE=no
+MLMODE=no
+LINKMODE=no
+CUSTOMMODE=no
+VERBOSE=no
+VERSION=no
+BUILDVM=no
+ARCHIVE=no
+COMPILE=no
+INTERFACE=no
+NATIVE=no
+RUNTIME=$VAMDIR/bin/vamrun
+
+usage ()
+{
+    echo "VAM ML and C compiler, archiver and bytecode builder."
+    echo " (C) 2004 BSSLAB Dr. Stefan Bosse, version $version"
+    echo
+    echo "Some modes::"
+    echo " -i *.cmi :               Generate ML interface from implementation source"
+    echo " -c *.ml *.mli:           ML Compile mode"
+    echo " -c *.c:                  C Compile mode"
+    echo " -a -o <libname> *.cmo:   ML Archive mode"
+    echo " -a -o <libname> *.o:     C Archive mode"
+    echo " -build-vm :              ML: Build new custom VM"
+    echo " -custom :                ML: Custom mode"
+    echo " -usepp:                  ML: User preprocessor"
+    echo
+    echo " -o <progname> *.cmo *.cma:   Build byte code executable"
+    echo " -native ... :                Build standalone native program"
+    echo " -g:                      Debug mode"
+    echo
+    echo "OCAMLC::"
+    $OCAMLC --help
+    exit 1
+}
+
+# Parse options
+while [ $# -gt 0 ]
+do
+        case $1 in
+        "")             ;;
+        -h)             usage ;;
+        -help)          usage ;;
+        -o)             OUTPUT=$2; shift ;;
+        -l*)            CLIB="$CLIB $1";;
+        -L)             LIBPATHS="$LIBPATHS $2"; shift;;
+        -I)             INCPATHS="$INCPATHS $2"; shift;;
+        -g)             DEBUG=yes ;;
+        -v)             VERBOSE=yes ;;
+        -a)             ARCHIVE=yes ;;
+        -c)             COMPILE=yes ;;
+        -i)             INTERFACE=yes; MLMODE=yes;;
+        -usepp)         USEPP=$PP;;
+        -version)       VERSION=yes ;;
+        -custom)        CUSTOMMODE=yes ;;
+        -make-runtime)  BUILDVM=yes ;;
+        -use-runtime)   RUNTIME=$1; shift;;
+        -native)        NATIVE=yes;;
+        -build-vm)      BUILDVM=yes ;;
+        *.c)            CSRC="$CSRC $1";CMODE=yes;;
+        *.o)            COBJ="$COBJ $1" ;;
+        *.a)            CLIB="$CLIB $1" ;;
+        *.ml)           MLSRC="$MLSRC $1"; MLMODE=yes;;
+        *.mli)          MLISRC="$MLISRC $1"; MLMODE=yes;;
+        *.cmi)          MLIOBJ="$MLIOBJ $1" ;;
+        *.cmo)          MLOBJ="$MLOBJ $1";MLMODE=yes ;;
+        *.cma)          MLLIB="$MLLIB $1";MLMODE=yes ;;
+        -*)             OPTS="$OPTS $1" ;;      # also accept all other options
+        *)              echo "unrecognized argument [$1]" >&2; exit 1;;
+        esac
+        shift
+done
+
+if [ "X$OUTPUT" != "X" ]
+then
+    LINKMODE=yes
+fi
+
+if [ "$MLMODE" = yes ] 
+then
+    if [ "$CMODE" = yes ]
+    then
+        echo "vamc: MLMODE and CMODE both selected!"
+        exit 
+    fi
+    OPTS="$OPTS $MLFLAGS"
+    if [ "$DEBUG" = yes ]
+    then
+        OPTS="$OPTS -g"
+    fi
+    
+fi
+
+if [ "$VERBOSE" = "yes" ] 
+then
+    echo "CSRC=$CSRC"
+    echo "MLSRC=$MLSRC"
+    echo "MLISRC=$MLISRC"
+    echo "COBJ=$COBJ"
+    echo "MLOBJ=$MLOBJ"
+    echo "MLIOBJ=$MLIOBJ"
+    echo "CLIB=$CLIB"
+    echo "MLLIB=$MLLIB"
+
+    echo "LIBPATHS=$LIBPATHS"
+    echo "INCPATHS=$INCPATHS"
+    echo "Options=$OPTS"
+    echo "Output=$OUTPUT"
+fi
+
+if [ "$VERSION" = "yes" ] 
+then
+    $CC -v
+    $VM -b $OCAMLC -v
+fi
+
+export TOOLSET=$VAMDIR/toolset
+
+if [ "$MLMODE" = yes ]   
+then
+    INCL=""
+    for i in `echo $INCPATHS`
+    do
+        INCL="$INCL -I $i"  
+    done
+
+    if [ "$COMPILE" = yes ]   
+    then
+        $VM $OCAMLC -c $USEPP $OPTS $INCL $MLSRC $MLISRC
+    fi
+
+    if [ "$INTERFACE" = yes ]   
+    then
+        IN=$MLSRC
+        OUT=${IN/.ml/.mli}
+        OBJ=${IN/.ml/.cmo}
+        $VM $OCAMLC $USEPP $INCL -c -i $IN > $OUT
+        $RM $OBJ 2> /dev/null
+    fi
+
+    if [ "$LINKMODE" = yes ]
+    then
+        if [ "$NATIVE" = no ]
+        then
+            if [ "$VERBOSE" = yes ]
+            then
+                echo "$VM $OCAMLC -use-runtime $RUNTIME $INCL \
+                         $OPTS $MLLIB $STDMLLIB -o $OUTPUT $MLOBJ" 
+
+            fi
+            $VM $OCAMLC -use-runtime $RUNTIME $INCL \
+                         $OPTS $MLLIB $STDMLLIB -o $OUTPUT $MLOBJ
+        else
+            CLIBS=""
+            for i in `echo $STDOCLIB`
+            do
+                CLIBS="$CLIBS -cclib $STDOCLIBPATH/$i"  
+            done
+            for i in `echo $STDCLIB`
+            do
+                CLIBS="$CLIBS -cclib $STDCLIBPATH/$i"  
+            done
+            for i in `echo $CLIBEXTRA`
+            do
+                CLIBS="$CLIBS -cclib $i"  
+            done
+            if [ "$VERBOSE" = yes ]
+            then
+                echo $VM $OCAMLC -custom -use-runtime $RUNTIME $INCL \
+                    $OPTS $MLLIB $STDMLLIB $CLIBS -o $OUTPUT $MLOBJ
+            fi
+            $VM $OCAMLC -custom -use-runtime $RUNTIME $INCL \
+                    $OPTS $MLLIB $STDMLLIB $CLIBS -o $OUTPUT $MLOBJ
+            
+        fi
+    fi
+fi
