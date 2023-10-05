@@ -1,0 +1,109 @@
+_opt0={-fno-defer-pop, -Wall, -Wno-unused, -MD, -DAMOEBA, -g};
+_opt1={'-I/amoeba/Vam-2.0/ocamlsys/lib/ocaml/caml', '-I/amoeba/src/h', '-I/amoeba/src/h/server', '-I/amoeba/src/amunix/h', '-I/amoeba/src/h/class', '-I/amoeba/src/h/toolset/gnu-2-freebsd.amunix', '-I/amoeba/Amunix/include', '-include /amoeba/src/amunix/h/amuthr.h', '-include /amoeba/src/amunix/h/amuthr_unix.h'};
+_opt2={-g};
+_opt3={-g, -thread};
+_opt4={-I, interface, -I, '../../interface'};
+_opt5={-g, -thread};
+_opt6={-I, interface, -I, '../../interface'};
+_opt7={-g};
+_opt8={-fno-defer-pop, -Wall, -Wno-unused, -MD, -DAMOEBA, -g};
+_opt9={'-I/amoeba/Vam-2.0/ocamlsys/lib/ocaml/caml', '-I/amoeba/src/h', '-I/amoeba/src/h/server', '-I/amoeba/src/amunix/h', '-I/amoeba/src/h/class', '-I/amoeba/src/h/toolset/gnu-2-freebsd.amunix', '-I/amoeba/Amunix/include', '-include /amoeba/src/amunix/h/amuthr.h', '-include /amoeba/src/amunix/h/amuthr_unix.h'};
+_73=/amoeba/vam-2.0/src/matrix;
+_75=$_73/matrix.mli[cid=1121594599];
+_89=.Amake/version00;
+_57=/amoeba/Vam-2.0/ocamlsys/bin;
+_58=$_57/ocamlrun[cid=1119370181];
+_=ocaml-c-intf(
+	$_75[cid=1121606941],
+	$_89/matrix.cmi[cid=1121607164],
+	$_opt3,
+	{},
+	$_opt4,
+	$_58,
+	$_89/matrix.mli.d[cid=1121607164],
+	{},
+	{}
+)==%true;
+_76=$_73/matrix.ml[cid=1121594469];
+_52=/amoeba/vam-2.0/toolset;
+_53=$_52/ocamlmvcmi.sh[cid=1019717890];
+_=ocaml-c-impl(
+	$_76[cid=1121606936],
+	$_89/matrix.cmo[cid=1121607164],
+	$_opt3,
+	{},
+	$_opt4,
+	$_58,
+	$_53,
+	$_89/matrix.ml.d[cid=1121607164],
+	{$_75[cid=1121606941],$_75[cid=1121606941]},
+	{}
+)==%true;
+_=ocaml-ar(
+	{matrix.cmo[cid=1121607164]},
+	{matrix.cmi[cid=1121607164]},
+	$_89/matrix.cma[cid=1121607164],
+	{-custom,-cclib,-lmatrix_ext},
+	$_opt2,
+	$_58
+)==%true;
+_77=$_73/matrix_ext.c[cid=1121594803];
+_94=gcc[cid=0];
+_60=$_52/mkdep.sh[cid=1077447107];
+_30=/amoeba/src/amunix/h;
+_95=$_30/amuthr.h[cid=1082994999];
+_28=/amoeba/src/h;
+_96=$_28/amoeba.h[cid=1075028563];
+_32=/amoeba/src/h/toolset/gnu-2-freebsd.amunix;
+_97=$_32/am_types.h[cid=988132981];
+_99=/amoeba/src/h/toolset/gnu-2-freebsd.amunix/../generic;
+_100=$_99/am_types4.h[cid=986031350];
+_101=$_28/_ARGS.h[cid=986031353];
+_102=$_30/amuthr_unix.h[cid=1116775900];
+_103=/amoeba/src/h/sys;
+_104=$_103/debug.h[cid=988132980];
+_38=/amoeba/Vam-2.0/ocamlsys/lib/ocaml/caml;
+_105=$_38/mlvalues.h[cid=1113929209];
+_106=$_38/config.h[cid=1113929208];
+_107=$_38/misc.h[cid=1113929209];
+_108=/usr/include;
+_109=$_108/stddef.h[cid=1026975259];
+_110=/usr/include/machine;
+_111=$_110/ansi.h[cid=1026975258];
+_112=$_108/stdlib.h[cid=1026975259];
+_113=/usr/include/sys;
+_114=$_113/cdefs.h[cid=1026975258];
+_115=$_38/alloc.h[cid=1113929208];
+_116=$_38/custom.h[cid=1113929208];
+_117=$_38/callback.h[cid=1113929208];
+_118=$_38/memory.h[cid=1113929209];
+_119=$_38/gc.h[cid=1113929209];
+_120=$_38/major_gc.h[cid=1113929209];
+_121=$_38/freelist.h[cid=1113929209];
+_122=$_38/minor_gc.h[cid=1113929209];
+_123=$_38/signals.h[cid=1113929209];
+_124=$_38/fail.h[cid=1113929208];
+_125=$_108/setjmp.h[cid=1026975259];
+_126=$_110/setjmp.h[cid=1026975258];
+_127=$_108/stdio.h[cid=1026975259];
+_128=$_73/matrix.h[cid=1121594550];
+_=comp-cc(
+	$_77[cid=1121607179],
+	$_89/matrix_ext.o[cid=1121607180],
+	$_opt0,
+	{},
+	$_opt1,
+	$_94,
+	$_60,
+	$_89/matrix_ext.c.d[cid=1121607181],
+	{$_95,$_96,$_97,$_100,$_101,$_102,$_104,$_105,$_106,$_107,$_109,$_111,$_112,$_114,$_115,$_116,$_117,$_118,$_119,$_120,$_121,$_122,$_123,$_124,$_125,$_126,$_127,$_128[cid=1121603625]}
+)==%true;
+_90=ar[cid=0];
+_91=ranlib[cid=0];
+_=ar-cc(
+	{matrix_ext.o[cid=1121607180]},
+	$_89/libmatrix_ext.a[cid=1121607181],
+	{rc},
+	$_90,
+	$_91
+)==%true;
