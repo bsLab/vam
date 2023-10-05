@@ -1,0 +1,15 @@
+2005.5.29:
+    exceptions now caught in exec_control_obj and exec_stop_obj
+    exec_obj extented with log print fucntion exec_print
+
+2005.9.11:
+    added signal names
+
+2006.1.7:
+    exec_obj_XX: added 
+        obj.exec_stat <- Exec_down; 
+    after process termination
+    pro_setcomment added
+
+2006.1.15:
+    do_control modified (op exec_down during startup)
