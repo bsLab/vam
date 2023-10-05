@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#
+# Build an archive
+#
+
+if [ "X$VAMDIR" = "X" ] 
+then
+	VAMDIR=@VAMDIR@
+fi
+
+
+$VAMDIR/bin/vamrun -b $VAMDIR/ocamlsys/bin/ocamlc 	\
+	-I $VAMDIR/interface			\
+	-I $VAMDIR/lib				\
+	-I $VAMDIR/ocamlsys/lib/ocaml		\
+	-I $VAMDIR/ocamlsys/lib/ocaml/threads	\
+	-I $VAMDIR/ocamlsys/lib/ocaml/sys	\
+	-thread -a				\
+	$@
+
